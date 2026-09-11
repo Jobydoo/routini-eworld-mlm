@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Routini eWorld - Portail MLM Officiel Cosmétiques & Beauté</title>
+  <meta name="description" content="Portail officiel Routini eWorld pour la gestion du réseau MLM beauté, arbre généalogique, suivi des PV/SV, boutique cosmétique et commissions.">
+  
+  <!-- Polices Google Fonts & Icônes FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Feuille de style principale -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       Barre Rapide de Démonstration & Changement de Profil (En-tête supérieur)
+       ======================================================================== -->
+  <div class="quick-role-bar" id="quickRoleBar" style="display: none;">
+    <div class="role-info">
+      <span class="role-badge-tag" id="quickCurrentRoleTag">PROPRIÉTAIRE</span>
+      <span>Session active : <strong id="quickCurrentUserName">Direction Générale Routini (ADMIN001)</strong></span>
+    </div>
+    <div class="role-actions">
+      <span style="font-size: 0.75rem; opacity: 0.85;">Tester un profil :</span>
+      <button class="btn-switch-account owner-btn" data-target-code="ADMIN001" onclick="window.app.switchAccount('ADMIN001')">
+        <i class="fas fa-crown"></i> Direction (ADMIN001)
+      </button>
+      <button class="btn-switch-account" data-target-code="818204921" onclick="window.app.switchAccount('818204921')">
+        <i class="fas fa-gem"></i> Karim (Diamond 5%)
+      </button>
+      <button class="btn-switch-account" data-target-code="818205114" onclick="window.app.switchAccount('818205114')">
+        <i class="fas fa-award" style="color: #10b981;"></i> Fatima (Leader 2%)
+      </button>
+      <button class="btn-switch-account" data-target-code="818206330" onclick="window.app.switchAccount('818206330')">
+        <i class="fas fa-cubes" style="color: #0ea5e9;"></i> Mehdi (Builder 1%)
+      </button>
+      <button class="btn-switch-account" data-target-code="818209441" onclick="window.app.switchAccount('818209441')">
+        <i class="fas fa-user"></i> Youssef (Partner N1)
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Écran de Connexion & Authentification (Affiché si non connecté)
+       ======================================================================== -->
+  <section class="auth-wrapper" id="authSection">
+    <div class="auth-card" id="authCard">
+      <div class="auth-header">
+        <div class="brand-logo-area">
+          <div class="routini-logo-box">Routini</div>
+          <div class="routini-logo-text">
+            <h1>eWorld</h1>
+            <span>Cosmétiques & Soins d'Excellence</span>
+          </div>
+        </div>
+        <p>Portail Sécurisé Intégré des Distributeurs & de la Direction Générale</p>
+      </div>
+
+      <!-- Onglets d'accès (Distributeur vs Administrateur / Direction) -->
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab" id="tabDistributor">
+          <i class="fas fa-user-tie"></i> Espace Distributeur
+        </button>
+        <button type="button" class="auth-tab owner-tab active" id="tabOwner">
+          <i class="fas fa-crown"></i> Administrateur (Direction)
+        </button>
+      </div>
+
+      <div class="auth-body">
+        <form id="loginForm">
+          <div class="form-group">
+            <label id="authRoleLabel">Identifiant Administrateur ou Distributeur :</label>
+            <div class="input-with-icon">
+              <i class="fas fa-id-badge input-icon"></i>
+              <input type="text" id="authUsername" value="admin" placeholder="Ex: admin ou ADMIN001" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Mot de passe :</label>
+            <div class="input-with-icon">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" id="authPassword" value="admin123" placeholder="••••••••" required>
+            </div>
+          </div>
+
+          <div class="form-meta">
+            <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer;">
+              <input type="checkbox" checked> Mémoriser mes identifiants
+            </label>
+            <span style="font-size: 0.78rem; color: #64748b;">Réseau actif : 50 membres • 6 mois</span>
+          </div>
+
+          <button type="submit" class="btn-primary-auth btn-owner-auth" id="btnSubmitAuth">
+            <i class="fas fa-crown"></i> Connexion Direction Générale (Admin)
+          </button>
+
+          <!-- Boîte de Connexion Rapide Démo -->
+          <div class="quick-connect-box">
+            <p><i class="fas fa-bolt" style="color: #f59e0b;"></i> Connexion Rapide en 1-Clic :</p>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+              <button type="button" style="background: #0f172a; color: #fff; font-weight: 700;" onclick="window.authController.quickLogin('admin')">
+                👑 Connexion Admin (admin / admin123)
+              </button>
+              <button type="button" onclick="window.authController.quickLogin('818204921')">
+                💎 Karim Benali (Ambassador Casablanca)
+              </button>
+              <button type="button" onclick="window.authController.quickLogin('818205114')">
+                🌸 Fatima-Zahra (Ambassador Rabat)
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Disposition Principale de l'Application (Sidebar + Header + Vues)
+       ======================================================================== -->
+  <div class="app-layout" id="appMainLayout" style="display: none;">
+
+    <!-- Barre Latérale de Navigation (Sidebar) -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="sidebar-header">
+        <div class="routini-logo-box" style="padding: 2px 8px; font-size: 1.1rem;">R</div>
+        <div class="sidebar-brand-name">
+          Routini
+          <small>Cosmétiques & MLM</small>
+        </div>
+      </div>
+
+      <!-- Fiche Profil Utilisateur Connecté -->
+      <div class="sidebar-user-card">
+        <div class="user-avatar-circle" id="sidebarUserAvatar">K</div>
+        <div class="user-info-text">
+          <div class="name" id="sidebarUserName">Karim Benali</div>
+          <span class="code" id="sidebarUserCode">ID: 818204921</span>
+          <span class="rank-pill" id="sidebarUserRank">Star Diamond</span>
+        </div>
+      </div>
+
+      <!-- Menu de Navigation -->
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation Principale</div>
+
+        <a href="#" class="nav-item active" data-view="dashboard">
+          <i class="fas fa-th-large"></i>
+          <span>Tableau de Bord</span>
+        </a>
+
+        <a href="#" class="nav-item" data-view="genealogy">
+          <i class="fas fa-sitemap"></i>
+          <span>Arbre Généalogique</span>
+          <span class="nav-badge">Réseau</span>
+        </a>
+
+        <a href="#" class="nav-item" data-view="shop">
+          <i class="fas fa-spa"></i>
+          <span>Boutique Cosmétiques</span>
+        </a>
+
+        <a href="#" class="nav-item" data-view="bonus">
+          <i class="fas fa-wallet"></i>
+          <span>Commissions & E-Point</span>
+        </a>
+
+        <a href="#" class="nav-item" data-view="sponsor">
+          <i class="fas fa-user-plus"></i>
+          <span>Nouveau Distributeur</span>
+        </a>
+
+        <!-- Onglet Réservé Exclusivement au Propriétaire / Super Administrateur -->
+        <div class="nav-section-title" id="adminSectionHeader" style="margin-top: 14px;">Direction Routini</div>
+        <a href="#" class="nav-item admin-exclusive" id="navItemAdmin" data-view="admin">
+          <i class="fas fa-crown"></i>
+          <span>Direction Générale</span>
+          <span class="nav-badge" style="background: var(--rtn-rose);">Owner</span>
+        </a>
+      </nav>
+
+      <!-- Pied de Barre Latérale -->
+      <div class="sidebar-footer">
+        <button class="btn-logout" id="btnLogout">
+          <i class="fas fa-power-off"></i>
+          <span>Déconnexion</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Zone de Contenu Principale -->
+    <main class="main-wrapper">
+
+      <!-- En-tête Supérieur Fixe -->
+      <header class="main-header">
+        <div class="header-left">
+          <button class="btn-toggle-sidebar" id="btnToggleSidebar" aria-label="Menu Mobile">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="header-page-title">
+            <h2 id="headerTitleText">Tableau de Bord eWorld</h2>
+            <p id="headerDescText">Aperçu général de vos performances et qualifications Routini</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Sélecteur de Devise -->
+          <div class="currency-selector-badge" title="Changer la devise d'affichage">
+            <i class="fas fa-coins" style="color: var(--rtn-gold); margin-right: 4px;"></i>
+            <select id="currencySelect">
+              <option value="DH">MAD (DH)</option>
+              <option value="EUR">EUR (€)</option>
+            </select>
+          </div>
+
+          <!-- Solde Portefeuille E-Point Rapide -->
+          <div class="header-quick-wallet" title="Solde de votre portefeuille E-Point" onclick="window.app.switchView('bonus')" style="cursor: pointer;">
+            <i class="fas fa-wallet"></i>
+            <span id="headerWalletAmount">19 850,00 DH</span>
+          </div>
+
+          <!-- Indicateur Langue -->
+          <div class="lang-badge" title="Langue officielle du portail">
+            <span style="font-size: 1rem; margin-right: 4px;">🇲🇦</span>
+            <span>FR</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Corps Dynamique de la Page -->
+      <div class="page-content">
+
+        <!-- ==================================================================
+             VUE 1 : Tableau de Bord (Dashboard eWorld)
+             ================================================================== -->
+        <section class="view-panel" id="view-dashboard">
+          
+          <!-- Bannière de Qualification au Rang Supérieur -->
+          <div class="qualification-banner">
+            <div class="qualif-left">
+              <h3><i class="fas fa-trophy" style="color: #fbbf24;"></i> Statut de Qualification Mensuelle</h3>
+              <p>Objectif vers le prochain palier d'honneur : <strong id="dashNextRankName">Star Ruby</strong></p>
+            </div>
+            <div class="qualif-progress-box">
+              <div class="progress-labels">
+                <span>Progression PGPV</span>
+                <span id="dashQualifText">85% complété</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="dashQualifFill" style="width: 85%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grille des Métriques Clés MLM -->
+          <div class="metrics-grid">
+            <div class="metric-card card-ppv">
+              <div class="metric-header">
+                <span class="metric-title">Points Personnels (PPV)</span>
+                <div class="metric-icon"><i class="fas fa-spa"></i></div>
+              </div>
+              <div class="metric-value" id="dashPPV">320 PV</div>
+              <div class="metric-meta"><span class="badge-success">● Distributeur Actif Qualifié</span></div>
+            </div>
+
+            <div class="metric-card card-gpv">
+              <div class="metric-header">
+                <span class="metric-title">Volume Équipe (PV)</span>
+                <div class="metric-icon"><i class="fas fa-network-wired"></i></div>
+              </div>
+              <div class="metric-value" id="dashGPV">16 850 PV</div>
+              <div class="metric-meta" id="dashDownlinesCount">Descendance active</div>
+            </div>
+
+            <div class="metric-card card-sv">
+              <div class="metric-header">
+                <span class="metric-title">Base Commissions (SV / CV)</span>
+                <div class="metric-icon"><i class="fas fa-receipt"></i></div>
+              </div>
+              <div class="metric-value" id="dashSV">8 420 SV/CV</div>
+              <div class="metric-meta">Base officielle N1/N2/N3 & Leadership</div>
+            </div>
+
+            <div class="metric-card card-wallet">
+              <div class="metric-header">
+                <span class="metric-title">Portefeuille E-Point</span>
+                <div class="metric-icon"><i class="fas fa-coins"></i></div>
+              </div>
+              <div class="metric-value" id="dashWallet">19 850,00 DH</div>
+              <div class="metric-meta"><span class="badge-success">Disponible immédiatement</span></div>
+            </div>
+          </div>
+
+          <!-- Raccourcis Rapides & Dernières Commandes -->
+          <div class="data-table-card">
+            <div class="table-header-bar">
+              <h3>Dernières Commandes Cosmétiques Validées</h3>
+              <button class="btn-switch-account" onclick="window.app.switchView('shop')">
+                <i class="fas fa-plus"></i> Commander des Cosmétiques
+              </button>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Réf. Commande</th>
+                    <th>Date</th>
+                    <th>Distributeur</th>
+                    <th>Points (PV)</th>
+                    <th>Montant Payé</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody id="dashRecentOrdersBody">
+                  <!-- Rempli dynamiquement par app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VUE 2 : Arbre Généalogique & Gestion du Réseau (Genealogy Tree)
+             ================================================================== -->
+        <section class="view-panel" id="view-genealogy" style="display: none;">
+          <div class="genealogy-container">
+            <div class="genealogy-toolbar">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Rechercher un partenaire ou code..." oninput="window.genealogyController.setSearch(this.value)">
+              </div>
+
+              <div class="genealogy-view-switch">
+                <button class="view-btn active" id="btnViewTree" onclick="window.genealogyController.setViewMode('tree'); this.classList.add('active'); document.getElementById('btnViewTable').classList.remove('active');">
+                  <i class="fas fa-project-diagram"></i> Arbre Graphique
+                </button>
+                <button class="view-btn" id="btnViewTable" onclick="window.genealogyController.setViewMode('table'); this.classList.add('active'); document.getElementById('btnViewTree').classList.remove('active');">
+                  <i class="fas fa-table"></i> Tableau Descendance
+                </button>
+              </div>
+            </div>
+
+            <!-- Espace d'affichage de l'arbre -->
+            <div id="genealogyContentArea">
+              <!-- Rendu par genealogy.js -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VUE 3 : Boutique Routini Cosmétiques (E-Shop & Points PV/SV)
+             ================================================================== -->
+        <section class="view-panel" id="view-shop" style="display: none;">
+          <div class="shop-layout">
+            <div>
+              <!-- Filtres de Catégories Cosmétiques -->
+              <div class="products-filter-bar">
+                <button class="filter-pill active" onclick="window.shopController.setCategory('Tous'); document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active')); this.classList.add('active');">
+                  Tous les Articles
+                </button>
+                <button class="filter-pill" style="border: 1.5px solid #f59e0b; font-weight: 800; color: #b45309;" onclick="window.shopController.setCategory('Packs & Rituels'); document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active')); this.classList.add('active');">
+                  🎁 Packs & Rituels Beauté
+                </button>
+                <button class="filter-pill" onclick="window.shopController.setCategory('Soins Visage'); document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active')); this.classList.add('active');">
+                  ✨ Soins Visage & Sérums
+                </button>
+                <button class="filter-pill" onclick="window.shopController.setCategory('Anti-Âge'); document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active')); this.classList.add('active');">
+                  🌙 Anti-Âge & Nuit
+                </button>
+                <button class="filter-pill" onclick="window.shopController.setCategory('Huiles Précieuses'); document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active')); this.classList.add('active');">
+                  🌹 Huile d'Argan Pure
+                </button>
+                <button class="filter-pill" onclick="window.shopController.setCategory('Soins Corps'); document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active')); this.classList.add('active');">
+                  🧴 Soins Corps & Rituels
+                </button>
+              </div>
+
+              <!-- Grille des Produits Cosmétiques -->
+              <div class="products-grid" id="shopProductsGrid">
+                <!-- Rempli par shop.js -->
+              </div>
+            </div>
+
+            <!-- Panier Flottant -->
+            <div id="shopCartContainer">
+              <!-- Rempli par shop.js -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VUE 4 : Portefeuille E-Point & Commissions MLM
+             ================================================================== -->
+        <section class="view-panel" id="view-bonus" style="display: none;">
+          <div id="bonusContentArea">
+            <!-- Rempli par bonus.js -->
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VUE 5 : Inscription & Parrainage Nouveau Membre
+             ================================================================== -->
+        <section class="view-panel" id="view-sponsor" style="display: none;">
+          <div class="sponsor-form-card">
+            <div class="form-section-banner">
+              <h3><i class="fas fa-user-plus"></i> Formulaire d'Adhésion Partenaire ROUTINE ONE PLAN</h3>
+              <p>Rattachez un nouveau distributeur sous votre parrainage. Conformément aux principes Routine : <strong>Inscription = 0 DH</strong> (pas de recrutement payé). L'achat d'un pack de démarrage est optionnel.</p>
+            </div>
+
+            <form id="formRegisterMember">
+              <input type="hidden" id="selectedKitPV" value="0">
+              <input type="hidden" id="selectedKitSV" value="0">
+
+              <!-- Section Parrainage -->
+              <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 14px; color: var(--rtn-navy);">1. Informations sur le Parrain (Sponsor)</h4>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Code Parrain :</label>
+                  <input type="text" id="sponsorCodeInput" class="form-control" readonly style="background: #f1f5f9; font-weight: 700;">
+                </div>
+                <div class="form-group">
+                  <label>Nom du Parrain :</label>
+                  <input type="text" id="sponsorNameDisplay" class="form-control" readonly style="background: #f1f5f9; font-weight: 700;">
+                </div>
+              </div>
+
+              <!-- Section Candidat -->
+              <h4 style="font-size: 0.95rem; font-weight: 700; margin: 20px 0 14px; color: var(--rtn-navy);">2. Informations Personnelles du Nouveau Partenaire</h4>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Nom Complet (CIN / Passeport) :</label>
+                  <input type="text" id="newMemberFullName" class="form-control" placeholder="Ex: Kenza Bennani" required>
+                </div>
+                <div class="form-group">
+                  <label>Adresse Email :</label>
+                  <input type="email" id="newMemberEmail" class="form-control" placeholder="kenza.bennani@email.com" required>
+                </div>
+              </div>
+
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label>Numéro de Téléphone :</label>
+                  <input type="tel" id="newMemberPhone" class="form-control" placeholder="+212 600 000000" required>
+                </div>
+                <div class="form-group">
+                  <label>Ville de Résidence :</label>
+                  <input type="text" id="newMemberCity" class="form-control" placeholder="Casablanca" required>
+                </div>
+                <div class="form-group">
+                  <label>Pays :</label>
+                  <input type="text" class="form-control" value="Maroc" readonly style="background: #f1f5f9;">
+                </div>
+              </div>
+
+              <!-- Section Choix du Kit ou Inscription Gratuite (Slide 2 & 12) -->
+              <h4 style="font-size: 0.95rem; font-weight: 700; margin: 20px 0 6px; color: var(--rtn-navy);">3. Formule d'Adhésion Beauté (0 DH ou avec Pack de Démarrage)</h4>
+              <p style="font-size: 0.8rem; color: #64748b;">La sélection d'un pack crédite instantanément les PV de qualification et le SV de commission.</p>
+
+              <div class="kit-cards-grid">
+                <div class="kit-card selected" data-pv="0" data-sv="0">
+                  <span class="kit-badge" style="background:#15803d; color:#fff;">Officiel 0 DH</span>
+                  <div class="kit-title">Adhésion Standard (0 DH)</div>
+                  <div class="kit-price">0 DH</div>
+                  <div class="kit-pv">Activation Immédiate</div>
+                  <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Inscription 100% gratuite. Le partenaire pourra commander ses soins et débuter ses ventes sans frais d'entrée.</p>
+                </div>
+
+                <div class="kit-card" data-pv="100" data-sv="420">
+                  <span class="kit-badge">Recommandé</span>
+                  <div class="kit-title">Pack Routine Glow Découverte</div>
+                  <div class="kit-price">740 DH (DP)</div>
+                  <div class="kit-pv">+100 PV • 420 SV</div>
+                  <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Comprend : Sérum Vitamine C, Crème Jour SPF 30, Eau Micellaire + Trousse Routini.</p>
+                </div>
+
+                <div class="kit-card" data-pv="200" data-sv="840">
+                  <span class="kit-badge" style="background: var(--rtn-rose);">Populaire</span>
+                  <div class="kit-title">Pack Rituel Anti-Âge Suprême</div>
+                  <div class="kit-price">1 460 DH (DP)</div>
+                  <div class="kit-pv">+200 PV • 840 SV</div>
+                  <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Comprend : Crème Nuit Rétinol, Huile Précieuse d'Argan, Masque Argile Rose, Contour Yeux.</p>
+                </div>
+
+                <div class="kit-card" data-pv="500" data-sv="2150">
+                  <span class="kit-badge" style="background: var(--rtn-gold); color: #000;">Master Pro</span>
+                  <div class="kit-title">Pack Ambassadrice Institut</div>
+                  <div class="kit-price">3 600 DH (DP)</div>
+                  <div class="kit-pv">+500 PV • 2 150 SV</div>
+                  <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Gamme complète en double exemplaire pour présentations, démonstrations et vente directe.</p>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+                <button type="submit" class="btn-primary-auth" style="width: auto; padding: 12px 32px;">
+                  <i class="fas fa-check-circle"></i> Valider l'Adhésion & Attribuer le Code Partenaire
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VUE 6 : Espace Propriétaire / Super Administrateur (Admin Back-Office)
+             ================================================================== -->
+        <section class="view-panel" id="view-admin" style="display: none;">
+          <div id="adminContentArea">
+            <!-- Rempli par admin.js -->
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       Modale Générique Réutilisable
+       ======================================================================== -->
+  <div class="modal-overlay" id="appModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modalTitle">Titre de la fenêtre</h3>
+        <button class="btn-close-modal" id="btnCloseModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Contenu dynamique injecté -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Conteneur des Toasts -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts JS Applicatifs (Modulaires) -->
+  <script src="js/mock_data.js?v=8.0"></script>
+  <script src="js/state.js?v=8.0"></script>
+  <script src="js/auth.js?v=8.0"></script>
+  <script src="js/genealogy.js?v=8.0"></script>
+  <script src="js/shop.js?v=8.0"></script>
+  <script src="js/bonus.js?v=8.0"></script>
+  <script src="js/admin.js?v=8.0"></script>
+  <script src="js/app.js?v=8.0"></script>
+</body>
+</html>
