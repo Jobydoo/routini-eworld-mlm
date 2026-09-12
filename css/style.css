@@ -1710,6 +1710,12 @@ html, body {
   visibility: visible;
 }
 
+#modalRegisterClient.active {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 .modal-container {
   background: var(--bg-surface);
   border-radius: var(--radius-xl);

@@ -93,46 +93,17 @@ class AuthController {
     const btnCancelClientReg = document.getElementById('btnCancelClientRegister');
     const formRegisterClient = document.getElementById('formRegisterClient');
 
-    const openModal = () => { if (modalClientReg) modalClientReg.style.display = 'flex'; };
-    const closeModal = () => { if (modalClientReg) modalClientReg.style.display = 'none'; };
-
-    if (btnOpenClientReg) btnOpenClientReg.addEventListener('click', openModal);
-    if (btnCloseClientReg) btnCloseClientReg.addEventListener('click', closeModal);
-    if (btnCancelClientReg) btnCancelClientReg.addEventListener('click', closeModal);
+    if (btnOpenClientReg) btnOpenClientReg.addEventListener('click', () => this.openClientRegisterModal());
+    if (btnCloseClientReg) btnCloseClientReg.addEventListener('click', () => this.closeClientRegisterModal());
+    if (btnCancelClientReg) btnCancelClientReg.addEventListener('click', () => this.closeClientRegisterModal());
     if (modalClientReg) {
       modalClientReg.addEventListener('click', (e) => {
-        if (e.target === modalClientReg) closeModal();
+        if (e.target === modalClientReg) this.closeClientRegisterModal();
       });
     }
 
     if (formRegisterClient) {
-      formRegisterClient.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const fullName = document.getElementById('regClientName').value.trim();
-        const email = document.getElementById('regClientEmail').value.trim();
-        const password = document.getElementById('regClientPassword').value.trim();
-        const phone = document.getElementById('regClientPhone').value.trim();
-        const city = document.getElementById('regClientCity').value.trim();
-        const address = document.getElementById('regClientAddress').value.trim();
-
-        const result = window.stateManager.registerDirectClient({
-          fullName,
-          email,
-          password,
-          phone,
-          city,
-          address
-        });
-
-        if (result.success) {
-          closeModal();
-          formRegisterClient.reset();
-          window.app.showToast(result.message, 'success');
-          this.handleSuccessfulAuth();
-        } else {
-          window.app.showToast(result.message, 'error');
-        }
-      });
+      formRegisterClient.addEventListener('submit', (e) => this.handleClientRegisterSubmit(e));
     }
 
     // Soumission du formulaire de connexion
@@ -197,6 +168,55 @@ class AuthController {
       window.app.switchView('admin');
     } else {
       window.app.switchView('dashboard');
+    }
+  }
+
+  openClientRegisterModal() {
+    const modal = document.getElementById('modalRegisterClient');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.add('active');
+    }
+  }
+
+  closeClientRegisterModal() {
+    const modal = document.getElementById('modalRegisterClient');
+    if (modal) {
+      modal.classList.remove('active');
+      setTimeout(() => {
+        if (!modal.classList.contains('active')) {
+          modal.style.display = 'none';
+        }
+      }, 200);
+    }
+  }
+
+  handleClientRegisterSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const fullName = document.getElementById('regClientName').value.trim();
+    const email = document.getElementById('regClientEmail').value.trim();
+    const password = document.getElementById('regClientPassword').value.trim();
+    const phone = document.getElementById('regClientPhone').value.trim();
+    const city = document.getElementById('regClientCity').value.trim();
+    const address = document.getElementById('regClientAddress').value.trim();
+
+    const result = window.stateManager.registerDirectClient({
+      fullName,
+      email,
+      password,
+      phone,
+      city,
+      address
+    });
+
+    if (result.success) {
+      this.closeClientRegisterModal();
+      const form = document.getElementById('formRegisterClient');
+      if (form) form.reset();
+      window.app.showToast(result.message, 'success');
+      this.handleSuccessfulAuth();
+    } else {
+      window.app.showToast(result.message, 'error');
     }
   }
 
