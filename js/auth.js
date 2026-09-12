@@ -186,10 +186,9 @@ class AuthController {
     document.getElementById('authSection').style.display = 'none';
     document.getElementById('appMainLayout').style.display = 'flex';
 
-    // Règle stricte de confidentialité : Seul le propriétaire peut voir la barre de changement rapide
     const quickBar = document.getElementById('quickRoleBar');
     if (quickBar) {
-      quickBar.style.display = window.stateManager.isOwner() ? 'flex' : 'none';
+      quickBar.style.display = 'flex';
     }
 
     window.app.renderAllViews();

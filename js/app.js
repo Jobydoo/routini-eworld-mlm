@@ -23,7 +23,7 @@ class App {
       document.getElementById('appMainLayout').style.display = 'flex';
       const quickBar = document.getElementById('quickRoleBar');
       if (quickBar) {
-        quickBar.style.display = window.stateManager.isOwner() ? 'flex' : 'none';
+        quickBar.style.display = 'flex';
       }
       this.renderAllViews();
       this.switchView('dashboard');
@@ -270,13 +270,11 @@ class App {
 
   updateQuickRoleBar() {
     const quickBar = document.getElementById('quickRoleBar');
-    const isOwner = window.stateManager.isOwner();
+    if (!quickBar) return;
 
-    // Règle de confidentialité : La barre de switch rapide n'est visible que pour la Direction
-    if (quickBar) {
-      quickBar.style.display = isOwner ? 'flex' : 'none';
-    }
-    if (!isOwner) return;
+    // Toujours garder la barre rapide active dès qu'une session existe,
+    // afin de pouvoir tester tous les profils et passer de l'un à l'autre en 1 clic
+    quickBar.style.display = 'flex';
 
     const currentUser = window.stateManager.currentUser;
     const currentNameEl = document.getElementById('quickCurrentUserName');
@@ -288,17 +286,22 @@ class App {
         currentRoleTag.textContent = 'DIRECTION FONDATRICE';
         currentRoleTag.style.background = '#0f172a';
       } else if (currentUser.role === 'client') {
-        currentRoleTag.textContent = 'CLIENT PRIVILÈGE DIRECT';
+        currentRoleTag.textContent = 'CLIENT PRIVILÈGE (SANS ARBRE)';
         currentRoleTag.style.background = '#be185d';
       } else {
-        currentRoleTag.textContent = `${currentUser.rankCode} — ONE PLAN V4`;
-        currentRoleTag.style.background = '#be185d';
+        const rate = currentUser.rankCode === 'AMBASSADOR' ? '7%' :
+                     currentUser.rankCode === 'DIAMOND' ? '5%' :
+                     currentUser.rankCode === 'MANAGER' ? '3%' :
+                     currentUser.rankCode === 'LEADER' ? '2%' :
+                     currentUser.rankCode === 'BUILDER' ? '1%' : 'N1 (10% CV)';
+        currentRoleTag.textContent = `${currentUser.rankCode} (${rate}) — V4`;
+        currentRoleTag.style.background = currentUser.rankCode === 'BUILDER' ? '#0ea5e9' : '#0284c7';
       }
     }
 
     document.querySelectorAll('.btn-switch-account').forEach(btn => {
       const target = btn.getAttribute('data-target-code');
-      if (target && currentUser && target === currentUser.code) {
+      if (target && currentUser && (target === currentUser.code || target === currentUser.id)) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
@@ -309,8 +312,28 @@ class App {
   switchAccount(code) {
     const success = window.stateManager.setCurrentUser(code);
     if (success) {
-      this.renderAllViews();
-      this.showToast(`Profil activé : ${window.stateManager.currentUser.name} (${window.stateManager.currentUser.rankName || window.stateManager.currentUser.rankCode})`, 'success');
+      const user = window.stateManager.currentUser;
+      
+      // Redirection intelligente selon les autorisations du profil sélectionné
+      if (window.stateManager.isClient()) {
+        this.switchView('dashboard');
+      } else if (window.stateManager.isOwner()) {
+        if (this.currentView === 'admin' || !this.currentView) {
+          this.switchView('admin');
+        } else {
+          this.renderAllViews();
+        }
+      } else {
+        // Si un distributeur était sur l'écran admin, le basculer sur le dashboard
+        if (this.currentView === 'admin') {
+          this.switchView('dashboard');
+        } else {
+          this.renderAllViews();
+        }
+      }
+
+      this.updateQuickRoleBar();
+      this.showToast(`Profil activé : ${user.name} (${user.rankName || user.rankCode})`, 'success');
     }
   }
 
