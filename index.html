@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Routini eWorld - Portail MLM Officiel Cosmétiques & Beauté</title>
-  <meta name="description" content="Portail officiel Routini eWorld pour la gestion du réseau MLM beauté, arbre généalogique, suivi des PV/SV, boutique cosmétique et commissions.">
+  <title>Routini eWorld - ROUTINI ONE PLAN (Version 4 • Septembre 2026)</title>
+  <meta name="description" content="Portail officiel Routini eWorld pour la gestion du réseau MLM beauté, arbre généalogique, suivi des PV/CV, boutique cosmétique et commissions selon le ROUTINI ONE PLAN Version 4.">
   
   <!-- Polices Google Fonts & Icônes FontAwesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
 <body>
 
   <!-- ========================================================================
-       Barre Rapide de Démonstration & Changement de Profil (En-tête supérieur)
+       Barre Rapide de Démonstration & Changement de Profil (En-tête supérieur V4)
        ======================================================================== -->
   <div class="quick-role-bar" id="quickRoleBar" style="display: none;">
     <div class="role-info">
@@ -26,21 +26,30 @@
       <span>Session active : <strong id="quickCurrentUserName">Direction Générale Routini (ADMIN001)</strong></span>
     </div>
     <div class="role-actions">
-      <span style="font-size: 0.75rem; opacity: 0.85;">Tester un profil :</span>
+      <span style="font-size: 0.75rem; opacity: 0.85;">Tester un profil V4 :</span>
       <button class="btn-switch-account owner-btn" data-target-code="ADMIN001" onclick="window.app.switchAccount('ADMIN001')">
-        <i class="fas fa-crown"></i> Direction (ADMIN001)
+        <i class="fas fa-crown"></i> Direction (ADMIN)
       </button>
       <button class="btn-switch-account" data-target-code="818204921" onclick="window.app.switchAccount('818204921')">
-        <i class="fas fa-gem"></i> Karim (Diamond 5%)
-      </button>
-      <button class="btn-switch-account" data-target-code="818205114" onclick="window.app.switchAccount('818205114')">
-        <i class="fas fa-award" style="color: #10b981;"></i> Fatima (Leader 2%)
+        <i class="fas fa-gem" style="color: #ec4899;"></i> Karim (Ambassador 7%)
       </button>
       <button class="btn-switch-account" data-target-code="818206330" onclick="window.app.switchAccount('818206330')">
-        <i class="fas fa-cubes" style="color: #0ea5e9;"></i> Mehdi (Builder 1%)
+        <i class="fas fa-gem" style="color: #3b82f6;"></i> Mehdi (Diamond 5%)
       </button>
-      <button class="btn-switch-account" data-target-code="818209441" onclick="window.app.switchAccount('818209441')">
-        <i class="fas fa-user"></i> Youssef (Partner N1)
+      <button class="btn-switch-account" data-target-code="818210552" onclick="window.app.switchAccount('818210552')">
+        <i class="fas fa-star" style="color: #f59e0b;"></i> Nadia (Manager 3%)
+      </button>
+      <button class="btn-switch-account" data-target-code="818217123" onclick="window.app.switchAccount('818217123')">
+        <i class="fas fa-award" style="color: #10b981;"></i> Siham (Leader 2%)
+      </button>
+      <button class="btn-switch-account" data-target-code="818229345" onclick="window.app.switchAccount('818229345')">
+        <i class="fas fa-cubes" style="color: #0ea5e9;"></i> Ibtissam (Builder 1%)
+      </button>
+      <button class="btn-switch-account" data-target-code="818243789" onclick="window.app.switchAccount('818243789')">
+        <i class="fas fa-user-check" style="color: #22c55e;"></i> Najat (Partner Actif)
+      </button>
+      <button class="btn-switch-account" style="border-color: #fca5a5; background: #fff1f2;" data-target-code="818252678" onclick="window.app.switchAccount('818252678')" title="Tester la règle de non-versement pour activité < 50 PV (Slide 8/15)">
+        <i class="fas fa-user-clock" style="color: #ef4444;"></i> Driss (Inactif < 50 PV)
       </button>
     </div>
   </div>
@@ -61,18 +70,53 @@
         <p>Portail Sécurisé Intégré des Distributeurs & de la Direction Générale</p>
       </div>
 
-      <!-- Onglets d'accès (Distributeur vs Administrateur / Direction) -->
-      <div class="auth-tabs">
+      <!-- Onglets d'accès (Client Direct vs Distributeur vs Administrateur / Direction) -->
+      <div class="auth-tabs" id="authTabsContainer">
+        <button type="button" class="auth-tab client-tab" id="tabClient">
+          <i class="fas fa-shopping-bag"></i> Espace Client
+        </button>
         <button type="button" class="auth-tab" id="tabDistributor">
           <i class="fas fa-user-tie"></i> Espace Distributeur
         </button>
         <button type="button" class="auth-tab owner-tab active" id="tabOwner">
-          <i class="fas fa-crown"></i> Administrateur (Direction)
+          <i class="fas fa-crown"></i> Direction Générale
         </button>
       </div>
 
       <div class="auth-body">
+        <!-- Bannière incitative création de compte Client Direct sans arbre -->
+        <div id="clientRegisterPromo" style="display: none; background: #fdf2f8; border: 1.5px dashed #f472b6; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; text-align: center;">
+          <p style="font-size: 0.84rem; color: #9d174d; font-weight: 700; margin-bottom: 4px;">
+            ✨ Nouveau Client Privilège Routini ?
+          </p>
+          <p style="font-size: 0.74rem; color: #64748b; margin-bottom: 8px;">
+            Commandez directement sans parrainage ni réseau MLM.<br>
+            <strong>+50 points fidélité offerts</strong> immédiatement à l'inscription !
+          </p>
+          <button type="button" id="btnOpenClientRegister" class="btn-client-action" style="padding: 7px 16px; font-size: 0.8rem; margin: 0 auto; width: auto;">
+            <i class="fas fa-user-plus"></i> Créer mon Compte Client (Gratuit)
+          </button>
+        </div>
+
         <form id="loginForm">
+          <!-- Sélecteur Rapide Démo pour Présentation Client -->
+          <div class="form-group" id="demoClientSelectWrapper" style="display: none; background: #fdf2f8; padding: 12px; border-radius: 8px; border: 1.5px solid var(--rtn-rose-light); margin-bottom: 16px;">
+            <label style="color: var(--rtn-rose-dark); font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+              <i class="fas fa-magic"></i> Choisir un profil client pour tester :
+            </label>
+            <select id="demoClientSelect" class="form-control" style="font-size: 0.82rem; margin-top: 4px; padding: 8px 10px; border: 1px solid var(--rtn-rose);">
+              <option value="818204921" selected>💎 Karim Benali (Ambassador 7% • Casablanca)</option>
+              <option value="818205114">🌸 Fatima-Zahra El Amrani (Ambassador 7% • Rabat)</option>
+              <option value="818206330">💎 Mehdi Alami (Diamond 5% • Marrakech)</option>
+              <option value="818210552">⭐ Nadia Mansouri (Manager 3% • Fès)</option>
+              <option value="818217123">🌿 Siham Tazi (Leader 2% • Tanger)</option>
+              <option value="818229345">📦 Ibtissam Fassi (Builder 1% • Agadir)</option>
+              <option value="818243789">✅ Najat Bennani (Partner Actif 50 PV • Meknès)</option>
+              <option value="818252678">⏳ Driss Chraibi (Partner Inactif &lt; 50 PV • Oujda)</option>
+            </select>
+            <small style="color: #64748b; font-size: 0.72rem; display: block; margin-top: 4px;">Pré-remplit automatiquement le code et le mot de passe du partenaire.</small>
+          </div>
+
           <div class="form-group">
             <label id="authRoleLabel">Identifiant Administrateur ou Distributeur :</label>
             <div class="input-with-icon">
@@ -104,14 +148,23 @@
           <div class="quick-connect-box">
             <p><i class="fas fa-bolt" style="color: #f59e0b;"></i> Connexion Rapide en 1-Clic :</p>
             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+              <button type="button" style="background: #fdf2f8; color: #9d174d; border: 1.5px solid #f472b6; font-weight: 700;" onclick="window.authController.quickLogin('CLT-818101')">
+                🛍️ Salma (Client Direct)
+              </button>
               <button type="button" style="background: #0f172a; color: #fff; font-weight: 700;" onclick="window.authController.quickLogin('admin')">
-                👑 Connexion Admin (admin / admin123)
+                👑 Admin (Direction)
               </button>
               <button type="button" onclick="window.authController.quickLogin('818204921')">
-                💎 Karim Benali (Ambassador Casablanca)
+                💎 Karim (Ambassador)
               </button>
-              <button type="button" onclick="window.authController.quickLogin('818205114')">
-                🌸 Fatima-Zahra (Ambassador Rabat)
+              <button type="button" onclick="window.authController.quickLogin('818206330')">
+                💎 Mehdi (Diamond)
+              </button>
+              <button type="button" onclick="window.authController.quickLogin('818210552')">
+                ⭐ Nadia (Manager)
+              </button>
+              <button type="button" onclick="window.authController.quickLogin('818243789')">
+                ✅ Najat (Partner)
               </button>
             </div>
           </div>
@@ -147,32 +200,43 @@
 
       <!-- Menu de Navigation -->
       <nav class="sidebar-nav">
-        <div class="nav-section-title">Navigation Principale</div>
+        <div class="nav-section-title" id="navMainSectionTitle">Navigation Principale</div>
 
-        <a href="#" class="nav-item active" data-view="dashboard">
+        <a href="#" class="nav-item active" id="navItemDashboard" data-view="dashboard">
           <i class="fas fa-th-large"></i>
-          <span>Tableau de Bord</span>
+          <span id="navItemDashboardLabel">Tableau de Bord</span>
         </a>
 
-        <a href="#" class="nav-item" data-view="genealogy">
+        <a href="#" class="nav-item mlm-nav-item" id="navItemGenealogy" data-view="genealogy">
           <i class="fas fa-sitemap"></i>
           <span>Arbre Généalogique</span>
           <span class="nav-badge">Réseau</span>
         </a>
 
-        <a href="#" class="nav-item" data-view="shop">
+        <a href="#" class="nav-item" id="navItemShop" data-view="shop">
           <i class="fas fa-spa"></i>
-          <span>Boutique Cosmétiques</span>
+          <span id="navItemShopLabel">Boutique Cosmétiques</span>
         </a>
 
-        <a href="#" class="nav-item" data-view="bonus">
+        <a href="#" class="nav-item mlm-nav-item" id="navItemBonus" data-view="bonus">
           <i class="fas fa-wallet"></i>
           <span>Commissions & E-Point</span>
         </a>
 
-        <a href="#" class="nav-item" data-view="sponsor">
+        <a href="#" class="nav-item mlm-nav-item" id="navItemSponsor" data-view="sponsor">
           <i class="fas fa-user-plus"></i>
           <span>Nouveau Distributeur</span>
+        </a>
+
+        <!-- Liens spécifiques au Client Direct Privilège -->
+        <a href="#" class="nav-item client-nav-item" id="navItemClientOrders" data-view="dashboard" style="display: none;">
+          <i class="fas fa-box-open"></i>
+          <span>Mes Commandes & Livraisons</span>
+        </a>
+
+        <a href="#" class="nav-item client-nav-item" id="navItemClientLoyalty" data-view="dashboard" style="display: none;">
+          <i class="fas fa-gift"></i>
+          <span>Mes Points Fidélité</span>
         </a>
 
         <!-- Onglet Réservé Exclusivement au Propriétaire / Super Administrateur -->
@@ -218,10 +282,16 @@
             </select>
           </div>
 
-          <!-- Solde Portefeuille E-Point Rapide -->
-          <div class="header-quick-wallet" title="Solde de votre portefeuille E-Point" onclick="window.app.switchView('bonus')" style="cursor: pointer;">
+          <!-- Solde Portefeuille E-Point Rapide (Distributeur / Admin) -->
+          <div class="header-quick-wallet" id="headerWalletContainer" title="Solde de votre portefeuille E-Point" onclick="window.app.switchView('bonus')" style="cursor: pointer;">
             <i class="fas fa-wallet"></i>
             <span id="headerWalletAmount">19 850,00 DH</span>
+          </div>
+
+          <!-- Solde Points Fidélité (Client Direct Privilège) -->
+          <div class="header-quick-wallet" id="headerClientLoyaltyBadge" title="Vos Points Fidélité (20 pts = 10 DH de réduction)" onclick="window.app.showLoyaltyDetails()" style="display: none; background: #fdf2f8; border: 1.5px solid #f472b6; color: #9d174d; cursor: pointer;">
+            <i class="fas fa-gift" style="color: #be185d;"></i>
+            <span id="headerClientLoyaltyText">340 Pts Fidélité</span>
           </div>
 
           <!-- Indicateur Langue -->
@@ -240,86 +310,209 @@
              ================================================================== -->
         <section class="view-panel" id="view-dashboard">
           
-          <!-- Bannière de Qualification au Rang Supérieur -->
-          <div class="qualification-banner">
-            <div class="qualif-left">
-              <h3><i class="fas fa-trophy" style="color: #fbbf24;"></i> Statut de Qualification Mensuelle</h3>
-              <p>Objectif vers le prochain palier d'honneur : <strong id="dashNextRankName">Star Ruby</strong></p>
-            </div>
-            <div class="qualif-progress-box">
-              <div class="progress-labels">
-                <span>Progression PGPV</span>
-                <span id="dashQualifText">85% complété</span>
+          <!-- ==============================================================
+               SECTION MLM DISTRIBUTEURS & OWNER (Arbre, PV, GPV, SV, Bonus)
+               ============================================================== -->
+          <div id="dashMLMSection">
+            <!-- Bannière de Qualification au Rang Supérieur -->
+            <div class="qualification-banner">
+              <div class="qualif-left">
+                <h3><i class="fas fa-trophy" style="color: #fbbf24;"></i> Statut de Qualification Mensuelle</h3>
+                <p>Objectif vers le prochain palier d'honneur : <strong id="dashNextRankName">Star Ruby</strong></p>
               </div>
-              <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="dashQualifFill" style="width: 85%;"></div>
+              <div class="qualif-progress-box">
+                <div class="progress-labels">
+                  <span>Progression PGPV</span>
+                  <span id="dashQualifText">85% complété</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" id="dashQualifFill" style="width: 85%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Grille des Métriques Clés MLM -->
+            <div class="metrics-grid">
+              <div class="metric-card card-ppv">
+                <div class="metric-header">
+                  <span class="metric-title">Points Personnels (PPV)</span>
+                  <div class="metric-icon"><i class="fas fa-spa"></i></div>
+                </div>
+                <div class="metric-value" id="dashPPV">320 PV</div>
+                <div class="metric-meta"><span class="badge-success">● Distributeur Actif Qualifié</span></div>
+              </div>
+
+              <div class="metric-card card-gpv">
+                <div class="metric-header">
+                  <span class="metric-title">Volume Équipe (PV)</span>
+                  <div class="metric-icon"><i class="fas fa-network-wired"></i></div>
+                </div>
+                <div class="metric-value" id="dashGPV">16 850 PV</div>
+                <div class="metric-meta" id="dashDownlinesCount">Descendance active</div>
+              </div>
+
+              <div class="metric-card card-sv">
+                <div class="metric-header">
+                  <span class="metric-title">Base Commissions (SV / CV)</span>
+                  <div class="metric-icon"><i class="fas fa-receipt"></i></div>
+                </div>
+                <div class="metric-value" id="dashSV">8 420 SV/CV</div>
+                <div class="metric-meta">Base officielle N1/N2/N3 & Leadership</div>
+              </div>
+
+              <div class="metric-card card-wallet">
+                <div class="metric-header">
+                  <span class="metric-title">Portefeuille E-Point</span>
+                  <div class="metric-icon"><i class="fas fa-coins"></i></div>
+                </div>
+                <div class="metric-value" id="dashWallet">19 850,00 DH</div>
+                <div class="metric-meta"><span class="badge-success">Disponible immédiatement</span></div>
+              </div>
+            </div>
+
+            <!-- Raccourcis Rapides & Dernières Commandes -->
+            <div class="data-table-card">
+              <div class="table-header-bar">
+                <h3>Dernières Commandes Cosmétiques Validées</h3>
+                <button class="btn-switch-account" onclick="window.app.switchView('shop')">
+                  <i class="fas fa-plus"></i> Commander des Cosmétiques
+                </button>
+              </div>
+              <div style="overflow-x: auto;">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Réf. Commande</th>
+                      <th>Date</th>
+                      <th>Distributeur</th>
+                      <th>Points (PV)</th>
+                      <th>Montant Payé</th>
+                      <th>Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashRecentOrdersBody">
+                    <!-- Rempli dynamiquement par app.js -->
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
 
-          <!-- Grille des Métriques Clés MLM -->
-          <div class="metrics-grid">
-            <div class="metric-card card-ppv">
-              <div class="metric-header">
-                <span class="metric-title">Points Personnels (PPV)</span>
-                <div class="metric-icon"><i class="fas fa-spa"></i></div>
+          <!-- ==============================================================
+               SECTION CLIENT DIRECT PRIVILÈGE (Affiché si role === 'client')
+               Sans Arbre MLM, Sans Matrice Réseau, Suivi Commandes & Fidélité
+               ============================================================== -->
+          <div id="dashClientSection" style="display: none;">
+            <!-- Bannière de Bienvenue Espace Client Privilège -->
+            <div class="client-welcome-banner">
+              <div>
+                <h2>
+                  <i class="fas fa-sparkles" style="color: #fef08a;"></i>
+                  Bienvenue dans votre Espace Client Privilège Routini
+                </h2>
+                <p>
+                  Profitez de l'excellence de nos rituels cosmétiques sans contrainte de réseau MLM, suivez vos livraisons Amana en direct et cumulez vos points fidélité.
+                </p>
               </div>
-              <div class="metric-value" id="dashPPV">320 PV</div>
-              <div class="metric-meta"><span class="badge-success">● Distributeur Actif Qualifié</span></div>
+              <div class="client-loyalty-pill">
+                <div class="pts-number" id="dashClientFidelityPts">340 pts</div>
+                <div class="pts-sub">Solde Fidélité (<span id="dashClientDiscountVal">170 DH</span> de réduction)</div>
+              </div>
             </div>
 
-            <div class="metric-card card-gpv">
-              <div class="metric-header">
-                <span class="metric-title">Volume Équipe (PV)</span>
-                <div class="metric-icon"><i class="fas fa-network-wired"></i></div>
+            <!-- Grille des Cartes Statistiques Client -->
+            <div class="client-stats-grid">
+              <div class="client-stat-card">
+                <div class="card-head">
+                  <span class="card-title">Points Fidélité</span>
+                  <div class="card-icon" style="background: #fdf2f8; color: #be185d;">
+                    <i class="fas fa-gift"></i>
+                  </div>
+                </div>
+                <div class="card-val" id="clientCardPoints">340 Pts</div>
+                <div class="card-sub"><span style="color: #15803d; font-weight:700;">10% du montant</span> reversé en points fidélité</div>
               </div>
-              <div class="metric-value" id="dashGPV">16 850 PV</div>
-              <div class="metric-meta" id="dashDownlinesCount">Descendance active</div>
+
+              <div class="client-stat-card">
+                <div class="card-head">
+                  <span class="card-title">Commandes Beauté</span>
+                  <div class="card-icon" style="background: #eff6ff; color: #2563eb;">
+                    <i class="fas fa-shopping-bag"></i>
+                  </div>
+                </div>
+                <div class="card-val" id="clientCardOrdersCount">2</div>
+                <div class="card-sub">Soins et rituels commandés</div>
+              </div>
+
+              <div class="client-stat-card">
+                <div class="card-head">
+                  <span class="card-title">Dernière Livraison</span>
+                  <div class="card-icon" style="background: #ecfdf5; color: #059669;">
+                    <i class="fas fa-truck"></i>
+                  </div>
+                </div>
+                <div class="card-val" style="font-size: 1.05rem;" id="clientCardDeliveryStatus">En cours d'expédition</div>
+                <div class="card-sub" id="clientCardTrackingNum">Amana : AMN-RBT-88402</div>
+              </div>
+
+              <div class="client-stat-card">
+                <div class="card-head">
+                  <span class="card-title">Barème Réduction</span>
+                  <div class="card-icon" style="background: #fefce8; color: #ca8a04;">
+                    <i class="fas fa-gem"></i>
+                  </div>
+                </div>
+                <div class="card-val" style="font-size: 1.15rem; color: #b45309;">20 Pts = 10 DH</div>
+                <div class="card-sub">Déductible directement sur vos commandes</div>
+              </div>
             </div>
 
-            <div class="metric-card card-sv">
-              <div class="metric-header">
-                <span class="metric-title">Base Commissions (SV / CV)</span>
-                <div class="metric-icon"><i class="fas fa-receipt"></i></div>
-              </div>
-              <div class="metric-value" id="dashSV">8 420 SV/CV</div>
-              <div class="metric-meta">Base officielle N1/N2/N3 & Leadership</div>
-            </div>
-
-            <div class="metric-card card-wallet">
-              <div class="metric-header">
-                <span class="metric-title">Portefeuille E-Point</span>
-                <div class="metric-icon"><i class="fas fa-coins"></i></div>
-              </div>
-              <div class="metric-value" id="dashWallet">19 850,00 DH</div>
-              <div class="metric-meta"><span class="badge-success">Disponible immédiatement</span></div>
-            </div>
-          </div>
-
-          <!-- Raccourcis Rapides & Dernières Commandes -->
-          <div class="data-table-card">
-            <div class="table-header-bar">
-              <h3>Dernières Commandes Cosmétiques Validées</h3>
-              <button class="btn-switch-account" onclick="window.app.switchView('shop')">
-                <i class="fas fa-plus"></i> Commander des Cosmétiques
+            <!-- Actions Rapides Client -->
+            <div class="client-quick-actions">
+              <button class="btn-client-action" onclick="window.app.switchView('shop')">
+                <i class="fas fa-cart-plus"></i> Commander des Soins & Packs
+              </button>
+              <button class="btn-client-action-outline" onclick="window.app.showLoyaltyDetails()">
+                <i class="fas fa-award"></i> Voir mes Avantages Fidélité
+              </button>
+              <button class="btn-client-action-outline" onclick="window.app.showDeliveryInfo()">
+                <i class="fas fa-map-marker-alt"></i> Mon Adresse de Livraison
               </button>
             </div>
-            <div style="overflow-x: auto;">
-              <table class="custom-table">
-                <thead>
-                  <tr>
-                    <th>Réf. Commande</th>
-                    <th>Date</th>
-                    <th>Distributeur</th>
-                    <th>Points (PV)</th>
-                    <th>Montant Payé</th>
-                    <th>Statut</th>
-                  </tr>
-                </thead>
-                <tbody id="dashRecentOrdersBody">
-                  <!-- Rempli dynamiquement par app.js -->
-                </tbody>
-              </table>
+
+            <!-- Tableau des Commandes Client -->
+            <div class="data-table-card" id="clientOrdersTableCard">
+              <div class="table-header-bar">
+                <div>
+                  <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-box-open" style="color: var(--rtn-rose);"></i>
+                    Historique de vos Commandes & Suivis de Colis
+                  </h3>
+                  <p style="font-size: 0.78rem; color: #64748b; margin-top: 2px;">
+                    Expéditions sécurisées sous 24-48h par Amana Express partout au Maroc
+                  </p>
+                </div>
+                <button class="btn-client-action" style="padding: 6px 14px; font-size: 0.8rem;" onclick="window.app.switchView('shop')">
+                  <i class="fas fa-plus"></i> Nouvelle Commande
+                </button>
+              </div>
+              <div style="overflow-x: auto;">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Réf. Commande</th>
+                      <th>Date</th>
+                      <th>Articles Commandés</th>
+                      <th>Montant Payé (TTC)</th>
+                      <th>Mode de Règlement</th>
+                      <th>Suivi Colis & Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashClientOrdersBody">
+                    <!-- Rempli dynamiquement par app.js -->
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </section>
@@ -457,9 +650,9 @@
                 </div>
               </div>
 
-              <!-- Section Choix du Kit ou Inscription Gratuite (Slide 2 & 12) -->
-              <h4 style="font-size: 0.95rem; font-weight: 700; margin: 20px 0 6px; color: var(--rtn-navy);">3. Formule d'Adhésion Beauté (0 DH ou avec Pack de Démarrage)</h4>
-              <p style="font-size: 0.8rem; color: #64748b;">La sélection d'un pack crédite instantanément les PV de qualification et le SV de commission.</p>
+              <!-- Section Choix du Kit ou Inscription Gratuite (Slide 2 & 10) -->
+              <h4 style="font-size: 0.95rem; font-weight: 700; margin: 20px 0 6px; color: var(--rtn-navy);">3. Formule d'Adhésion Beauté (0 DH ou avec Pack de Démarrage V4)</h4>
+              <p style="font-size: 0.8rem; color: #64748b;">Conformément à la Slide 2 : Inscription = 0 DH. La sélection d'un pack crédite instantanément les PV de qualification et le CV de commission.</p>
 
               <div class="kit-cards-grid">
                 <div class="kit-card selected" data-pv="0" data-sv="0">
@@ -467,31 +660,31 @@
                   <div class="kit-title">Adhésion Standard (0 DH)</div>
                   <div class="kit-price">0 DH</div>
                   <div class="kit-pv">Activation Immédiate</div>
-                  <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Inscription 100% gratuite. Le partenaire pourra commander ses soins et débuter ses ventes sans frais d'entrée.</p>
+                  <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Inscription 100% gratuite. Le partenaire pourra commander ses soins au Prix Membre (90% PP) et débuter sans frais d'entrée.</p>
                 </div>
 
-                <div class="kit-card" data-pv="100" data-sv="420">
+                <div class="kit-card" data-pv="50" data-sv="270">
+                  <span class="kit-badge" style="background: var(--rtn-rose);">Étalon Slide 3/5</span>
+                  <div class="kit-title">Duo Rituel Étalon ONE PLAN</div>
+                  <div class="kit-price">450 DH (PM)</div>
+                  <div class="kit-pv">+50 PV • 270 CV</div>
+                  <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Formule de référence du plan : Sérum Vitamine C + Crème Nuit Rétinol (500 DH PP ➔ 450 DH PM ➔ 50 PV ➔ 270 CV).</p>
+                </div>
+
+                <div class="kit-card" data-pv="100" data-sv="540">
                   <span class="kit-badge">Recommandé</span>
                   <div class="kit-title">Pack Routine Glow Découverte</div>
-                  <div class="kit-price">740 DH (DP)</div>
-                  <div class="kit-pv">+100 PV • 420 SV</div>
+                  <div class="kit-price">900 DH (PM)</div>
+                  <div class="kit-pv">+100 PV • 540 CV</div>
                   <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Comprend : Sérum Vitamine C, Crème Jour SPF 30, Eau Micellaire + Trousse Routini.</p>
                 </div>
 
-                <div class="kit-card" data-pv="200" data-sv="840">
-                  <span class="kit-badge" style="background: var(--rtn-rose);">Populaire</span>
+                <div class="kit-card" data-pv="200" data-sv="1080">
+                  <span class="kit-badge" style="background: var(--rtn-gold); color: #000;">Populaire</span>
                   <div class="kit-title">Pack Rituel Anti-Âge Suprême</div>
-                  <div class="kit-price">1 460 DH (DP)</div>
-                  <div class="kit-pv">+200 PV • 840 SV</div>
+                  <div class="kit-price">1 800 DH (PM)</div>
+                  <div class="kit-pv">+200 PV • 1 080 CV</div>
                   <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Comprend : Crème Nuit Rétinol, Huile Précieuse d'Argan, Masque Argile Rose, Contour Yeux.</p>
-                </div>
-
-                <div class="kit-card" data-pv="500" data-sv="2150">
-                  <span class="kit-badge" style="background: var(--rtn-gold); color: #000;">Master Pro</span>
-                  <div class="kit-title">Pack Ambassadrice Institut</div>
-                  <div class="kit-price">3 600 DH (DP)</div>
-                  <div class="kit-pv">+500 PV • 2 150 SV</div>
-                  <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">Gamme complète en double exemplaire pour présentations, démonstrations et vente directe.</p>
                 </div>
               </div>
 
@@ -518,6 +711,79 @@
   </div>
 
   <!-- ========================================================================
+       Modale d'Inscription Client Direct Privilège (Sans Arbre MLM)
+       ======================================================================== -->
+  <div class="modal-overlay" id="modalRegisterClient" style="display: none;">
+    <div class="modal-container" style="max-width: 560px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #4a044e 0%, #831843 100%); color: #fff;">
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-sparkles" style="color: #fef08a;"></i> Inscription Client Privilège Routini
+        </h3>
+        <button class="btn-close-modal" id="btnCloseClientRegisterModal" style="color: #fff;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <div style="background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="font-size: 1.6rem;">🎁</div>
+            <div>
+              <strong style="color: #9d174d; font-size: 0.88rem;">Adhésion 100% Gratuite & Sans Arbre MLM</strong>
+              <p style="color: #64748b; font-size: 0.78rem; margin: 2px 0 0;">
+                Créez votre compte en 30 secondes pour commander vos soins au détail et recevoir immédiatement <strong>+50 points de fidélité de bienvenue</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <form id="formRegisterClient">
+          <div class="form-group">
+            <label for="regClientName">Nom et Prénom :</label>
+            <input type="text" id="regClientName" class="form-control" placeholder="Ex: Salma Bennani" required>
+          </div>
+
+          <div class="form-group">
+            <label for="regClientEmail">Adresse Email :</label>
+            <input type="email" id="regClientEmail" class="form-control" placeholder="salma.bennani@gmail.com" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label for="regClientPassword">Mot de passe :</label>
+              <input type="password" id="regClientPassword" class="form-control" placeholder="••••••••" required>
+            </div>
+            <div class="form-group">
+              <label for="regClientPhone">Téléphone (WhatsApp) :</label>
+              <input type="tel" id="regClientPhone" class="form-control" placeholder="+212 662 000000" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label for="regClientCity">Ville de Livraison :</label>
+              <input type="text" id="regClientCity" class="form-control" placeholder="Casablanca, Rabat, Marrakech..." required>
+            </div>
+            <div class="form-group">
+              <label for="regClientCountry">Pays :</label>
+              <input type="text" id="regClientCountry" class="form-control" value="Maroc" readonly style="background:#f1f5f9;">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regClientAddress">Adresse de Livraison complète :</label>
+            <input type="text" id="regClientAddress" class="form-control" placeholder="Ex: 14 Avenue Mohammed VI, Souissi" required>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn-client-action-outline" id="btnCancelClientRegister">Annuler</button>
+            <button type="submit" class="btn-client-action" id="btnSubmitClientRegister">
+              <i class="fas fa-check-circle"></i> Créer mon Compte & Accéder à la Boutique
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
        Modale Générique Réutilisable
        ======================================================================== -->
   <div class="modal-overlay" id="appModal">
@@ -535,14 +801,14 @@
   <!-- Conteneur des Toasts -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Scripts JS Applicatifs (Modulaires) -->
-  <script src="js/mock_data.js?v=8.0"></script>
-  <script src="js/state.js?v=8.0"></script>
-  <script src="js/auth.js?v=8.0"></script>
-  <script src="js/genealogy.js?v=8.0"></script>
-  <script src="js/shop.js?v=8.0"></script>
-  <script src="js/bonus.js?v=8.0"></script>
-  <script src="js/admin.js?v=8.0"></script>
-  <script src="js/app.js?v=8.0"></script>
+  <!-- Scripts JS Applicatifs (Modulaires V4) -->
+  <script src="js/mock_data.js?v=9.0"></script>
+  <script src="js/state.js?v=9.0"></script>
+  <script src="js/auth.js?v=9.0"></script>
+  <script src="js/genealogy.js?v=9.0"></script>
+  <script src="js/shop.js?v=9.0"></script>
+  <script src="js/bonus.js?v=9.0"></script>
+  <script src="js/admin.js?v=9.0"></script>
+  <script src="js/app.js?v=9.0"></script>
 </body>
 </html>

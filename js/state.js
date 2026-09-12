@@ -1,117 +1,152 @@
 /**
  * Routini eWorld MLM - Gestionnaire d'État Global et Base de Données Locale
- * Modèle Officiel : ROUTINE ONE PLAN (V1 - V2 - V3)
- * Document de Référence : 23 Slides Officielles
+ * Modèle Officiel : ROUTINE ONE PLAN — Version 4 (Septembre 2026)
+ * Document de Référence : Document Officiel 18 Slides (Septembre 2026)
  * 
- * Principes Fondamentaux :
- * 1. Inscription Partenaire = 0 DH (pas de recrutement payé).
- * 2. 3 Profils Clients (Slide 14) :
- *    - Client Direct (0% commission, points fidélité, stabilisateur de marge)
- *    - Client Rattaché (10% commission au Partner vendeur + CV réseau N1/N2/N3)
- *    - Partner (ventes + réseau, pas de commission sur auto-achat)
- * 3. Les Compteurs (Slide 3 & 21) :
- *    - Points Fidélité Client : 20 pts = 10 DH (remise futur achat, pas de cash)
- *    - PV (Qualification) : Mesure l'activité et détermine le grade
- *    - CV (Commission Volume) : Outil interne de sécurité financière et base de calcul N1/N2/N3/Leadership
- * 4. Règle Anti-Double Paiement & Anti-Auto-Achat (Slide 15, 17, 20) :
- *    - Une vente = une commission personnelle (10% vendeur OU position réseau, jamais deux fois)
- *    - Le N1 commence au niveau supérieur dans la chaîne de parrainage
- * 5. Payout Cash Cible : <= 22% du CA (Slide 19 & 23)
- * 6. Les 6 Grades (Slide 6 & 11) :
- *    - Partner (N1) -> Builder (1%, N1+N2) -> Leader (2%, N1+N2+N3) -> Manager (3%) -> Diamond (5%) -> Ambassador (7%)
+ * 6 Règles Fondamentales du Plan en 1 Minute (Slide 2) :
+ * 1. Prix Membre (PM) : 90% du Prix Public (PP). Même remise de 10% pour TOUS les grades.
+ * 2. Points PV : 1 PV = 10 DH Prix Public (PV = PP ÷ 10). Mesure l'activité et le volume de référence.
+ * 3. Commission Value (CV) : 60% du Prix Membre payé (CV = 60% × PM). Base monétaire de calcul des commissions.
+ * 4. Commissions Réseau : N1 10% • N2 5% • N3 3% appliqués au CV (jusqu'à 3 niveaux max).
+ * 5. Qualification Builder : ≥ 2 000 PV équipe cumulés (Seul grade supérieur avec seuil PV !).
+ * 6. Progression après Builder : NOUVELLE RÈGLE 100% STRUCTURELLE (aucun seuil de PV équipe !) :
+ *    - Leader : 2 Builders actifs
+ *    - Manager : 2 Leaders actifs
+ *    - Diamond : 2 Managers actifs
+ *    - Ambassador : 2 Diamonds actifs
+ * 
+ * Activité Personnelle Mensuelle (Slide 8) :
+ * - Partner : 50 PV minimum (500 DH PP / 450 DH PM)
+ * - Builder : 100 PV minimum (1 000 DH PP / 900 DH PM)
+ * - Leader : 200 PV minimum (2 000 DH PP / 1 800 DH PM)
+ * - Manager : 400 PV minimum (4 000 DH PP / 3 600 DH PM)
+ * - Diamond : 800 PV minimum (8 000 DH PP / 7 200 DH PM)
+ * - Ambassador : 1 600 PV minimum (16 000 DH PP / 14 400 DH PM)
+ * Règle d'inactivité (Slide 8 & 15) : Si le minimum personnel n'est pas atteint, aucune commission n'est versée ce mois-là.
+ * Grade historique et réseau conservés.
+ * 
+ * Leadership Différentiel (Slide 9) :
+ * - Builder 1% • Leader 2% • Manager 3% • Diamond 5% • Ambassador 7%
+ * - Formule : Taux membre - Taux plus haut qualifié de la branche = Différentiel payé.
  */
 
-const STORAGE_KEY = 'ROUTINI_ONE_PLAN_STATE_V8';
+const STORAGE_KEY = 'ROUTINI_ONE_PLAN_STATE_V4_2026';
 
-// Barème officiel des 6 grades Routine ONE PLAN
+// Barème officiel des 6 grades Routine ONE PLAN - Version 4
 const ROUTINE_GRADES = [
   {
     code: 'PARTNER',
     name: 'Partner',
-    minPV: 150,
-    minClients: 5,
-    structure: 'Actif (150 PV ou 5 clients)',
+    minPersonalPV: 50, // 50 PV perso min (Slide 8)
+    teamPVCumul: 0,
+    structure: 'Inscription + Activité personnelle (≥ 50 PV)',
     depth: 'N1 (10% CV)',
     maxDepth: 1,
     leadershipRate: 0,
     badgeClass: 'rank-partner',
-    desc: 'Actif sans achat personnel obligatoire. Accès au Niveau 1.'
+    desc: '50 PV perso/mois (450 DH) • Accès Niveau 1 (10% CV)'
   },
   {
     code: 'BUILDER',
     name: 'Builder',
-    minPV: 500,
-    structure: '2 actifs directs',
-    depth: 'N1 + N2',
+    minPersonalPV: 100, // 100 PV perso min (Slide 8)
+    teamPVCumul: 2000, // ≥ 2 000 PV équipe cumulés (Seul grade avec seuil PV !)
+    structure: '≥ 2 000 PV équipe cumulés',
+    depth: 'N1 (10%) + N2 (5%)',
     maxDepth: 2,
     leadershipRate: 0.01,
     badgeClass: 'rank-builder',
-    desc: '500 PV Équipe/mois • Accès N1 (10%) + N2 (5%) • Leadership 1%'
+    desc: '100 PV perso/mois (900 DH) • ≥ 2 000 PV équipe cumulés • Accès N1 (10%) + N2 (5%) • Leadership 1%'
   },
   {
     code: 'LEADER',
     name: 'Leader',
-    minPV: 2500,
-    structure: '3 Builders directs',
-    depth: 'N1 + N2 + N3',
+    minPersonalPV: 200, // 200 PV perso min (Slide 8)
+    teamPVCumul: 0, // Aucun seuil PV après Builder (Slide 7)
+    structure: '2 Builders actifs',
+    depth: 'N1 (10%) + N2 (5%) + N3 (3%)',
     maxDepth: 3,
     leadershipRate: 0.02,
     badgeClass: 'rank-leader',
-    desc: '2 500 PV Équipe/mois • Accès N1 + N2 + N3 • Leadership 2%'
+    desc: '200 PV perso/mois (1 800 DH) • 2 Builders actifs directs • Accès N1 + N2 + N3 • Leadership 2%'
   },
   {
     code: 'MANAGER',
     name: 'Manager',
-    minPV: 10000,
-    structure: '3 Leaders directs',
+    minPersonalPV: 400, // 400 PV perso min (Slide 8)
+    teamPVCumul: 0, // Aucun seuil PV après Builder (Slide 7)
+    structure: '2 Leaders actifs',
     depth: 'N1 + N2 + N3',
     maxDepth: 3,
     leadershipRate: 0.03,
     badgeClass: 'rank-manager',
-    desc: '10 000 PV Équipe/mois • Leadership 3%'
+    desc: '400 PV perso/mois (3 600 DH) • 2 Leaders actifs directs • Accès N1 + N2 + N3 • Leadership 3%'
   },
   {
     code: 'DIAMOND',
     name: 'Diamond',
-    minPV: 30000,
-    structure: '3 Managers directs',
+    minPersonalPV: 800, // 800 PV perso min (Slide 8)
+    teamPVCumul: 0, // Aucun seuil PV après Builder (Slide 7)
+    structure: '2 Managers actifs',
     depth: 'N1 + N2 + N3',
     maxDepth: 3,
     leadershipRate: 0.05,
     badgeClass: 'rank-diamond',
-    desc: '30 000 PV Équipe/mois • Leadership 5%'
+    desc: '800 PV perso/mois (7 200 DH) • 2 Managers actifs directs • Accès N1 + N2 + N3 • Leadership 5%'
   },
   {
     code: 'AMBASSADOR',
     name: 'Ambassador',
-    minPV: 100000,
-    structure: '3 Diamonds directs',
+    minPersonalPV: 1600, // 1600 PV perso min (Slide 8)
+    teamPVCumul: 0, // Aucun seuil PV après Builder (Slide 7)
+    structure: '2 Diamonds actifs',
     depth: 'N1 + N2 + N3',
     maxDepth: 3,
     leadershipRate: 0.07,
     badgeClass: 'rank-ambassador',
-    desc: '100 000 PV Équipe/mois • Leadership 7% (palier suprême)'
+    desc: '1 600 PV perso/mois (14 400 DH) • 2 Diamonds actifs directs • Accès N1 + N2 + N3 • Leadership 7% (palier suprême)'
   }
 ];
 
-// Catalogue des 9 Soins Officiels & Packs Routines (avec SV/CV dynamique modifiable par l'Admin)
+// Catalogue des Soins Officiels & Packs Routines (Formules strictes V4 : PM = 90% PP, PV = PP / 10, CV = 60% PM)
 const INITIAL_PRODUCTS = [
-  // --- PACKS ROUTINES COSMÉTIQUES (CV adapté Slide 21) ---
+  // --- PACKS ROUTINES COSMÉTIQUES ---
+  {
+    id: 'PACK-000',
+    name: 'Duo Rituel Éclat & Nuit (Formule Étalon ONE PLAN)',
+    category: 'Packs & Rituels',
+    isPack: true,
+    badge: 'Étalon Officiel (Slide 3)',
+    desc: 'Le pack référence du plan : Sérum Vitamine C + Crème Anti-Âge Nuit. Illustration exacte : 500 DH PP ➔ 450 DH PM ➔ 50 PV ➔ 270 DH CV.',
+    icon: '💎',
+    priceRP_DH: 500,
+    pricePM_DH: 450,
+    priceDP_DH: 450,
+    priceRP_EUR: 46.50,
+    pricePM_EUR: 41.85,
+    priceDP_EUR: 41.85,
+    pv: 50,
+    sv: 270, // 60% de 450 DH PM
+    marginCategory: 'Pack Étalon V4 (CV 60%)',
+    stock: 80
+  },
   {
     id: 'PACK-001',
-    name: 'Pack Routine Glow Découverte (3 Soins + Trousse)',
+    name: 'Pack Routine Glow Découverte (3 Soins + Trousse Beauté)',
     category: 'Packs & Rituels',
     isPack: true,
     badge: 'Starter Pack',
     desc: 'Rituel coup d’éclat : Sérum Vitamine C, Crème Jour SPF 30, Eau Micellaire + Trousse beauté Routini.',
     icon: '🎁',
-    priceDP_DH: 740,
-    priceRP_DH: 980,
-    priceDP_EUR: 68.00,
-    priceRP_EUR: 90.00,
+    priceRP_DH: 1000,
+    pricePM_DH: 900,
+    priceDP_DH: 900,
+    priceRP_EUR: 93.00,
+    pricePM_EUR: 83.70,
+    priceDP_EUR: 83.70,
     pv: 100,
-    sv: 420, // SV / CV Modifiable
-    marginCategory: 'Pack promotionnel (CV équilibré)',
+    sv: 540, // 60% de 900 DH
+    marginCategory: 'Pack Découverte (CV 60%)',
     stock: 50
   },
   {
@@ -122,13 +157,15 @@ const INITIAL_PRODUCTS = [
     badge: 'Populaire',
     desc: 'Le rituel régénérant intense : Crème Nuit Rétinol, Huile Précieuse d’Argan & Rose, Masque Argile et Soin Yeux.',
     icon: '✨',
-    priceDP_DH: 1460,
-    priceRP_DH: 1950,
-    priceDP_EUR: 135.00,
-    priceRP_EUR: 180.00,
+    priceRP_DH: 2000,
+    pricePM_DH: 1800,
+    priceDP_DH: 1800,
+    priceRP_EUR: 186.00,
+    pricePM_EUR: 167.40,
+    priceDP_EUR: 167.40,
     pv: 200,
-    sv: 840,
-    marginCategory: 'Pack promotionnel',
+    sv: 1080, // 60% de 1800 DH
+    marginCategory: 'Pack Rituel Premium (CV 60%)',
     stock: 35
   },
   {
@@ -137,19 +174,21 @@ const INITIAL_PRODUCTS = [
     category: 'Packs & Rituels',
     isPack: true,
     badge: 'Master Pro',
-    desc: 'Coffret professionnel complet comprenant l’ensemble des soins Routini en double exemplaire pour démonstrations.',
+    desc: 'Coffret professionnel complet comprenant l’ensemble des soins Routini en double exemplaire pour démonstrations et ateliers.',
     icon: '👑',
-    priceDP_DH: 3600,
-    priceRP_DH: 4800,
-    priceDP_EUR: 330.00,
-    priceRP_EUR: 445.00,
+    priceRP_DH: 5000,
+    pricePM_DH: 4500,
+    priceDP_DH: 4500,
+    priceRP_EUR: 465.00,
+    pricePM_EUR: 418.50,
+    priceDP_EUR: 418.50,
     pv: 500,
-    sv: 2150,
-    marginCategory: 'Pack Institut Pro',
+    sv: 2700, // 60% de 4500 DH
+    marginCategory: 'Pack Institut Pro (CV 60%)',
     stock: 20
   },
 
-  // --- LES 9 PRODUITS DE BASE ROUTINI (Slide 21 : Cosmetics à bonne marge = CV élevé) ---
+  // --- LES 9 SOINS DE BASE ROUTINI (PP -> PM 90% -> PV PP/10 -> CV 60% PM) ---
   {
     id: 'RTN-001',
     name: 'Sérum Éclat Vitamine C & Acide Hyaluronique (30ml)',
@@ -158,13 +197,15 @@ const INITIAL_PRODUCTS = [
     badge: 'Bestseller',
     desc: 'Sérum ultra-concentré anti-oxydant, illumine le teint et repulpe la peau dès la première semaine.',
     icon: '✨',
-    priceDP_DH: 240,
-    priceRP_DH: 320,
-    priceDP_EUR: 22.50,
-    priceRP_EUR: 30.00,
-    pv: 22,
-    sv: 110, // CV modifiable
-    marginCategory: 'Cosmétique forte marge (CV élevé)',
+    priceRP_DH: 350,
+    pricePM_DH: 315,
+    priceDP_DH: 315,
+    priceRP_EUR: 32.55,
+    pricePM_EUR: 29.30,
+    priceDP_EUR: 29.30,
+    pv: 35,
+    sv: 189,
+    marginCategory: 'Cosmétique Visage (CV 60%)',
     stock: 140
   },
   {
@@ -175,13 +216,15 @@ const INITIAL_PRODUCTS = [
     badge: 'Nouveauté',
     desc: 'Soin de nuit lissant aux peptides et bakuchiol végétal. Raffermit les contours et comble les rides.',
     icon: '🌙',
-    priceDP_DH: 290,
-    priceRP_DH: 390,
-    priceDP_EUR: 27.00,
-    priceRP_EUR: 36.50,
-    pv: 28,
-    sv: 130,
-    marginCategory: 'Cosmétique forte marge (CV élevé)',
+    priceRP_DH: 420,
+    pricePM_DH: 378,
+    priceDP_DH: 378,
+    priceRP_EUR: 39.06,
+    pricePM_EUR: 35.15,
+    priceDP_EUR: 35.15,
+    pv: 42,
+    sv: 227,
+    marginCategory: 'Cosmétique Anti-Âge (CV 60%)',
     stock: 95
   },
   {
@@ -192,120 +235,134 @@ const INITIAL_PRODUCTS = [
     badge: 'Protection',
     desc: 'Bouclier protecteur anti-pollution et anti-UV enrichi en extrait de thé blanc et céramides.',
     icon: '☀️',
-    priceDP_DH: 210,
-    priceRP_DH: 280,
-    priceDP_EUR: 19.50,
-    priceRP_EUR: 26.00,
-    pv: 18,
-    sv: 95,
-    marginCategory: 'Cosmétique forte marge',
+    priceRP_DH: 300,
+    pricePM_DH: 270,
+    priceDP_DH: 270,
+    priceRP_EUR: 27.90,
+    pricePM_EUR: 25.11,
+    priceDP_EUR: 25.11,
+    pv: 30,
+    sv: 162,
+    marginCategory: 'Cosmétique Visage (CV 60%)',
     stock: 120
   },
   {
     id: 'RTN-004',
-    name: 'Huile Précieuse d’Argan Pure Bio & Rose de Damas (100ml)',
+    name: 'Huile Précieuse d’Argan Bio & Rose de Damas (50ml)',
     category: 'Huiles Précieuses',
     isPack: false,
-    badge: 'Bio Certifié',
-    desc: 'Élixir 100% pur pressé à froid certifié bio, infusé de pétales de rose. Nourrit visage et cheveux.',
+    badge: 'Trésor Maroc',
+    desc: 'Élixir pur pressé à froid dans le Souss, parfumé à la rose de Kelaat M\'gouna. Nourrit visage et cheveux.',
     icon: '🌹',
-    priceDP_DH: 260,
-    priceRP_DH: 350,
-    priceDP_EUR: 24.00,
-    priceRP_EUR: 32.50,
-    pv: 25,
-    sv: 120,
-    marginCategory: 'Huile Précieuse (CV élevé)',
+    priceRP_DH: 280,
+    pricePM_DH: 252,
+    priceDP_DH: 252,
+    priceRP_EUR: 26.04,
+    pricePM_EUR: 23.44,
+    priceDP_EUR: 23.44,
+    pv: 28,
+    sv: 151,
+    marginCategory: 'Huiles Précieuses (CV 60%)',
     stock: 110
   },
   {
     id: 'RTN-005',
-    name: 'Contour des Yeux Défatigant Caféine & Peptides (15ml)',
+    name: 'Eau Micellaire Purifiante aux Fleurs d’Oranger (200ml)',
     category: 'Soins Visage',
     isPack: false,
-    badge: 'Anti-Cernes',
-    desc: 'Formule décongestionnante fraîche instantanée anti-cernes, anti-poches et lissante pour le regard.',
-    icon: '👁️',
-    priceDP_DH: 175,
-    priceRP_DH: 235,
-    priceDP_EUR: 16.00,
-    priceRP_EUR: 22.00,
-    pv: 15,
-    sv: 80,
-    marginCategory: 'Soin ciblé',
-    stock: 130
+    badge: '',
+    desc: 'Démaquillant doux haute tolérance enrichi en hydrolat de fleur d’oranger et glycérine végétale.',
+    icon: '🌸',
+    priceRP_DH: 180,
+    pricePM_DH: 162,
+    priceDP_DH: 162,
+    priceRP_EUR: 16.74,
+    pricePM_EUR: 15.07,
+    priceDP_EUR: 15.07,
+    pv: 18,
+    sv: 97,
+    marginCategory: 'Nettoyant Doux (CV 60%)',
+    stock: 180
   },
   {
     id: 'RTN-006',
-    name: 'Masque Purifiant Éclat Argile Rose & Niacinamide (100ml)',
+    name: 'Contour des Yeux Anti-Cernes & Poches Caféine + Peptides (15ml)',
     category: 'Soins Visage',
     isPack: false,
-    badge: 'Purifiant',
-    desc: 'Désincruste les pores sans assécher, équilibre le sébum et affine le grain de peau pour un teint lumineux.',
-    icon: '🌸',
-    priceDP_DH: 160,
-    priceRP_DH: 220,
-    priceDP_EUR: 15.00,
-    priceRP_EUR: 20.50,
-    pv: 14,
-    sv: 70,
-    marginCategory: 'Soin ciblé',
-    stock: 85
+    badge: 'Ciblé',
+    desc: 'Gel frais décongestionnant, réduit instantanément l’apparence des cernes sombres et des poches.',
+    icon: '👁️',
+    priceRP_DH: 250,
+    pricePM_DH: 225,
+    priceDP_DH: 225,
+    priceRP_EUR: 23.25,
+    pricePM_EUR: 20.93,
+    priceDP_EUR: 20.93,
+    pv: 25,
+    sv: 135,
+    marginCategory: 'Soin Ciblé (CV 60%)',
+    stock: 130
   },
   {
     id: 'RTN-007',
-    name: 'Eau Micellaire Apaisante Eau de Bleuet & Aloe Vera (250ml)',
-    category: 'Nettoyants',
+    name: 'Masque Purifiant Éclat à l’Argile Rose & Miel du Souss (100ml)',
+    category: 'Soins Visage',
     isPack: false,
-    badge: 'Douceur',
-    desc: 'Démaquille en douceur visage, yeux et lèvres tout en apaisant les peaux sensibles.',
-    icon: '💧',
-    priceDP_DH: 115,
-    priceRP_DH: 155,
-    priceDP_EUR: 10.50,
-    priceRP_EUR: 14.50,
-    pv: 10,
-    sv: 45, // Petit prix = CV plus faible (Slide 21)
-    marginCategory: 'Nettoyant petit prix (CV ajusté)',
-    stock: 175
+    badge: 'Détox',
+    desc: 'Masque gommant ultra-doux qui affine le grain de peau, resserre les pores et réveille la luminosité.',
+    icon: '🍯',
+    priceRP_DH: 220,
+    pricePM_DH: 198,
+    priceDP_DH: 198,
+    priceRP_EUR: 20.46,
+    pricePM_EUR: 18.41,
+    priceDP_EUR: 18.41,
+    pv: 22,
+    sv: 119,
+    marginCategory: 'Masque Détox (CV 60%)',
+    stock: 85
   },
   {
     id: 'RTN-008',
-    name: 'Gommage Exfoliant Corps Sucre Doré & Noix de Coco (200g)',
+    name: 'Lait Corps Hydratant Satinant Fleur d’Oranger & Karité (250ml)',
     category: 'Soins Corps',
     isPack: false,
-    badge: 'Gourmand',
-    desc: 'Gommage gourmand qui élimine les cellules mortes et laisse un voile satiné parfumé.',
-    icon: '🥥',
-    priceDP_DH: 185,
-    priceRP_DH: 250,
-    priceDP_EUR: 17.00,
-    priceRP_EUR: 23.00,
-    pv: 16,
-    sv: 80,
-    marginCategory: 'Soins Corps',
-    stock: 90
+    badge: '',
+    desc: 'Émulsion onctueuse pénétration rapide pour une peau douce, nourrie et délicatement parfumée toute la journée.',
+    icon: '🧴',
+    priceRP_DH: 240,
+    pricePM_DH: 216,
+    priceDP_DH: 216,
+    priceRP_EUR: 22.32,
+    pricePM_EUR: 20.09,
+    priceDP_EUR: 20.09,
+    pv: 24,
+    sv: 130,
+    marginCategory: 'Soins Corps (CV 60%)',
+    stock: 150
   },
   {
     id: 'RTN-009',
-    name: 'Lait Corps Soyeux Beurre de Karité & Fleur d’Oranger (300ml)',
+    name: 'Gommage Corps Divin aux Cristaux de Sucre & Argan (200ml)',
     category: 'Soins Corps',
     isPack: false,
-    badge: 'Hydratant',
-    desc: 'Lait hydratation 24h à absorption rapide. Adoucit et parfume délicatement la peau.',
-    icon: '🧴',
-    priceDP_DH: 145,
-    priceRP_DH: 195,
-    priceDP_EUR: 13.50,
-    priceRP_EUR: 18.00,
-    pv: 12,
-    sv: 60,
-    marginCategory: 'Soins Corps',
+    badge: 'Spa Rituel',
+    desc: 'Exfoliant fondant traditionnel marocain, élimine les cellules mortes et enveloppe le corps d’un voile soyeux.',
+    icon: '🌿',
+    priceRP_DH: 200,
+    pricePM_DH: 180,
+    priceDP_DH: 180,
+    priceRP_EUR: 18.60,
+    pricePM_EUR: 16.74,
+    priceDP_EUR: 16.74,
+    pv: 20,
+    sv: 108,
+    marginCategory: 'Soins Corps (CV 60%)',
     stock: 160
   }
 ];
 
-// Membres initiaux, commandes et transactions (sourcés depuis mock_data.js)
+// Membres initiaux, commandes et transactions sourcés depuis mock_data.js
 const INITIAL_MEMBERS = (typeof window !== 'undefined' && window.ROUTINI_MOCK_DATA && window.ROUTINI_MOCK_DATA.members)
   ? window.ROUTINI_MOCK_DATA.members
   : [];
@@ -318,13 +375,87 @@ const INITIAL_TRANSACTIONS = (typeof window !== 'undefined' && window.ROUTINI_MO
   ? window.ROUTINI_MOCK_DATA.transactions
   : [];
 
+// Client Direct Démo Officiel (Sans Arbre MLM - ROUTINI ONE PLAN V4 Slide 10)
+const DEFAULT_DIRECT_CLIENT = {
+  id: "CLT-818101",
+  code: "CLT-818101",
+  name: "Salma Bennani",
+  email: "salma.bennani@gmail.com",
+  role: "client",
+  rankCode: "CLIENT",
+  rankName: "Client Privilège",
+  sponsorCode: null, // STRICTEMENT SANS ARBRE NI PARRAINAGE
+  sponsorName: "Routini Boutique Directe",
+  password: "client123",
+  phone: "+212 662 987654",
+  city: "Rabat",
+  address: "14 Avenue Mohammed VI, Souissi",
+  country: "Maroc",
+  joinDate: "10/05/2026",
+  ppv: 0,
+  teamPV: 0,
+  gpv: 0,
+  sv: 0,
+  monthlySalesDH: 0,
+  walletDH: 0.00,
+  clientsCount: 0,
+  fidelityPoints: 340, // 340 points (20 pts = 10 DH => 170 DH de réduction)
+  active: true
+};
+
+const DEFAULT_CLIENT_ORDERS = [
+  {
+    id: "CMD-CLT-98421",
+    orderType: "direct_client",
+    memberCode: "CLT-818101",
+    memberName: "Salma Bennani (Client Direct)",
+    date: "04/09/2026",
+    itemsCount: 2,
+    totalPP: 770,
+    totalDH: 770,
+    totalEUR: 71.61,
+    totalPV: 77,
+    totalSV: 415.8,
+    paymentMethod: "Carte Bancaire CMI (Maroc)",
+    shippingAddress: "14 Avenue Mohammed VI, Souissi, Rabat",
+    status: "Livrée",
+    trackingNumber: "AMN-RBT-77291",
+    deliveryCarrier: "Amana Express (Poste Maroc)",
+    items: [
+      { name: "Crème Anti-Âge Régénératrice Nuit (50ml)", qty: 1, price: 420 },
+      { name: "Sérum Éclat Vitamine C & Huile de Figue de Barbarie (30ml)", qty: 1, price: 350 }
+    ]
+  },
+  {
+    id: "CMD-CLT-99150",
+    orderType: "direct_client",
+    memberCode: "CLT-818101",
+    memberName: "Salma Bennani (Client Direct)",
+    date: "11/09/2026",
+    itemsCount: 1,
+    totalPP: 500,
+    totalDH: 500,
+    totalEUR: 46.50,
+    totalPV: 50,
+    totalSV: 270,
+    paymentMethod: "Paiement à la Livraison (COD)",
+    shippingAddress: "14 Avenue Mohammed VI, Souissi, Rabat",
+    status: "En cours d'expédition",
+    trackingNumber: "AMN-RBT-88402",
+    deliveryCarrier: "Amana Express (Poste Maroc)",
+    items: [
+      { name: "Duo Rituel Éclat & Nuit (Pack Étalon)", qty: 1, price: 500 }
+    ]
+  }
+];
+
 class StateManager {
   constructor() {
     this.currency = 'DH';
     this.eurRate = 0.093;
     this.currentUser = null;
     this.cart = [];
-    this.orderChannel = 'attached_client'; // 'attached_client' (10% + CV), 'partner_personal' (0% auto-com), 'direct_client' (0% MLM)
+    this.orderChannel = 'attached_client'; // 'attached_client' (10% vente directe + CV réseau), 'partner_personal' (Prix Membre 90%, 0% auto-com), 'direct_client' (Prix Public 100%, 0% MLM)
     this.grades = ROUTINE_GRADES;
     this.transactions = [];
     this.loadState();
@@ -340,15 +471,118 @@ class StateManager {
         this.orders = (parsed.orders && parsed.orders.length >= 100) ? parsed.orders : INITIAL_ORDERS;
         this.transactions = (parsed.transactions && parsed.transactions.length >= 5) ? parsed.transactions : INITIAL_TRANSACTIONS;
         this.currency = parsed.currency || 'DH';
-        const savedUserId = parsed.currentUserId || 'ADMIN001';
-        this.currentUser = this.getMemberByCode(savedUserId) || this.members[0];
+        
+        // Garantir la présence du client direct démo Salma Bennani
+        if (!this.members.some(m => m.code === 'CLT-818101')) {
+          this.members.push(JSON.parse(JSON.stringify(DEFAULT_DIRECT_CLIENT)));
+        }
+        DEFAULT_CLIENT_ORDERS.forEach(ord => {
+          if (!this.orders.some(o => o.id === ord.id)) {
+            this.orders.unshift(JSON.parse(JSON.stringify(ord)));
+          }
+        });
+
+        // Respecter l'état de déconnexion si l'utilisateur s'est déconnecté (currentUserId === null)
+        if (parsed.currentUserId === null) {
+          this.currentUser = null;
+        } else {
+          const savedUserId = parsed.currentUserId || 'ADMIN001';
+          this.currentUser = this.getMemberByCode(savedUserId) || this.members[0];
+        }
       } else {
         this.resetToDefaults();
       }
+      this.ensureTransactionsInitialized();
     } catch (e) {
-      console.error('Erreur chargement état local Routini:', e);
+      console.error('Erreur chargement état local Routini V4:', e);
       this.resetToDefaults();
     }
+  }
+
+  ensureTransactionsInitialized() {
+    if (!this.transactions || this.transactions.length === 0) {
+      this.transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+    }
+    // S'assurer que les transactions existantes ont un memberCode associé
+    this.transactions.forEach((tx) => {
+      if (!tx.memberCode) {
+        tx.memberCode = '818204921'; // Karim Benali (compte démo principal)
+      }
+    });
+
+    // Transactions de démonstration ciblées pour chaque profil type
+    const demoTransactions = [
+      {
+        memberCode: 'ADMIN001',
+        date: '01/09/2026',
+        ref: 'DIR-082026',
+        desc: 'Clôture mensuelle CA Entreprise (Août 2026 • 185 000 PV)',
+        type: 'credit',
+        amount: 36000,
+        status: 'Validé & Versé'
+      },
+      {
+        memberCode: '818205114',
+        date: '01/09/2026',
+        ref: 'BONUS-05114-0826',
+        desc: 'Commissions mensuelles Ambassador (Août 2026 • ONE PLAN V4)',
+        type: 'credit',
+        amount: 4890,
+        status: 'Validé & Versé'
+      },
+      {
+        memberCode: '818206330',
+        date: '01/09/2026',
+        ref: 'BONUS-06330-0826',
+        desc: 'Commissions mensuelles Diamond 5% (Août 2026 • ONE PLAN V4)',
+        type: 'credit',
+        amount: 3200,
+        status: 'Validé & Versé'
+      },
+      {
+        memberCode: '818210552',
+        date: '01/09/2026',
+        ref: 'BONUS-10552-0826',
+        desc: 'Commissions mensuelles Manager 3% (Août 2026 • ONE PLAN V4)',
+        type: 'credit',
+        amount: 1850,
+        status: 'Validé & Versé'
+      },
+      {
+        memberCode: '818217123',
+        date: '01/09/2026',
+        ref: 'BONUS-17123-0826',
+        desc: 'Commissions mensuelles Leader 2% (Août 2026 • ONE PLAN V4)',
+        type: 'credit',
+        amount: 1200,
+        status: 'Validé & Versé'
+      },
+      {
+        memberCode: '818229345',
+        date: '01/09/2026',
+        ref: 'BONUS-29345-0826',
+        desc: 'Commissions mensuelles Builder 1% (Août 2026 • ONE PLAN V4)',
+        type: 'credit',
+        amount: 650,
+        status: 'Validé & Versé'
+      },
+      {
+        memberCode: '818243789',
+        date: '01/09/2026',
+        ref: 'BONUS-43789-0826',
+        desc: 'Commissions Niveau 1 (Août 2026 • 50 PV validés)',
+        type: 'credit',
+        amount: 150,
+        status: 'Validé & Versé'
+      }
+    ];
+
+    demoTransactions.forEach(dTx => {
+      const exists = this.transactions.some(t => t.memberCode === dTx.memberCode);
+      if (!exists) {
+        this.transactions.push(dTx);
+      }
+    });
   }
 
   saveState() {
@@ -359,96 +593,166 @@ class StateManager {
         orders: this.orders,
         transactions: this.transactions,
         currency: this.currency,
-        currentUserId: this.currentUser ? this.currentUser.code : 'ADMIN001'
+        currentUserId: this.currentUser ? this.currentUser.code : null
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (e) {
-      console.error('Erreur sauvegarde état Routini:', e);
+      console.error('Erreur sauvegarde état Routini V4:', e);
     }
   }
 
   resetToDefaults() {
     this.products = JSON.parse(JSON.stringify(INITIAL_PRODUCTS));
     this.members = JSON.parse(JSON.stringify(INITIAL_MEMBERS));
+    if (!this.members.some(m => m.code === 'CLT-818101')) {
+      this.members.push(JSON.parse(JSON.stringify(DEFAULT_DIRECT_CLIENT)));
+    }
     this.orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
+    DEFAULT_CLIENT_ORDERS.forEach(ord => {
+      if (!this.orders.some(o => o.id === ord.id)) {
+        this.orders.unshift(JSON.parse(JSON.stringify(ord)));
+      }
+    });
     this.transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
     this.currency = 'DH';
-    this.currentUser = this.members[0]; // Administrateur par défaut
+    this.currentUser = this.members[0]; // Direction par défaut
     this.cart = [];
     this.orderChannel = 'attached_client';
+    this.ensureTransactionsInitialized();
     this.saveState();
   }
 
   setCurrency(curr) {
-    if (curr === 'DH' || curr === 'EUR') {
+    if (['DH', 'EUR'].includes(curr)) {
       this.currency = curr;
       this.saveState();
     }
   }
 
   formatMoney(amountDH) {
-    if (typeof amountDH !== 'number' || isNaN(amountDH)) amountDH = 0;
+    const num = Number(amountDH) || 0;
     if (this.currency === 'EUR') {
-      const eur = amountDH * this.eurRate;
+      const eur = num * this.eurRate;
       return eur.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
     }
-    return amountDH.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' DH';
+    return num.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' DH';
   }
 
-  getMemberByCode(code) {
-    if (!code) return null;
-    const clean = String(code).trim().toLowerCase();
-    if (clean === 'admin' || clean === 'admin001') {
-      return this.members.find(m => m.code === 'ADMIN001' || m.id === 'ADMIN001' || m.role === 'owner') || this.members[0];
+  login(codeOrEmail, password) {
+    if (!codeOrEmail) {
+      return { success: false, message: 'Veuillez renseigner votre identifiant ou code partenaire/client.' };
     }
-    return this.members.find(m => 
-      m.code.toLowerCase() === clean || 
-      m.id.toLowerCase() === clean || 
-      (m.email && m.email.toLowerCase() === clean)
+
+    const input = String(codeOrEmail).trim().toLowerCase();
+
+    // 1. Détection compte Administrateur / Direction
+    if (input === 'admin' || input === 'admin001') {
+      const admin = this.members.find(m => m.role === 'owner' || m.code === 'ADMIN001');
+      if (admin) {
+        if (password && password !== admin.password && password !== 'admin123') {
+          return { success: false, message: 'Mot de passe administrateur incorrect.' };
+        }
+        this.currentUser = admin;
+        this.saveState();
+        return { success: true, user: admin };
+      }
+    }
+
+    // 2. Recherche par Code (Distributeur 818... ou Client CLT-...) ou par Email
+    const member = this.members.find(m => 
+      String(m.code).toLowerCase() === input || 
+      String(m.id).toLowerCase() === input || 
+      (m.email && m.email.toLowerCase() === input)
     );
-  }
 
-  getGrade(rankCode) {
-    return this.grades.find(g => g.code === rankCode) || this.grades[0];
-  }
-
-  login(code, password) {
-    const member = this.getMemberByCode(code);
     if (!member) {
-      return { success: false, message: 'Identifiant introuvable. Pour l\'administrateur, utilisez "admin" ou "ADMIN001".' };
+      return { 
+        success: false, 
+        message: 'Identifiant ou adresse email introuvable. Veuillez vérifier vos identifiants ou créer un compte client.' 
+      };
     }
 
-    const isAdmin = member.role === 'owner' || member.code === 'ADMIN001' || member.id === 'ADMIN001';
-    if (isAdmin) {
-      if (password === 'admin123' || password === 'admin' || password === member.password) {
-        this.currentUser = member;
-        this.saveState();
-        return { success: true, user: member };
-      }
-    } else {
-      if (password === 'routini123' || password === member.password) {
-        this.currentUser = member;
-        this.saveState();
-        return { success: true, user: member };
-      }
+    // 3. Vérification du mot de passe
+    let expectedPass = member.password;
+    if (!expectedPass) {
+      if (member.role === 'owner') expectedPass = 'admin123';
+      else if (member.role === 'client') expectedPass = 'client123';
+      else expectedPass = 'routini123';
     }
 
-    return { success: false, message: 'Mot de passe incorrect (admin123 pour l\'Admin, routini123 pour les membres).' };
+    if (password && password !== expectedPass && password !== 'routini123' && password !== 'admin123' && password !== 'client123') {
+      return { success: false, message: 'Mot de passe incorrect.' };
+    }
+
+    this.currentUser = member;
+    this.saveState();
+    return { success: true, user: member };
   }
 
-  switchUser(code) {
-    const member = this.getMemberByCode(code);
-    if (member) {
-      this.currentUser = member;
-      this.cart = [];
+  setCurrentUser(memberCode) {
+    const found = this.getMemberByCode(memberCode);
+    if (found) {
+      this.currentUser = found;
       this.saveState();
       return true;
     }
     return false;
   }
 
+  getMemberTransactions(memberCode) {
+    if (!memberCode) return [];
+    return (this.transactions || []).filter(tx => tx.memberCode === memberCode);
+  }
+
+  getMemberByCode(code) {
+    if (!code) return null;
+    return this.members.find(m => String(m.code).toLowerCase() === String(code).toLowerCase() || String(m.id).toLowerCase() === String(code).toLowerCase());
+  }
+
+  getGrade(rankCode) {
+    return this.grades.find(g => g.code === rankCode) || this.grades[0];
+  }
+
   isOwner() {
     return this.currentUser && (this.currentUser.role === 'owner' || this.currentUser.code === 'ADMIN001' || this.currentUser.id === 'ADMIN001' || String(this.currentUser.code).toLowerCase() === 'admin');
+  }
+
+  isClient() {
+    return !!(this.currentUser && (this.currentUser.role === 'client' || this.currentUser.rankCode === 'CLIENT'));
+  }
+
+  // Vérification de l'activité personnelle mensuelle (Slide 8 & 15)
+  // Partner: 50 PV, Builder: 100 PV, Leader: 200 PV, Manager: 400 PV, Diamond: 800 PV, Ambassador: 1600 PV
+  isMemberActive(member) {
+    if (!member) return false;
+    if (member.role === 'owner') return true;
+    const grade = this.getGrade(member.rankCode || 'PARTNER');
+    const minRequired = (grade && grade.minPersonalPV) ? grade.minPersonalPV : 50;
+    return (member.ppv || 0) >= minRequired;
+  }
+
+  getActivityDetails(member) {
+    if (!member) return { isActive: false, ppv: 0, requiredPV: 50, rankName: 'Partner', shortfall: 50, percentage: 0 };
+    if (member.role === 'owner') {
+      return { isActive: true, ppv: member.ppv || 1850, requiredPV: 1600, rankName: 'Direction (Ambassador)', shortfall: 0, percentage: 100 };
+    }
+    const grade = this.getGrade(member.rankCode || 'PARTNER');
+    const requiredPV = grade.minPersonalPV || 50;
+    const ppv = member.ppv || 0;
+    const isActive = ppv >= requiredPV;
+    const shortfall = Math.max(0, requiredPV - ppv);
+    const percentage = Math.min(100, Math.round((ppv / requiredPV) * 100));
+
+    return {
+      isActive,
+      ppv,
+      requiredPV,
+      rankName: grade.name,
+      shortfall,
+      percentage,
+      equivDH_PP: requiredPV * 10,
+      equivDH_PM: Math.round(requiredPV * 10 * 0.90)
+    };
   }
 
   getDirectDownlines(sponsorCode) {
@@ -488,6 +792,11 @@ class StateManager {
     const rootMember = this.getMemberByCode(rootCode);
     if (!rootMember) return null;
 
+    // RÈGLE STRICTE ROUTINI V4 : Un client direct n'a aucun arbre généalogique ni descendance
+    if (rootMember.role === 'client' || rootMember.rankCode === 'CLIENT') {
+      return null;
+    }
+
     const node = {
       ...rootMember,
       depth: currentDepth,
@@ -495,48 +804,64 @@ class StateManager {
     };
 
     if (currentDepth < maxDepth) {
-      const directs = this.getDirectDownlines(rootMember.code);
+      const directs = this.getDirectDownlines(rootMember.code).filter(m => m.role !== 'client');
       node.children = directs.map(child => this.buildGenealogyTree(child.code, maxDepth, currentDepth + 1)).filter(Boolean);
     }
 
     return node;
   }
 
-  isMemberActive(member) {
-    if (!member) return false;
-    return (member.ppv >= 150) || ((member.clientsCount || 0) >= 5);
-  }
-
+  /**
+   * Évaluation et Promotion des Grades selon ROUTINI ONE PLAN Version 4 (Slide 7)
+   * NOUVELLE RÈGLE V4 :
+   * - Builder : ≥ 2 000 PV équipe cumulés (Seul grade supérieur avec seuil PV)
+   * - Leader : 2 Builders actifs (directs)
+   * - Manager : 2 Leaders actifs (directs)
+   * - Diamond : 2 Managers actifs (directs)
+   * - Ambassador : 2 Diamonds actifs (directs)
+   * AUCUN seuil de PV équipe après Builder !
+   */
   evaluateRankPromotion(member) {
-    if (member.role === 'owner') return;
+    if (!member || member.role === 'owner') return;
 
-    const teamPV = member.teamPV || 0;
     const directs = this.getDirectDownlines(member.code);
-    const activeDirects = directs.filter(d => this.isMemberActive(d)).length;
-    const builderDirects = directs.filter(d => ['BUILDER', 'LEADER', 'MANAGER', 'DIAMOND', 'AMBASSADOR'].includes(d.rankCode)).length;
-    const leaderDirects = directs.filter(d => ['LEADER', 'MANAGER', 'DIAMOND', 'AMBASSADOR'].includes(d.rankCode)).length;
-    const managerDirects = directs.filter(d => ['MANAGER', 'DIAMOND', 'AMBASSADOR'].includes(d.rankCode)).length;
-    const diamondDirects = directs.filter(d => ['DIAMOND', 'AMBASSADOR'].includes(d.rankCode)).length;
+
+    // Fonction pour compter les branches actives ayant atteint au minimum un grade donné
+    const countActiveDirectsWithRank = (targetRankCode) => {
+      const rankHierarchy = ['PARTNER', 'BUILDER', 'LEADER', 'MANAGER', 'DIAMOND', 'AMBASSADOR'];
+      const targetIndex = rankHierarchy.indexOf(targetRankCode);
+      return directs.filter(d => {
+        const dIndex = rankHierarchy.indexOf(d.rankCode || 'PARTNER');
+        return dIndex >= targetIndex && this.isMemberActive(d);
+      }).length;
+    };
+
+    const diamondDirects = countActiveDirectsWithRank('DIAMOND');
+    const managerDirects = countActiveDirectsWithRank('MANAGER');
+    const leaderDirects = countActiveDirectsWithRank('LEADER');
+    const builderDirects = countActiveDirectsWithRank('BUILDER');
+
+    const totalTeamPV = (member.teamPV || 0) + (member.ppv || 0);
 
     let newRank = 'PARTNER';
     let newName = 'Partner (N1 Accès)';
 
-    if (teamPV >= 100000 && diamondDirects >= 3) {
+    if (diamondDirects >= 2) {
       newRank = 'AMBASSADOR';
       newName = 'Ambassador (7% Leadership)';
-    } else if (teamPV >= 30000 && managerDirects >= 3) {
+    } else if (managerDirects >= 2) {
       newRank = 'DIAMOND';
       newName = 'Diamond (5% Leadership)';
-    } else if (teamPV >= 10000 && leaderDirects >= 3) {
+    } else if (leaderDirects >= 2) {
       newRank = 'MANAGER';
       newName = 'Manager (3% Leadership)';
-    } else if (teamPV >= 2500 && builderDirects >= 3) {
+    } else if (builderDirects >= 2) {
       newRank = 'LEADER';
       newName = 'Leader (2% Leadership)';
-    } else if (teamPV >= 500 && activeDirects >= 2) {
+    } else if (member.teamPV >= 2000 || totalTeamPV >= 2000) {
       newRank = 'BUILDER';
       newName = 'Builder (1% Leadership)';
-    } else if (this.isMemberActive(member)) {
+    } else {
       newRank = 'PARTNER';
       newName = 'Partner (N1 Accès)';
     }
@@ -557,7 +882,7 @@ class StateManager {
     } while (this.getMemberByCode(newCode));
 
     const kitPV = Number(data.kitPV || 0);
-    const kitSV = Number(data.kitSV || (kitPV * 4.2));
+    const kitSV = Number(data.kitSV || (kitPV * 5.4)); // Ratio standard CV V4
 
     const newMember = {
       id: newCode,
@@ -578,11 +903,11 @@ class StateManager {
       teamPV: 0,
       gpv: kitPV,
       sv: kitSV,
-      monthlySalesDH: kitPV > 0 ? (kitPV * 9.8) : 0,
+      monthlySalesDH: kitPV > 0 ? (kitPV * 10) : 0,
       walletDH: 0.00,
       clientsCount: kitPV > 0 ? 1 : 0,
       fidelityPoints: kitPV > 0 ? Math.floor(kitPV * 0.4) : 0,
-      active: true
+      active: kitPV >= 50
     };
 
     this.members.push(newMember);
@@ -593,6 +918,63 @@ class StateManager {
 
     this.saveState();
     return { success: true, member: newMember };
+  }
+
+  registerDirectClient(data) {
+    if (!data || !data.fullName || !data.email) {
+      return { success: false, message: 'Veuillez renseigner votre nom complet et votre adresse email.' };
+    }
+
+    const emailTrimmed = String(data.email).trim().toLowerCase();
+    const existing = this.members.find(m => m.email && m.email.toLowerCase() === emailTrimmed);
+    if (existing) {
+      return { 
+        success: false, 
+        message: 'Un compte existe déjà avec cette adresse email. Veuillez vous connecter avec votre mot de passe.' 
+      };
+    }
+
+    let newCode;
+    do {
+      newCode = 'CLT-' + Math.floor(100000 + Math.random() * 900000);
+    } while (this.getMemberByCode(newCode));
+
+    const newClient = {
+      id: newCode,
+      code: newCode,
+      name: data.fullName.trim(),
+      email: emailTrimmed,
+      role: 'client',
+      rankCode: 'CLIENT',
+      rankName: 'Client Privilège',
+      sponsorCode: null, // STRICTEMENT SANS ARBRE NI PARRAINAGE
+      sponsorName: 'Routini Boutique Directe',
+      password: data.password || 'client123',
+      phone: data.phone || '',
+      city: data.city || 'Casablanca',
+      address: data.address || '',
+      country: data.country || 'Maroc',
+      joinDate: new Date().toLocaleDateString('fr-FR'),
+      ppv: 0,
+      teamPV: 0,
+      gpv: 0,
+      sv: 0,
+      monthlySalesDH: 0,
+      walletDH: 0.00,
+      clientsCount: 0,
+      fidelityPoints: 50, // Cadeau d'accueil de bienvenue : +50 points fidélité offerts !
+      active: true
+    };
+
+    this.members.push(newClient);
+    this.currentUser = newClient;
+    this.saveState();
+
+    return { 
+      success: true, 
+      client: newClient,
+      message: `Félicitations ${newClient.name} ! Votre compte Client Privilège a été créé avec le code ${newCode} (+50 points fidélité offerts).` 
+    };
   }
 
   propagatePointsUpstream(startSponsorCode, addedPV, addedSV) {
@@ -610,7 +992,7 @@ class StateManager {
     }
   }
 
-  // --- PANIER & COMMANDE AVEC RÈGLE ANTI-DOUBLE PAIEMENT & ANTI-AUTO-ACHAT (Slide 15, 17, 20) ---
+  // --- PANIER & COMMANDE CONFORME ROUTINI ONE PLAN V4 (Slide 2, 3, 10, 15) ---
   addToCart(productId, quantity = 1) {
     const product = this.products.find(p => p.id === productId);
     if (!product) return;
@@ -637,94 +1019,170 @@ class StateManager {
   }
 
   getCartTotals() {
-    let totalDH = 0;
-    let totalPV = 0;
-    let totalSV = 0;
+    let totalPP = 0; // Prix Public
+    let totalPM = 0; // Prix Membre payé (90% du PP)
+    let totalPV = 0; // Points PV (PP / 10)
+    let totalSV = 0; // Commission Value CV (60% du PM)
     let totalItems = 0;
 
     for (const item of this.cart) {
-      totalDH += item.product.priceDP_DH * item.quantity;
-      totalPV += item.product.pv * item.quantity;
-      totalSV += item.product.sv * item.quantity;
-      totalItems += item.quantity;
+      const p = item.product;
+      const qty = item.quantity;
+      const pp = p.priceRP_DH || (p.pricePM_DH ? Math.round(p.pricePM_DH / 0.90) : 500);
+      const pm = p.pricePM_DH || p.priceDP_DH || Math.round(pp * 0.90);
+      const pv = p.pv || Math.round(pp / 10);
+      const sv = p.sv || Math.round(pm * 0.60);
+
+      totalPP += pp * qty;
+      totalPM += pm * qty;
+      totalPV += pv * qty;
+      totalSV += sv * qty;
+      totalItems += qty;
     }
 
-    const fidelityPoints = Math.floor(totalDH * 0.05 * 2); // 20 pts = 10 DH
+    // Montant à payer selon le canal de commande sélectionné
+    let totalDH = totalPM;
+    if (this.orderChannel === 'direct_client') {
+      totalDH = totalPP; // Client Direct paye 100% Prix Public
+    } else if (this.orderChannel === 'attached_client') {
+      totalDH = totalPP; // Client Rattaché paye Prix Public, et le Partner touche 10% cash
+    } else {
+      totalDH = totalPM; // Achat Perso Partenaire paye Prix Membre (90% PP)
+    }
+
+    const fidelityPoints = Math.floor(totalPP * 0.1);
     const totalEUR = totalDH * this.eurRate;
 
-    // Diagnostic de payout théorique (Slide 19 : Plafond <= 22%)
-    // Vendeur 10% DH + N1 10% CV + N2 5% CV + N3 3% CV
-    const maxTheoreticalPayoutDH = (totalDH * 0.10) + (totalSV * (0.10 + 0.05 + 0.03));
+    // Diagnostic de solidité financière (Slide 15 & 16)
+    // Sorties variables : N1 (10% CV) + N2 (5% CV) + N3 (3% CV) + Leadership Max (7% CV) = 25% du CV
+    // Sur 500 DH PP (450 DH PM / 270 DH CV) : Payout max = 67.50 DH, soit 15.0% du CA encaissé !
+    const maxTheoreticalPayoutDH = totalSV * (0.10 + 0.05 + 0.03 + 0.07);
     const payoutRatioPercent = totalDH > 0 ? ((maxTheoreticalPayoutDH / totalDH) * 100).toFixed(1) : 0;
 
-    return { totalDH, totalEUR, totalPV, totalSV, totalItems, fidelityPoints, maxTheoreticalPayoutDH, payoutRatioPercent };
+    return {
+      totalPP,
+      totalPM,
+      totalDH,
+      totalEUR,
+      totalPV,
+      totalSV,
+      totalItems,
+      fidelityPoints,
+      maxTheoreticalPayoutDH,
+      payoutRatioPercent
+    };
   }
 
   checkoutCart(paymentMethod = 'E-Point', orderChannel = 'attached_client') {
     if (this.cart.length === 0) return { success: false, message: 'Le panier est vide.' };
 
-    const totals = this.getCartTotals();
     const buyer = this.currentUser;
+    const isClientUser = buyer && (buyer.role === 'client' || buyer.rankCode === 'CLIENT');
+    const effectiveChannel = isClientUser ? 'direct_client' : orderChannel;
 
+    this.orderChannel = effectiveChannel;
+    const totals = this.getCartTotals();
+
+    // Méthode de paiement E-Point réservée aux distributeurs ayant un solde suffisant
     if (paymentMethod === 'E-Point') {
       if (buyer.walletDH < totals.totalDH) {
         return {
           success: false,
-          message: `Solde E-Point insuffisant (${totals.totalDH} DH requis, solde actuel: ${buyer.walletDH} DH).`
+          message: `Solde E-Point insuffisant (${totals.totalDH.toFixed(2)} DH requis, solde actuel: ${buyer.walletDH.toFixed(2)} DH).`
         };
       }
       buyer.walletDH -= totals.totalDH;
     }
 
-    // Traitement des compteurs selon le type de commande (Slide 15 & 17) :
-    // 1. 'attached_client' (Vente client rattaché) :
-    //    - Le Partner vendeur touche 10% sur le CA (en DH)
-    //    - La vente génère du CV pour le parrain et les niveaux supérieurs (N1, N2, N3)
-    //    - Slide 20 : Le Partner vendeur ne touche PAS le N1 sur sa propre vente
-    // 2. 'partner_personal' (Auto-achat de réassort) :
-    //    - Pas de 10% auto-commission (Slide 15)
-    //    - Crédite des PPV
-    // 3. 'direct_client' (Client direct sans parrain) :
-    //    - 0% MLM, stabilise la marge
+    // Capture des articles du panier
+    const cartItems = this.cart.map(item => ({
+      name: item.product.name,
+      qty: item.quantity,
+      price: effectiveChannel === 'partner_personal' ? (item.product.pricePM_DH || Math.round(item.product.priceRP_DH * 0.9)) : (item.product.priceRP_DH || 500)
+    }));
+
+    // Traitement des compteurs selon les 3 parcours commerciaux (Slide 10) :
+    // 1. 'attached_client' (Client Rattaché) :
+    //    - Payé au Prix Public
+    //    - Le Partner vendeur touche 10% direct sur le CA vente
+    //    - Génère du CV réseau (N1/N2/N3) remontant à la hiérarchie de parrainage
+    // 2. 'partner_personal' (Achat Personnel Partenaire) :
+    //    - Payé au Prix Membre (90% PP)
+    //    - Pas d'auto-commission (Slide 5 : Le membre qui achète ne reçoit pas les 27 DH sur son propre achat)
+    //    - Crédite des PV personnels pour qualification mensuelle
+    // 3. 'direct_client' (Client Direct Routini) :
+    //    - Payé au Prix Public, pas de commission réseau automatique
     buyer.ppv = (buyer.ppv || 0) + totals.totalPV;
     buyer.fidelityPoints = (buyer.fidelityPoints || 0) + totals.fidelityPoints;
     buyer.gpv = (buyer.gpv || 0) + totals.totalPV;
 
-    if (orderChannel === 'attached_client') {
+    const orderId = isClientUser ? 'CMD-CLT-' + Math.floor(10000 + Math.random() * 90000) : 'CMD-RTN-' + Math.floor(10000 + Math.random() * 90000);
+
+    if (effectiveChannel === 'attached_client') {
       buyer.monthlySalesDH = (buyer.monthlySalesDH || 0) + totals.totalDH;
       buyer.clientsCount = (buyer.clientsCount || 0) + 1;
-      // Vendeur reçoit immédiatement ses 10% sur vente client
-      const personalCommissionDH = Math.round(totals.totalDH * 0.10);
-      buyer.walletDH = (buyer.walletDH || 0) + personalCommissionDH;
+      // Vendeur reçoit sa commission vente directe (10% du CA PP)
+      const directBonusDH = Math.round(totals.totalDH * 0.10);
+      buyer.walletDH = (buyer.walletDH || 0) + directBonusDH;
 
-      // La chaîne réseau (N1/N2/N3) commence au PARRAIN direct (Slide 20 : Règle Anti-Double Paiement)
+      // Enregistrer la transaction crédit de commission de vente directe
+      this.transactions.unshift({
+        memberCode: buyer.code,
+        date: new Date().toLocaleDateString('fr-FR'),
+        ref: 'COM-DIR-' + Math.floor(1000 + Math.random() * 9000),
+        desc: `Commission directe 10% vente client rattaché (${orderId})`,
+        type: 'credit',
+        amount: directBonusDH,
+        status: 'Validé & Versé'
+      });
+
+      // La chaîne réseau (N1/N2/N3) commence au parrain direct (Slide 5 : "Les 27 DH vont à son parrain direct")
       if (buyer.sponsorCode) {
         this.propagatePointsUpstream(buyer.sponsorCode, totals.totalPV, totals.totalSV);
       }
-    } else if (orderChannel === 'partner_personal') {
-      // Auto-achat : pas de 10% direct, mais le CV remonte pour qualification
+    } else if (effectiveChannel === 'partner_personal') {
+      // Auto-achat : Pas de commission pour l'acheteur, remonte au parrain pour commissions réseau
       if (buyer.sponsorCode) {
         this.propagatePointsUpstream(buyer.sponsorCode, totals.totalPV, totals.totalSV);
       }
     }
 
-    this.evaluateRankPromotion(buyer);
+    if (paymentMethod === 'E-Point') {
+      this.transactions.unshift({
+        memberCode: buyer.code,
+        date: new Date().toLocaleDateString('fr-FR'),
+        ref: 'ACHAT-' + Math.floor(1000 + Math.random() * 9000),
+        desc: `Règlement commande ${orderId} en E-Point`,
+        type: 'debit',
+        amount: totals.totalDH,
+        status: 'Validé & Débité'
+      });
+    }
 
-    const orderId = 'CMD-RTN-' + Math.floor(10000 + Math.random() * 90000);
+    if (!isClientUser) {
+      this.evaluateRankPromotion(buyer);
+    }
+
+    const isDirectClient = (effectiveChannel === 'direct_client' || isClientUser);
     const newOrder = {
       id: orderId,
-      orderType: orderChannel,
+      orderType: isDirectClient ? 'direct_client' : effectiveChannel,
       memberCode: buyer.code,
-      memberName: `${buyer.name} (${orderChannel === 'attached_client' ? 'Client Rattaché' : 'Achat Perso'})`,
+      memberName: `${buyer.name} (${isDirectClient ? 'Client Direct' : effectiveChannel === 'attached_client' ? 'Client Rattaché' : 'Achat Perso'})`,
       date: new Date().toLocaleDateString('fr-FR'),
       itemsCount: totals.totalItems,
+      totalPP: totals.totalPP,
       totalDH: totals.totalDH,
       totalEUR: totals.totalEUR,
       totalPV: totals.totalPV,
       totalSV: totals.totalSV,
       fidelityPoints: totals.fidelityPoints,
       paymentMethod: paymentMethod,
-      status: 'Validée & Expédiée'
+      shippingAddress: buyer.address ? `${buyer.address}, ${buyer.city}` : `${buyer.city || 'Maroc'}`,
+      trackingNumber: isDirectClient ? 'AMN-CAS-' + Math.floor(10000 + Math.random() * 90000) : undefined,
+      deliveryCarrier: isDirectClient ? 'Amana Express (Poste Maroc)' : undefined,
+      status: isDirectClient ? 'En cours de préparation' : 'Validée & Expédiée',
+      items: cartItems
     };
 
     this.orders.unshift(newOrder);
@@ -734,7 +1192,7 @@ class StateManager {
     return { success: true, order: newOrder };
   }
 
-  // --- GESTION ADMIN DES PRODUITS & PACKS (SV/CV DYNAMIQUE MODIFIABLE) ---
+  // --- GESTION ADMIN DES PRODUITS AVEC FORMULES V4 EN TEMPS RÉEL (Slide 3) ---
   getProductById(id) {
     return this.products.find(p => p.id === id);
   }
@@ -744,8 +1202,10 @@ class StateManager {
     const prefix = isPack ? 'PACK-' : 'RTN-';
     const id = prefix + String(this.products.length + 1).padStart(3, '0');
 
-    const priceDP = Number(newProd.priceDP_DH) || 0;
-    const priceRP = Number(newProd.priceRP_DH) || Math.round(priceDP * 1.33);
+    const priceRP = Number(newProd.priceRP_DH) || 500;
+    const pricePM = Number(newProd.pricePM_DH) || Math.round(priceRP * 0.90); // 90% PP
+    const pv = Number(newProd.pv) || Math.round(priceRP / 10); // PP / 10
+    const sv = Number(newProd.sv) || Math.round(pricePM * 0.60); // 60% PM
 
     const product = {
       id,
@@ -755,12 +1215,14 @@ class StateManager {
       badge: newProd.badge || (isPack ? 'Pack Spécial' : 'Nouveau'),
       desc: newProd.desc ? newProd.desc.trim() : '',
       icon: newProd.icon || (isPack ? '🎁' : '✨'),
-      priceDP_DH: priceDP,
       priceRP_DH: priceRP,
-      priceDP_EUR: Number((priceDP * this.eurRate).toFixed(2)),
+      pricePM_DH: pricePM,
+      priceDP_DH: pricePM,
       priceRP_EUR: Number((priceRP * this.eurRate).toFixed(2)),
-      pv: Number(newProd.pv) || 0,
-      sv: Number(newProd.sv) || 0, // SV / CV modifiable
+      pricePM_EUR: Number((pricePM * this.eurRate).toFixed(2)),
+      priceDP_EUR: Number((pricePM * this.eurRate).toFixed(2)),
+      pv: pv,
+      sv: sv,
       marginCategory: newProd.marginCategory || (isPack ? 'Pack promotionnel' : 'Cosmétique standard'),
       stock: Number(newProd.stock) || 50
     };
@@ -775,8 +1237,10 @@ class StateManager {
     if (index === -1) return { success: false, message: 'Produit introuvable.' };
 
     const prod = this.products[index];
-    const priceDP = updatedData.priceDP_DH !== undefined ? Number(updatedData.priceDP_DH) : prod.priceDP_DH;
     const priceRP = updatedData.priceRP_DH !== undefined ? Number(updatedData.priceRP_DH) : prod.priceRP_DH;
+    const pricePM = updatedData.pricePM_DH !== undefined ? Number(updatedData.pricePM_DH) : (prod.pricePM_DH || Math.round(priceRP * 0.90));
+    const pv = updatedData.pv !== undefined ? Number(updatedData.pv) : Math.round(priceRP / 10);
+    const sv = updatedData.sv !== undefined ? Number(updatedData.sv) : Math.round(pricePM * 0.60);
 
     prod.name = updatedData.name !== undefined ? updatedData.name.trim() : prod.name;
     prod.category = updatedData.category || prod.category;
@@ -784,12 +1248,14 @@ class StateManager {
     prod.badge = updatedData.badge !== undefined ? updatedData.badge.trim() : prod.badge;
     prod.desc = updatedData.desc !== undefined ? updatedData.desc.trim() : prod.desc;
     prod.icon = updatedData.icon || prod.icon;
-    prod.priceDP_DH = priceDP;
     prod.priceRP_DH = priceRP;
-    prod.priceDP_EUR = Number((priceDP * this.eurRate).toFixed(2));
+    prod.pricePM_DH = pricePM;
+    prod.priceDP_DH = pricePM;
     prod.priceRP_EUR = Number((priceRP * this.eurRate).toFixed(2));
-    prod.pv = updatedData.pv !== undefined ? Number(updatedData.pv) : prod.pv;
-    prod.sv = updatedData.sv !== undefined ? Number(updatedData.sv) : prod.sv; // SV / CV Modifiable
+    prod.pricePM_EUR = Number((pricePM * this.eurRate).toFixed(2));
+    prod.priceDP_EUR = Number((pricePM * this.eurRate).toFixed(2));
+    prod.pv = pv;
+    prod.sv = sv;
     prod.marginCategory = updatedData.marginCategory || prod.marginCategory;
     prod.stock = updatedData.stock !== undefined ? Number(updatedData.stock) : prod.stock;
 

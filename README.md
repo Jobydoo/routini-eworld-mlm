@@ -1,60 +1,90 @@
-# Routini eWorld MLM — Modèle Officiel ROUTINE ONE PLAN
+# Routini eWorld MLM — Modèle Officiel ROUTINI ONE PLAN (Version 4 • Septembre 2026)
 
-Plateforme MLM et E-Commerce de Cosmétiques & Soins de Beauté au Maroc, implémentant rigoureusement le modèle mathématique et organisationnel des **23 slides officielles du ROUTINE ONE PLAN (V1 - V2 - V3)**.
+Plateforme MLM et E-Commerce de Cosmétiques & Soins de Beauté d'Excellence au Maroc, implémentant rigoureusement le modèle mathématique, commercial et organisationnel du document officiel **ROUTINI ONE PLAN (Version 4 • Septembre 2026)**.
 
 ---
 
-## 🚀 Accès Rapide & Identifiants
+## 🚀 Accès Rapide & Lancement Local
 
-### 👑 Espace Direction Générale / Administrateur
+### 📁 Emplacements des Dossiers
+- **Dossier de production :** `c:\Users\hp\.gemini\antigravity-ide\scratch\dxn-eworld-mlm`
+- **Dossier de sauvegarde (Backup certifié) :** `c:\Users\hp\.gemini\antigravity-ide\scratch\dxn-eworld-mlm_backup_v3`
+
+### 💻 Commandes d'Exécution
+```bash
+# Lancement avec Python (recommandé) :
+python -m http.server 8080
+
+# Ou avec Node.js :
+npx serve .
+```
+Accédez ensuite à l'application dans votre navigateur : **[http://localhost:8080](http://localhost:8080)**.
+
+---
+
+## 🔑 Identifiants de Démonstration
+
+### 👑 Espace Direction Générale / Fondateur
 - **Identifiant :** `admin` (ou `ADMIN001`)
 - **Mot de passe :** `admin123`
 - **Rôle :** Direction Fondatrice / Administrateur Système
 - **Fonctionnalités exclusives :**
-  - Modification en temps réel du **SV / CV**, **PV**, prix Distributeur (DP) et prix Public (RP) sur tous les produits et packs
-  - Ajout de nouveaux produits et création de **Packs Rituels promotionnels**
-  - Stress Test financier en direct avec respect strict du **plafond de payout cash ≤ 22%**
-  - Suivi en temps réel des **51 membres** et **135 commandes historiques**
+  - Contrôle du catalogue avec formules automatiques V4 : Prix Membre ($90\%$), Points PV ($PP \div 10$), Base CV ($60\%$ du Prix Membre).
+  - Stress Test financier en direct (Slide 15 & 16) : suivi des entrées et sorties variables ($N1 + N2 + N3 + \text{Leadership} \le 15\%$ du CA membre encaissé, bien en-deçà du plafond de $22\%$).
+  - Supervision des 51 partenaires et ajustement des barèmes PV/CV/Portefeuilles.
 
-### 💎 Espace Distributeur / Ambassadeur (Exemple)
-- **Code Membre :** `818204921`
-- **Mot de passe :** `routini123`
-- **Grade :** Star Diamond / Ambassadeur Casablanca
-- **Fonctionnalités :**
-  - Arbre généalogique interactif sur 3 niveaux (N1: 10%, N2: 5%, N3: 3%) et différentiel Leadership (1% à 7%)
-  - Portefeuille E-Point avec historique des clôtures mensuelles et virements bancaires (CIH, Attijariwafa, BMCE, BCP)
-  - Boutique cosmétiques avec tunnel de commande selon les 3 canaux (Client Direct, Client Rattaché, Achat Perso)
-
----
-
-## 🌟 Principes Clés du ROUTINE ONE PLAN Implémentés
-
-1. **Inscription Partenaire à 0 DH (Slide 2)** : Aucune obligation de commande personnelle pour adhérer ou rester actif.
-2. **3 Profils Clients & 3 Logiques de Rémunération (Slide 14-15)** :
-   - **Client Direct (0%)** : Sans code parrain, stabilisateur de marge, points fidélité (20 pts = 10 DH).
-   - **Client Rattaché** : 10% de commission vente directe au Partner + génération de CV réseau (N1/N2/N3).
-   - **Partner (Réseau & Ventes)** : Commissions d'équipe et ventes, règle stricte anti-auto-achat (pas d'auto-commission sur réassort perso).
-3. **Règle Anti-Double Paiement (Slide 15 & 20)** : Une vente = une seule commission personnelle (soit 10% vendeur, soit position réseau, jamais les deux).
-4. **Sécurité Financière & Payout Cash ≤ 22% (Slide 19 & 23)** : Vérification dynamique garantissant la solvabilité de l'entreprise.
-5. **Hiérarchie des 6 Grades Officiels** : Partner ➔ Builder (1%) ➔ Leader (2%) ➔ Manager (3%) ➔ Diamond (5%) ➔ Ambassador (7%).
+### 💎 Profils Distributeurs Disponibles
+- **Ambassador (7%) :** Karim Benali (`818204921` / `routini123`) — Casablanca
+- **Diamond (5%) :** Mehdi Alami (`818206330` / `routini123`) — Marrakech
+- **Manager (3%) :** Nadia Berrada (`818210552` / `routini123`) — Agadir
+- **Leader (2%) :** Siham Bouazza (`818217123` / `routini123`) — Oujda
+- **Builder (1%) :** Ibtissam Kadiri (`818229345` / `routini123`) — Kénitra
+- **Partner Actif :** Najat El Mokri (`818243789` / `routini123`)
+- **Partner Inactif (< 50 PV) :** Driss Bensaid (`818252678` / `routini123`) — *Démontre la règle de non-versement des commissions si l'activité personnelle n'est pas atteinte (Slide 8/15)*.
 
 ---
 
-## 📊 Données Réelles sur 6 Mois d'Exploitation (Mars – Septembre 2026)
+## 🌟 Les 6 Règles Clés du ROUTINI ONE PLAN V4 (Slide 2 & 3)
 
-- **51 Membres Réseau** répartis à travers les principales villes du Maroc : Casablanca, Rabat, Marrakech, Fès, Tanger, Agadir, Oujda, Meknès, Kénitra, Tétouan, Mohammedia, El Jadida, Nador, Safi, Essaouira.
-- **135 Commandes Validées & Livrées** réparties chronologiquement sur 6 mois d'activité.
-- **10 Transactions de Portefeuille** incluant 6 clôtures mensuelles de primes et 4 virements bancaires réels.
+1. **Prix Membre (PM) = 90% du Prix Public (PP)** : Même remise de 10% pour tous les grades.
+2. **Points PV = PP ÷ 10** ($1\text{ PV} = 10\text{ DH PP}$) : Mesure l'activité et le volume de référence.
+3. **Commission Value (CV) = 60% du Prix Membre payé** : Base monétaire exclusive de calcul des commissions.
+   - *Formule étalon (Slide 3 & 5) :* $500\text{ DH PP} \rightarrow 450\text{ DH PM} \rightarrow 50\text{ PV} \rightarrow 270\text{ DH CV}$.
+4. **Commissions Réseau sur CV (jusqu'à 3 niveaux max)** :
+   - **N1 (Filleuls directs)** : $10\%$ sur CV (ex : $27{,}00\text{ DH}$ sur panier étalon $500\text{ DH PP}$)
+   - **N2 (Filleuls de tes N1)** : $5\%$ sur CV (ex : $13{,}50\text{ DH}$)
+   - **N3 (Filleuls de tes N2)** : $3\%$ sur CV (ex : $8{,}10\text{ DH}$)
+5. **Qualification Builder** : $\ge 2\,000\text{ PV}$ équipe cumulés (*seul grade supérieur avec seuil PV !*).
+6. **Progression après Builder (NOUVELLE RÈGLE 100% STRUCTURELLE)** :
+   - Aucun seuil de PV équipe après Builder !
+   - Leader = $2$ Builders actifs
+   - Manager = $2$ Leaders actifs
+   - Diamond = $2$ Managers actifs
+   - Ambassador = $2$ Diamonds actifs
 
 ---
 
-## 💻 Déploiement Local
+## ⚡ Activité Personnelle Mensuelle (Slide 8 & 15)
 
-```bash
-# Lancement simple avec Python
-python -m http.server 8080
+Pour être éligible au versement des commissions du mois, chaque distributeur doit réaliser ses PV personnels propres :
+- **Partner :** $50\text{ PV}$ ($500\text{ DH PP}$ / $450\text{ DH PM}$)
+- **Builder :** $100\text{ PV}$ ($1\,000\text{ DH PP}$ / $900\text{ DH PM}$)
+- **Leader :** $200\text{ PV}$ ($2\,000\text{ DH PP}$ / $1\,800\text{ DH PM}$)
+- **Manager :** $400\text{ PV}$ ($4\,000\text{ DH PP}$ / $3\,600\text{ DH PM}$)
+- **Diamond :** $800\text{ PV}$ ($8\,000\text{ DH PP}$ / $7\,200\text{ DH PM}$)
+- **Ambassador :** $1\,600\text{ PV}$ ($16\,000\text{ DH PP}$ / $14\,400\text{ DH PM}$)
 
-# Ou avec Node.js
-npx serve .
-```
-Accédez ensuite à `http://localhost:8080`.
+> **Règle d'inactivité (Slide 8 & 15) :** Si le minimum personnel du grade n'est pas atteint, aucune commission n'est versée ce mois-là. Le grade historique et le réseau sont intégralement conservés.
+
+---
+
+## 📈 Simulateurs Officiels Intégrés
+
+1. **Simulation Réelle de Départ sur 3 Mois (Slide 11 & 12)** :
+   - Scénario : Toi + 2 fils (N1) + 4 petits-fils (N2), chacun à $500\text{ DH PP}$/mois.
+   - Commissions : M1 = $0\text{ DH}$, M2 = $54\text{ DH}$, M3 = $54\text{ DH}$ (Toi cumulant $400\text{ PV} < 2\,000\text{ PV}$, le N2 n'est pas encore ouvert).
+   - Chiffre d'affaires encaissé de la société : M1 = $450\text{ DH}$, M2 = $1\,350\text{ DH}$, M3 = $3\,150\text{ DH}$, Cumul = $4\,950\text{ DH}$.
+2. **Objectif 10 000 DH/mois (Slide 13)** :
+   - $30\text{ N1}$ ($810\text{ DH}$) + $180\text{ N2}$ ($2\,430\text{ DH}$) + $840\text{ N3}$ ($6\,804\text{ DH}$) = $10\,044\text{ DH}$/mois avec réglages dynamiques.
+3. **Simulateur Personnalisé Réseau & Leadership** :
+   - Calcul par branche descendante avec différentiel : $\text{Taux du membre} - \text{Taux du plus haut qualifié de la branche}$.

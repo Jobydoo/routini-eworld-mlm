@@ -1,43 +1,51 @@
 const fs = require('fs');
 const path = require('path');
 
-// 50 realistic Moroccan members spanning 6 months (March 2026 - September 2026)
+// ROUTINI ONE PLAN - Version 4 (Septembre 2026)
+// 51 Membres Réseau Maroc + 135 Commandes (Mars 2026 - Septembre 2026)
+// Formules officielles V4 :
+// 1. Prix Membre (PM) = 90% x PP
+// 2. Points PV = PP / 10 (1 PV = 10 DH PP)
+// 3. Commission Value (CV) = 60% x PM
+// 4. Progression après Builder : 100% structurelle (2 actifs du grade précédent), AUCUN seuil PV équipe après Builder !
+// 5. Activité perso mensuelle : Partner 50 PV, Builder 100 PV, Leader 200 PV, Manager 400 PV, Diamond 800 PV, Ambassador 1600 PV.
+
 const CITIES = ['Casablanca', 'Rabat', 'Marrakech', 'Fès', 'Tanger', 'Agadir', 'Meknès', 'Oujda', 'Kénitra', 'Tétouan', 'Mohammedia', 'El Jadida', 'Nador', 'Safi', 'Essaouira'];
 
 const MEMBERS_RAW = [
-  // Fondateur
+  // 1. Fondateur & Direction
   {
     id: 'ADMIN001', code: 'ADMIN001', name: 'Direction Générale Routini (Fondateur)',
     email: 'direction@routini-cosmetics.com', role: 'owner', rankCode: 'AMBASSADOR',
     rankName: 'Ambassador (7% Leadership)', sponsorCode: null, sponsorName: 'Siège Routini Cosmétiques',
     password: 'admin123', phone: '+212 522 888999', city: 'Casablanca', country: 'Maroc',
-    joinDate: '01/01/2023', ppv: 450, teamPV: 185000, gpv: 185450, sv: 128000,
-    monthlySalesDH: 32000, walletDH: 245800.00, clientsCount: 22, fidelityPoints: 680, active: true
+    joinDate: '01/01/2023', ppv: 1850, teamPV: 185000, gpv: 186850, sv: 128000,
+    monthlySalesDH: 36000, walletDH: 245800.00, clientsCount: 22, fidelityPoints: 680, active: true
   },
-  // 2 Ambassadeurs
+  // 2 Ambassadeurs (Seuil perso >= 1600 PV, 2 Diamonds actifs)
   {
     id: '818204921', code: '818204921', name: 'Karim Benali',
     email: 'karim.benali@routini-ambassador.com', role: 'distributor', rankCode: 'AMBASSADOR',
     rankName: 'Ambassador (7% Leadership)', sponsorCode: 'ADMIN001', sponsorName: 'Direction Générale Routini',
     password: 'routini123', phone: '+212 661 123456', city: 'Casablanca', country: 'Maroc',
-    joinDate: '15/01/2023', ppv: 380, teamPV: 124000, gpv: 124380, sv: 86000,
-    monthlySalesDH: 22000, walletDH: 54200.00, clientsCount: 16, fidelityPoints: 490, active: true
+    joinDate: '15/01/2023', ppv: 1650, teamPV: 124000, gpv: 125650, sv: 86000,
+    monthlySalesDH: 24000, walletDH: 54200.00, clientsCount: 16, fidelityPoints: 490, active: true
   },
   {
     id: '818205114', code: '818205114', name: 'Fatima-Zahra El Amrani',
     email: 'fz.elamrani@routini-ambassador.com', role: 'distributor', rankCode: 'AMBASSADOR',
     rankName: 'Ambassador (7% Leadership)', sponsorCode: '818204921', sponsorName: 'Karim Benali',
     password: 'routini123', phone: '+212 662 987654', city: 'Rabat', country: 'Maroc',
-    joinDate: '02/06/2023', ppv: 310, teamPV: 108000, gpv: 108310, sv: 74000,
-    monthlySalesDH: 18500, walletDH: 48900.00, clientsCount: 14, fidelityPoints: 410, active: true
+    joinDate: '02/06/2023', ppv: 1620, teamPV: 108000, gpv: 109620, sv: 74000,
+    monthlySalesDH: 21500, walletDH: 48900.00, clientsCount: 14, fidelityPoints: 410, active: true
   },
-  // 4 Diamants (30 000+ PV)
+  // 4 Diamants (Seuil perso >= 800 PV, 2 Managers actifs)
   {
     id: '818206330', code: '818206330', name: 'Mehdi Alami',
     email: 'mehdi.alami@routini-ambassador.com', role: 'distributor', rankCode: 'DIAMOND',
     rankName: 'Diamond (5% Leadership)', sponsorCode: '818204921', sponsorName: 'Karim Benali',
     password: 'routini123', phone: '+212 663 456789', city: 'Marrakech', country: 'Maroc',
-    joinDate: '10/09/2023', ppv: 280, teamPV: 46000, gpv: 46280, sv: 32000,
+    joinDate: '10/09/2023', ppv: 850, teamPV: 46000, gpv: 46850, sv: 32000,
     monthlySalesDH: 14000, walletDH: 28400.00, clientsCount: 11, fidelityPoints: 320, active: true
   },
   {
@@ -45,7 +53,7 @@ const MEMBERS_RAW = [
     email: 'amina.tazi@routini-ambassador.com', role: 'distributor', rankCode: 'DIAMOND',
     rankName: 'Diamond (5% Leadership)', sponsorCode: '818205114', sponsorName: 'Fatima-Zahra El Amrani',
     password: 'routini123', phone: '+212 664 112233', city: 'Fès', country: 'Maroc',
-    joinDate: '14/11/2023', ppv: 260, teamPV: 39500, gpv: 39760, sv: 27500,
+    joinDate: '14/11/2023', ppv: 830, teamPV: 39500, gpv: 40330, sv: 27500,
     monthlySalesDH: 12500, walletDH: 22100.00, clientsCount: 10, fidelityPoints: 290, active: true
   },
   {
@@ -53,7 +61,7 @@ const MEMBERS_RAW = [
     email: 'omar.elfassi@routini-ambassador.com', role: 'distributor', rankCode: 'DIAMOND',
     rankName: 'Diamond (5% Leadership)', sponsorCode: '818204921', sponsorName: 'Karim Benali',
     password: 'routini123', phone: '+212 665 223344', city: 'Casablanca', country: 'Maroc',
-    joinDate: '10/01/2024', ppv: 250, teamPV: 34800, gpv: 35050, sv: 24200,
+    joinDate: '10/01/2024', ppv: 820, teamPV: 34800, gpv: 35620, sv: 24200,
     monthlySalesDH: 11800, walletDH: 19800.00, clientsCount: 9, fidelityPoints: 260, active: true
   },
   {
@@ -61,16 +69,16 @@ const MEMBERS_RAW = [
     email: 'youssef.mansouri@routini-ambassador.com', role: 'distributor', rankCode: 'DIAMOND',
     rankName: 'Diamond (5% Leadership)', sponsorCode: '818207890', sponsorName: 'Amina Tazi',
     password: 'routini123', phone: '+212 665 778899', city: 'Tanger', country: 'Maroc',
-    joinDate: '05/02/2024', ppv: 240, teamPV: 31200, gpv: 31440, sv: 21800,
+    joinDate: '05/02/2024', ppv: 810, teamPV: 31200, gpv: 32010, sv: 21800,
     monthlySalesDH: 11200, walletDH: 17600.00, clientsCount: 9, fidelityPoints: 240, active: true
   },
-  // 7 Managers (10 000+ PV)
+  // 7 Managers (Seuil perso >= 400 PV, 2 Leaders actifs)
   {
     id: '818210552', code: '818210552', name: 'Nadia Berrada',
     email: 'nadia.berrada@routini-ambassador.com', role: 'distributor', rankCode: 'MANAGER',
     rankName: 'Manager (3% Leadership)', sponsorCode: '818206330', sponsorName: 'Mehdi Alami',
     password: 'routini123', phone: '+212 666 334455', city: 'Agadir', country: 'Maroc',
-    joinDate: '18/04/2024', ppv: 220, teamPV: 16800, gpv: 17020, sv: 12400,
+    joinDate: '18/04/2024', ppv: 430, teamPV: 16800, gpv: 17230, sv: 12400,
     monthlySalesDH: 9400, walletDH: 14200.00, clientsCount: 8, fidelityPoints: 210, active: true
   },
   {
@@ -78,7 +86,7 @@ const MEMBERS_RAW = [
     email: 'tariq.idrissi@routini-ambassador.com', role: 'distributor', rankCode: 'MANAGER',
     rankName: 'Manager (3% Leadership)', sponsorCode: '818205114', sponsorName: 'Fatima-Zahra El Amrani',
     password: 'routini123', phone: '+212 667 445566', city: 'Rabat', country: 'Maroc',
-    joinDate: '01/05/2024', ppv: 210, teamPV: 15400, gpv: 15610, sv: 11200,
+    joinDate: '01/05/2024', ppv: 425, teamPV: 15400, gpv: 15825, sv: 11200,
     monthlySalesDH: 8900, walletDH: 12900.00, clientsCount: 8, fidelityPoints: 195, active: true
   },
   {
@@ -86,7 +94,7 @@ const MEMBERS_RAW = [
     email: 'salma.chraibi@routini-ambassador.com', role: 'distributor', rankCode: 'MANAGER',
     rankName: 'Manager (3% Leadership)', sponsorCode: '818208455', sponsorName: 'Omar El Fassi',
     password: 'routini123', phone: '+212 668 556677', city: 'Casablanca', country: 'Maroc',
-    joinDate: '12/06/2024', ppv: 205, teamPV: 14200, gpv: 14405, sv: 10400,
+    joinDate: '12/06/2024', ppv: 420, teamPV: 14200, gpv: 14620, sv: 10400,
     monthlySalesDH: 8500, walletDH: 11800.00, clientsCount: 7, fidelityPoints: 180, active: true
   },
   {
@@ -94,7 +102,7 @@ const MEMBERS_RAW = [
     email: 'meriem.benjelloun@routini-ambassador.com', role: 'distributor', rankCode: 'MANAGER',
     rankName: 'Manager (3% Leadership)', sponsorCode: '818207890', sponsorName: 'Amina Tazi',
     password: 'routini123', phone: '+212 669 667788', city: 'Fès', country: 'Maroc',
-    joinDate: '20/07/2024', ppv: 200, teamPV: 13500, gpv: 13700, sv: 9800,
+    joinDate: '20/07/2024', ppv: 415, teamPV: 13500, gpv: 13915, sv: 9800,
     monthlySalesDH: 8200, walletDH: 10600.00, clientsCount: 7, fidelityPoints: 170, active: true
   },
   {
@@ -102,7 +110,7 @@ const MEMBERS_RAW = [
     email: 'bilal.benchekroun@routini-ambassador.com', role: 'distributor', rankCode: 'MANAGER',
     rankName: 'Manager (3% Leadership)', sponsorCode: '818206330', sponsorName: 'Mehdi Alami',
     password: 'routini123', phone: '+212 660 778899', city: 'Marrakech', country: 'Maroc',
-    joinDate: '15/08/2024', ppv: 195, teamPV: 12800, gpv: 12995, sv: 9200,
+    joinDate: '15/08/2024', ppv: 410, teamPV: 12800, gpv: 13210, sv: 9200,
     monthlySalesDH: 7900, walletDH: 9800.00, clientsCount: 7, fidelityPoints: 160, active: true
   },
   {
@@ -110,7 +118,7 @@ const MEMBERS_RAW = [
     email: 'kenza.bennani@routini-ambassador.com', role: 'distributor', rankCode: 'MANAGER',
     rankName: 'Manager (3% Leadership)', sponsorCode: '818209441', sponsorName: 'Youssef Mansouri',
     password: 'routini123', phone: '+212 661 889900', city: 'Tanger', country: 'Maroc',
-    joinDate: '01/09/2024', ppv: 190, teamPV: 11900, gpv: 12090, sv: 8600,
+    joinDate: '01/09/2024', ppv: 410, teamPV: 11900, gpv: 12310, sv: 8600,
     monthlySalesDH: 7400, walletDH: 9100.00, clientsCount: 6, fidelityPoints: 150, active: true
   },
   {
@@ -118,16 +126,16 @@ const MEMBERS_RAW = [
     email: 'hicham.naciri@routini-ambassador.com', role: 'distributor', rankCode: 'MANAGER',
     rankName: 'Manager (3% Leadership)', sponsorCode: '818210552', sponsorName: 'Nadia Berrada',
     password: 'routini123', phone: '+212 662 113355', city: 'Agadir', country: 'Maroc',
-    joinDate: '10/10/2024', ppv: 185, teamPV: 10600, gpv: 10785, sv: 7900,
+    joinDate: '10/10/2024', ppv: 405, teamPV: 10600, gpv: 11005, sv: 7900,
     monthlySalesDH: 7100, walletDH: 8500.00, clientsCount: 6, fidelityPoints: 140, active: true
   },
-  // 12 Leaders (2 500+ PV)
+  // 12 Leaders (Seuil perso >= 200 PV, 2 Builders actifs)
   {
     id: '818217123', code: '818217123', name: 'Siham Bouazza',
     email: 'siham.bouazza@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818207890', sponsorName: 'Amina Tazi',
     password: 'routini123', phone: '+212 663 224466', city: 'Oujda', country: 'Maroc',
-    joinDate: '05/11/2024', ppv: 180, teamPV: 6800, gpv: 6980, sv: 5400,
+    joinDate: '05/11/2024', ppv: 240, teamPV: 6800, gpv: 7040, sv: 5400,
     monthlySalesDH: 6200, walletDH: 6700.00, clientsCount: 6, fidelityPoints: 130, active: true
   },
   {
@@ -135,7 +143,7 @@ const MEMBERS_RAW = [
     email: 'reda.kabbaj@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818204921', sponsorName: 'Karim Benali',
     password: 'routini123', phone: '+212 664 335577', city: 'Casablanca', country: 'Maroc',
-    joinDate: '12/12/2024', ppv: 175, teamPV: 5900, gpv: 6075, sv: 4800,
+    joinDate: '12/12/2024', ppv: 230, teamPV: 5900, gpv: 6130, sv: 4800,
     monthlySalesDH: 5800, walletDH: 5900.00, clientsCount: 6, fidelityPoints: 125, active: true
   },
   {
@@ -143,7 +151,7 @@ const MEMBERS_RAW = [
     email: 'houda.daoudi@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818205114', sponsorName: 'Fatima-Zahra El Amrani',
     password: 'routini123', phone: '+212 665 446688', city: 'Rabat', country: 'Maroc',
-    joinDate: '15/01/2025', ppv: 170, teamPV: 5400, gpv: 5570, sv: 4400,
+    joinDate: '15/01/2025', ppv: 225, teamPV: 5400, gpv: 5625, sv: 4400,
     monthlySalesDH: 5400, walletDH: 5200.00, clientsCount: 5, fidelityPoints: 115, active: true
   },
   {
@@ -151,7 +159,7 @@ const MEMBERS_RAW = [
     email: 'amine.touzani@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818207890', sponsorName: 'Amina Tazi',
     password: 'routini123', phone: '+212 666 557799', city: 'Meknès', country: 'Maroc',
-    joinDate: '02/02/2025', ppv: 165, teamPV: 4800, gpv: 4965, sv: 3900,
+    joinDate: '02/02/2025', ppv: 220, teamPV: 4800, gpv: 5020, sv: 3900,
     monthlySalesDH: 5100, walletDH: 4700.00, clientsCount: 5, fidelityPoints: 110, active: true
   },
   {
@@ -159,7 +167,7 @@ const MEMBERS_RAW = [
     email: 'zineb.filali@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818213789', sponsorName: 'Meriem Benjelloun',
     password: 'routini123', phone: '+212 667 668800', city: 'Fès', country: 'Maroc',
-    joinDate: '20/02/2025', ppv: 165, teamPV: 4400, gpv: 4565, sv: 3600,
+    joinDate: '20/02/2025', ppv: 215, teamPV: 4400, gpv: 4615, sv: 3600,
     monthlySalesDH: 4800, walletDH: 4300.00, clientsCount: 5, fidelityPoints: 105, active: true
   },
   {
@@ -167,7 +175,7 @@ const MEMBERS_RAW = [
     email: 'hamza.slaoui@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818212456', sponsorName: 'Salma Chraibi',
     password: 'routini123', phone: '+212 668 779911', city: 'Casablanca', country: 'Maroc',
-    joinDate: '05/03/2025', ppv: 160, teamPV: 4100, gpv: 4260, sv: 3300,
+    joinDate: '05/03/2025', ppv: 215, teamPV: 4100, gpv: 4315, sv: 3300,
     monthlySalesDH: 4500, walletDH: 3900.00, clientsCount: 5, fidelityPoints: 95, active: true
   },
   {
@@ -175,7 +183,7 @@ const MEMBERS_RAW = [
     email: 'asmaa.chaoui@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818214890', sponsorName: 'Bilal Benchekroun',
     password: 'routini123', phone: '+212 669 880022', city: 'Marrakech', country: 'Maroc',
-    joinDate: '18/03/2025', ppv: 160, teamPV: 3800, gpv: 3960, sv: 3100,
+    joinDate: '18/03/2025', ppv: 210, teamPV: 3800, gpv: 4010, sv: 3100,
     monthlySalesDH: 4200, walletDH: 3600.00, clientsCount: 5, fidelityPoints: 90, active: true
   },
   {
@@ -183,7 +191,7 @@ const MEMBERS_RAW = [
     email: 'soufiane.berrada@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818215901', sponsorName: 'Kenza Bennani',
     password: 'routini123', phone: '+212 660 991133', city: 'Tanger', country: 'Maroc',
-    joinDate: '01/04/2025', ppv: 160, teamPV: 3500, gpv: 3660, sv: 2800,
+    joinDate: '01/04/2025', ppv: 210, teamPV: 3500, gpv: 3710, sv: 2800,
     monthlySalesDH: 3900, walletDH: 3300.00, clientsCount: 5, fidelityPoints: 85, active: true
   },
   {
@@ -191,7 +199,7 @@ const MEMBERS_RAW = [
     email: 'leila.lahlou@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818211234', sponsorName: 'Tariq Idrissi',
     password: 'routini123', phone: '+212 661 002244', city: 'Rabat', country: 'Maroc',
-    joinDate: '14/04/2025', ppv: 155, teamPV: 3200, gpv: 3355, sv: 2600,
+    joinDate: '14/04/2025', ppv: 205, teamPV: 3200, gpv: 3405, sv: 2600,
     monthlySalesDH: 3700, walletDH: 3100.00, clientsCount: 5, fidelityPoints: 80, active: true
   },
   {
@@ -199,7 +207,7 @@ const MEMBERS_RAW = [
     email: 'younes.tahiri@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818209441', sponsorName: 'Youssef Mansouri',
     password: 'routini123', phone: '+212 662 113355', city: 'Tétouan', country: 'Maroc',
-    joinDate: '02/05/2025', ppv: 155, teamPV: 2950, gpv: 3105, sv: 2400,
+    joinDate: '02/05/2025', ppv: 205, teamPV: 2950, gpv: 3155, sv: 2400,
     monthlySalesDH: 3500, walletDH: 2900.00, clientsCount: 5, fidelityPoints: 75, active: true
   },
   {
@@ -207,7 +215,7 @@ const MEMBERS_RAW = [
     email: 'sara.elamrani@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818208455', sponsorName: 'Omar El Fassi',
     password: 'routini123', phone: '+212 663 224466', city: 'Casablanca', country: 'Maroc',
-    joinDate: '15/05/2025', ppv: 155, teamPV: 2750, gpv: 2905, sv: 2200,
+    joinDate: '15/05/2025', ppv: 200, teamPV: 2750, gpv: 2950, sv: 2200,
     monthlySalesDH: 3300, walletDH: 2700.00, clientsCount: 5, fidelityPoints: 70, active: true
   },
   {
@@ -215,16 +223,16 @@ const MEMBERS_RAW = [
     email: 'mustapha.chraibi@routini-ambassador.com', role: 'distributor', rankCode: 'LEADER',
     rankName: 'Leader (2% Leadership)', sponsorCode: '818216012', sponsorName: 'Hicham Naciri',
     password: 'routini123', phone: '+212 664 335577', city: 'Agadir', country: 'Maroc',
-    joinDate: '01/06/2025', ppv: 150, teamPV: 2600, gpv: 2750, sv: 2100,
+    joinDate: '01/06/2025', ppv: 200, teamPV: 2600, gpv: 2800, sv: 2100,
     monthlySalesDH: 3100, walletDH: 2500.00, clientsCount: 5, fidelityPoints: 65, active: true
   },
-  // 14 Builders (500+ PV)
+  // 14 Builders (Seuil perso >= 100 PV, >= 2000 PV équipe cumulés - Slide 7)
   {
     id: '818229345', code: '818229345', name: 'Ibtissam Kadiri',
     email: 'ibtissam.kadiri@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818205114', sponsorName: 'Fatima-Zahra El Amrani',
     password: 'routini123', phone: '+212 665 446688', city: 'Kénitra', country: 'Maroc',
-    joinDate: '18/06/2025', ppv: 160, teamPV: 1850, gpv: 2010, sv: 1550,
+    joinDate: '18/06/2025', ppv: 140, teamPV: 2450, gpv: 2590, sv: 1550,
     monthlySalesDH: 2800, walletDH: 2100.00, clientsCount: 5, fidelityPoints: 60, active: true
   },
   {
@@ -232,7 +240,7 @@ const MEMBERS_RAW = [
     email: 'nabil.zerouali@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818217123', sponsorName: 'Siham Bouazza',
     password: 'routini123', phone: '+212 666 557799', city: 'Oujda', country: 'Maroc',
-    joinDate: '05/07/2025', ppv: 155, teamPV: 1620, gpv: 1775, sv: 1380,
+    joinDate: '05/07/2025', ppv: 135, teamPV: 2380, gpv: 2515, sv: 1380,
     monthlySalesDH: 2600, walletDH: 1950.00, clientsCount: 5, fidelityPoints: 55, active: true
   },
   {
@@ -240,7 +248,7 @@ const MEMBERS_RAW = [
     email: 'ghita.mansour@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818218234', sponsorName: 'Reda Kabbaj',
     password: 'routini123', phone: '+212 667 668800', city: 'Mohammedia', country: 'Maroc',
-    joinDate: '20/07/2025', ppv: 155, teamPV: 1450, gpv: 1605, sv: 1250,
+    joinDate: '20/07/2025', ppv: 130, teamPV: 2320, gpv: 2450, sv: 1250,
     monthlySalesDH: 2400, walletDH: 1800.00, clientsCount: 5, fidelityPoints: 50, active: true
   },
   {
@@ -248,7 +256,7 @@ const MEMBERS_RAW = [
     email: 'othmane.skalli@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818207890', sponsorName: 'Amina Tazi',
     password: 'routini123', phone: '+212 668 779911', city: 'Fès', country: 'Maroc',
-    joinDate: '08/08/2025', ppv: 150, teamPV: 1320, gpv: 1470, sv: 1150,
+    joinDate: '08/08/2025', ppv: 130, teamPV: 2280, gpv: 2410, sv: 1150,
     monthlySalesDH: 2250, walletDH: 1650.00, clientsCount: 5, fidelityPoints: 45, active: true
   },
   {
@@ -256,7 +264,7 @@ const MEMBERS_RAW = [
     email: 'mouna.bennis@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818204921', sponsorName: 'Karim Benali',
     password: 'routini123', phone: '+212 669 880022', city: 'Casablanca', country: 'Maroc',
-    joinDate: '25/08/2025', ppv: 150, teamPV: 1210, gpv: 1360, sv: 1050,
+    joinDate: '25/08/2025', ppv: 125, teamPV: 2210, gpv: 2335, sv: 1050,
     monthlySalesDH: 2100, walletDH: 1500.00, clientsCount: 5, fidelityPoints: 40, active: true
   },
   {
@@ -264,7 +272,7 @@ const MEMBERS_RAW = [
     email: 'walid.senhaji@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818222678', sponsorName: 'Hamza Slaoui',
     password: 'routini123', phone: '+212 660 112233', city: 'Casablanca', country: 'Maroc',
-    joinDate: '10/03/2026', ppv: 165, teamPV: 980, gpv: 1145, sv: 890,
+    joinDate: '10/03/2026', ppv: 125, teamPV: 2180, gpv: 2305, sv: 890,
     monthlySalesDH: 2300, walletDH: 1350.00, clientsCount: 5, fidelityPoints: 45, active: true
   },
   {
@@ -272,7 +280,7 @@ const MEMBERS_RAW = [
     email: 'samira.ouazzani@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818225901', sponsorName: 'Leila Lahlou',
     password: 'routini123', phone: '+212 661 223344', city: 'Rabat', country: 'Maroc',
-    joinDate: '15/03/2026', ppv: 160, teamPV: 890, gpv: 1050, sv: 820,
+    joinDate: '15/03/2026', ppv: 120, teamPV: 2150, gpv: 2270, sv: 820,
     monthlySalesDH: 2150, walletDH: 1250.00, clientsCount: 5, fidelityPoints: 40, active: true
   },
   {
@@ -280,7 +288,7 @@ const MEMBERS_RAW = [
     email: 'rachid.benzekri@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818223789', sponsorName: 'Asmaa Chaoui',
     password: 'routini123', phone: '+212 662 334455', city: 'Marrakech', country: 'Maroc',
-    joinDate: '22/03/2026', ppv: 155, teamPV: 780, gpv: 935, sv: 740,
+    joinDate: '22/03/2026', ppv: 120, teamPV: 2110, gpv: 2230, sv: 740,
     monthlySalesDH: 2000, walletDH: 1150.00, clientsCount: 5, fidelityPoints: 38, active: true
   },
   {
@@ -288,7 +296,7 @@ const MEMBERS_RAW = [
     email: 'bouchra.tazi@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818221567', sponsorName: 'Zineb Filali',
     password: 'routini123', phone: '+212 663 445566', city: 'Fès', country: 'Maroc',
-    joinDate: '02/04/2026', ppv: 155, teamPV: 720, gpv: 875, sv: 690,
+    joinDate: '02/04/2026', ppv: 115, teamPV: 2080, gpv: 2195, sv: 690,
     monthlySalesDH: 1950, walletDH: 1050.00, clientsCount: 5, fidelityPoints: 35, active: true
   },
   {
@@ -296,7 +304,7 @@ const MEMBERS_RAW = [
     email: 'adil.amrani@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818224890', sponsorName: 'Soufiane Berrada',
     password: 'routini123', phone: '+212 664 556677', city: 'Tanger', country: 'Maroc',
-    joinDate: '12/04/2026', ppv: 150, teamPV: 680, gpv: 830, sv: 640,
+    joinDate: '12/04/2026', ppv: 115, teamPV: 2060, gpv: 2175, sv: 640,
     monthlySalesDH: 1850, walletDH: 980.00, clientsCount: 5, fidelityPoints: 32, active: true
   },
   {
@@ -304,7 +312,7 @@ const MEMBERS_RAW = [
     email: 'hind.bennouna@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818228234', sponsorName: 'Mustapha Chraibi',
     password: 'routini123', phone: '+212 665 667788', city: 'Agadir', country: 'Maroc',
-    joinDate: '25/04/2026', ppv: 150, teamPV: 630, gpv: 780, sv: 600,
+    joinDate: '25/04/2026', ppv: 110, teamPV: 2040, gpv: 2150, sv: 600,
     monthlySalesDH: 1750, walletDH: 920.00, clientsCount: 5, fidelityPoints: 30, active: true
   },
   {
@@ -312,7 +320,7 @@ const MEMBERS_RAW = [
     email: 'kamal.belhaj@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818220456', sponsorName: 'Amine Touzani',
     password: 'routini123', phone: '+212 666 778899', city: 'Meknès', country: 'Maroc',
-    joinDate: '04/05/2026', ppv: 150, teamPV: 590, gpv: 740, sv: 560,
+    joinDate: '04/05/2026', ppv: 110, teamPV: 2030, gpv: 2140, sv: 560,
     monthlySalesDH: 1680, walletDH: 870.00, clientsCount: 5, fidelityPoints: 28, active: true
   },
   {
@@ -320,7 +328,7 @@ const MEMBERS_RAW = [
     email: 'safae.lahrichi@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818226012', sponsorName: 'Younes Tahiri',
     password: 'routini123', phone: '+212 667 889900', city: 'Tétouan', country: 'Maroc',
-    joinDate: '18/05/2026', ppv: 150, teamPV: 550, gpv: 700, sv: 530,
+    joinDate: '18/05/2026', ppv: 105, teamPV: 2020, gpv: 2125, sv: 530,
     monthlySalesDH: 1600, walletDH: 820.00, clientsCount: 5, fidelityPoints: 26, active: true
   },
   {
@@ -328,16 +336,16 @@ const MEMBERS_RAW = [
     email: 'yassine.cherkaoui@routini-ambassador.com', role: 'distributor', rankCode: 'BUILDER',
     rankName: 'Builder (1% Leadership)', sponsorCode: '818229345', sponsorName: 'Ibtissam Kadiri',
     password: 'routini123', phone: '+212 668 990011', city: 'Kénitra', country: 'Maroc',
-    joinDate: '30/05/2026', ppv: 150, teamPV: 510, gpv: 660, sv: 490,
+    joinDate: '30/05/2026', ppv: 105, teamPV: 2010, gpv: 2115, sv: 490,
     monthlySalesDH: 1550, walletDH: 780.00, clientsCount: 5, fidelityPoints: 25, active: true
   },
-  // 14 Partners (Actifs 150+ PV, entrés récemment entre juin et septembre 2026)
+  // 14 Partners (Seuil perso >= 50 PV pour être actif)
   {
     id: '818243789', code: '818243789', name: 'Najat El Mokri',
     email: 'najat.elmokri@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818230456', sponsorName: 'Nabil Zerouali',
     password: 'routini123', phone: '+212 669 001122', city: 'Oujda', country: 'Maroc',
-    joinDate: '08/06/2026', ppv: 170, teamPV: 180, gpv: 350, sv: 380,
+    joinDate: '08/06/2026', ppv: 75, teamPV: 180, gpv: 255, sv: 380,
     monthlySalesDH: 1900, walletDH: 540.00, clientsCount: 5, fidelityPoints: 30, active: true
   },
   {
@@ -345,7 +353,7 @@ const MEMBERS_RAW = [
     email: 'mourad.berrada@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818231567', sponsorName: 'Ghita Mansour',
     password: 'routini123', phone: '+212 660 113355', city: 'Mohammedia', country: 'Maroc',
-    joinDate: '19/06/2026', ppv: 165, teamPV: 140, gpv: 305, sv: 330,
+    joinDate: '19/06/2026', ppv: 70, teamPV: 140, gpv: 210, sv: 330,
     monthlySalesDH: 1820, walletDH: 490.00, clientsCount: 5, fidelityPoints: 28, active: true
   },
   {
@@ -353,7 +361,7 @@ const MEMBERS_RAW = [
     email: 'loubna.slaoui@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818227123', sponsorName: 'Sara El Amrani',
     password: 'routini123', phone: '+212 661 224466', city: 'Casablanca', country: 'Maroc',
-    joinDate: '02/07/2026', ppv: 160, teamPV: 120, gpv: 280, sv: 310,
+    joinDate: '02/07/2026', ppv: 65, teamPV: 120, gpv: 185, sv: 310,
     monthlySalesDH: 1750, walletDH: 460.00, clientsCount: 5, fidelityPoints: 26, active: true
   },
   {
@@ -361,7 +369,7 @@ const MEMBERS_RAW = [
     email: 'aziz.fassi@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818219345', sponsorName: 'Houda Daoudi',
     password: 'routini123', phone: '+212 662 335577', city: 'Rabat', country: 'Maroc',
-    joinDate: '14/07/2026', ppv: 155, teamPV: 100, gpv: 255, sv: 290,
+    joinDate: '14/07/2026', ppv: 60, teamPV: 100, gpv: 160, sv: 290,
     monthlySalesDH: 1680, walletDH: 430.00, clientsCount: 5, fidelityPoints: 24, active: true
   },
   {
@@ -369,7 +377,7 @@ const MEMBERS_RAW = [
     email: 'chaimaa.tazi@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818232678', sponsorName: 'Othmane Skalli',
     password: 'routini123', phone: '+212 663 446688', city: 'Fès', country: 'Maroc',
-    joinDate: '28/07/2026', ppv: 155, teamPV: 90, gpv: 245, sv: 270,
+    joinDate: '28/07/2026', ppv: 60, teamPV: 90, gpv: 150, sv: 270,
     monthlySalesDH: 1620, walletDH: 410.00, clientsCount: 5, fidelityPoints: 22, active: true
   },
   {
@@ -377,7 +385,7 @@ const MEMBERS_RAW = [
     email: 'hassan.elkhatib@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818214890', sponsorName: 'Bilal Benchekroun',
     password: 'routini123', phone: '+212 664 557799', city: 'Marrakech', country: 'Maroc',
-    joinDate: '05/08/2026', ppv: 150, teamPV: 80, gpv: 230, sv: 250,
+    joinDate: '05/08/2026', ppv: 55, teamPV: 80, gpv: 135, sv: 250,
     monthlySalesDH: 1580, walletDH: 390.00, clientsCount: 5, fidelityPoints: 20, active: true
   },
   {
@@ -385,7 +393,7 @@ const MEMBERS_RAW = [
     email: 'kawtar.naciri@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818215901', sponsorName: 'Kenza Bennani',
     password: 'routini123', phone: '+212 665 668800', city: 'Tanger', country: 'Maroc',
-    joinDate: '16/08/2026', ppv: 150, teamPV: 60, gpv: 210, sv: 220,
+    joinDate: '16/08/2026', ppv: 55, teamPV: 60, gpv: 115, sv: 220,
     monthlySalesDH: 1520, walletDH: 360.00, clientsCount: 5, fidelityPoints: 18, active: true
   },
   {
@@ -393,7 +401,7 @@ const MEMBERS_RAW = [
     email: 'mehdi.boukhris@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818212456', sponsorName: 'Salma Chraibi',
     password: 'routini123', phone: '+212 666 779911', city: 'El Jadida', country: 'Maroc',
-    joinDate: '25/08/2026', ppv: 150, teamPV: 40, gpv: 190, sv: 190,
+    joinDate: '25/08/2026', ppv: 52, teamPV: 40, gpv: 92, sv: 190,
     monthlySalesDH: 1480, walletDH: 320.00, clientsCount: 5, fidelityPoints: 16, active: true
   },
   {
@@ -401,28 +409,38 @@ const MEMBERS_RAW = [
     email: 'halima.zouiten@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818217123', sponsorName: 'Siham Bouazza',
     password: 'routini123', phone: '+212 667 880022', city: 'Nador', country: 'Maroc',
-    joinDate: '01/09/2026', ppv: 150, teamPV: 20, gpv: 170, sv: 160,
+    joinDate: '01/09/2026', ppv: 50, teamPV: 20, gpv: 70, sv: 160,
     monthlySalesDH: 1420, walletDH: 280.00, clientsCount: 5, fidelityPoints: 14, active: true
   },
+  // Exemple de partenaires sous le seuil d'activité (< 50 PV) pour illustrer la règle de non-versement (Slide 8/15)
   {
     id: '818252678', code: '818252678', name: 'Driss Bensaid',
     email: 'driss.bensaid@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818216012', sponsorName: 'Hicham Naciri',
     password: 'routini123', phone: '+212 668 991133', city: 'Safi', country: 'Maroc',
-    joinDate: '05/09/2026', ppv: 150, teamPV: 10, gpv: 160, sv: 140,
-    monthlySalesDH: 1380, walletDH: 240.00, clientsCount: 5, fidelityPoints: 12, active: true
+    joinDate: '05/09/2026', ppv: 30, teamPV: 10, gpv: 40, sv: 140, // 30 PV < 50 PV minimum
+    monthlySalesDH: 900, walletDH: 0.00, clientsCount: 2, fidelityPoints: 8, active: false
   },
   {
     id: '818253789', code: '818253789', name: 'Noura El Alami',
     email: 'noura.elalami@routini-ambassador.com', role: 'distributor', rankCode: 'PARTNER',
     rankName: 'Partner (N1 Accès)', sponsorCode: '818206330', sponsorName: 'Mehdi Alami',
     password: 'routini123', phone: '+212 669 002244', city: 'Essaouira', country: 'Maroc',
-    joinDate: '08/09/2026', ppv: 150, teamPV: 0, gpv: 150, sv: 120,
-    monthlySalesDH: 1350, walletDH: 210.00, clientsCount: 5, fidelityPoints: 10, active: true
+    joinDate: '08/09/2026', ppv: 25, teamPV: 0, gpv: 25, sv: 120, // 25 PV < 50 PV minimum
+    monthlySalesDH: 700, walletDH: 0.00, clientsCount: 1, fidelityPoints: 6, active: false
   }
 ];
 
-// Generate 120+ realistic orders across 6 months (15/03/2026 to 10/09/2026)
+// Pack Types V4 (PP -> PM 90% -> PV PP/10 -> CV 60% PM)
+const PACK_TYPES = [
+  { name: 'Pack Routine Glow Découverte', pp: 1000, dp: 900, pv: 100, sv: 540, items: 3 },
+  { name: 'Pack Rituel Anti-Âge Suprême', pp: 2000, dp: 1800, pv: 200, sv: 1080, items: 4 },
+  { name: 'Pack Ambassadrice Institut Routine', pp: 5000, dp: 4500, pv: 500, sv: 2700, items: 18 },
+  { name: 'Duo Éclat & Nuit (Formule Étalon)', pp: 500, dp: 450, pv: 50, sv: 270, items: 2 },
+  { name: 'Sérum Éclat Vitamine C + Crème Jour SPF 30', pp: 650, dp: 585, pv: 65, sv: 351, items: 2 },
+  { name: 'Coffret Nettoyant Micellaire & Masque Argile', pp: 400, dp: 360, pv: 40, sv: 216, items: 2 }
+];
+
 const DATES_6_MONTHS = [
   '15/03/2026', '18/03/2026', '22/03/2026', '26/03/2026', '29/03/2026',
   '02/04/2026', '06/04/2026', '10/04/2026', '14/04/2026', '18/04/2026', '23/04/2026', '28/04/2026',
@@ -431,15 +449,6 @@ const DATES_6_MONTHS = [
   '02/07/2026', '07/07/2026', '12/07/2026', '16/07/2026', '21/07/2026', '26/07/2026', '30/07/2026',
   '03/08/2026', '08/08/2026', '12/08/2026', '17/08/2026', '22/08/2026', '26/08/2026', '30/08/2026',
   '01/09/2026', '03/09/2026', '05/09/2026', '07/09/2026', '09/09/2026', '10/09/2026'
-];
-
-const PACK_TYPES = [
-  { name: 'Pack Routine Glow Découverte', dp: 740, pv: 100, sv: 420, items: 3 },
-  { name: 'Pack Rituel Anti-Âge Suprême', dp: 1460, pv: 200, sv: 840, items: 4 },
-  { name: 'Pack Ambassadrice Institut Routine', dp: 3600, pv: 500, sv: 2150, items: 18 },
-  { name: 'Sérum Éclat Vitamine C (x2) + Crème Jour', dp: 690, pv: 62, sv: 240, items: 3 },
-  { name: 'Huile Argan Bio + Crème Nuit Rétinol', dp: 550, pv: 53, sv: 205, items: 2 },
-  { name: 'Coffret Nettoyant & Masque Argile', dp: 275, pv: 24, sv: 90, items: 2 }
 ];
 
 const CHANNELS = ['attached_client', 'attached_client', 'partner_personal', 'direct_client'];
@@ -465,8 +474,9 @@ for (let i = 0; i < DATES_6_MONTHS.length; i++) {
       memberName: `${member.name} (${channel === 'attached_client' ? 'Client Rattaché' : channel === 'direct_client' ? 'Client Direct' : 'Achat Perso'})`,
       date: date,
       itemsCount: pack.items,
-      totalDH: pack.dp,
-      totalEUR: Number((pack.dp * 0.093).toFixed(2)),
+      totalPP: pack.pp,
+      totalDH: channel === 'direct_client' ? pack.pp : pack.dp, // Client direct paye PP, Membre paye PM (90%)
+      totalEUR: Number(((channel === 'direct_client' ? pack.pp : pack.dp) * 0.093).toFixed(2)),
       totalPV: pack.pv,
       totalSV: pack.sv,
       fidelityPoints: Math.floor(pack.dp * 0.1),
@@ -476,23 +486,22 @@ for (let i = 0; i < DATES_6_MONTHS.length; i++) {
   }
 }
 
-// 6 Monthly closures & Bank Withdrawals for bonus.js
+// 6 Monthly closures & Bank Withdrawals
 const HISTORICAL_TRANSACTIONS = [
-  { date: '01/09/2026', ref: 'BONUS-082026', desc: 'Clôture mensuelle des primes (Août 2026 • ONE PLAN)', type: 'credit', amount: 3450, status: 'Validé & Versé' },
+  { date: '01/09/2026', ref: 'BONUS-082026', desc: 'Clôture mensuelle des primes (Août 2026 • ONE PLAN V4)', type: 'credit', amount: 3450, status: 'Validé & Versé' },
   { date: '15/08/2026', ref: 'WD-ATTIJARI-892', desc: 'Virement bancaire vers Attijariwafa Bank (RIB *******4521)', type: 'debit', amount: 4000, status: 'Effectué' },
-  { date: '01/08/2026', ref: 'BONUS-072026', desc: 'Clôture mensuelle des primes (Juillet 2026 • ONE PLAN)', type: 'credit', amount: 3280, status: 'Validé & Versé' },
+  { date: '01/08/2026', ref: 'BONUS-072026', desc: 'Clôture mensuelle des primes (Juillet 2026 • ONE PLAN V4)', type: 'credit', amount: 3280, status: 'Validé & Versé' },
   { date: '18/07/2026', ref: 'WD-BMCE-731', desc: 'Virement bancaire vers Bank of Africa (RIB *******9812)', type: 'debit', amount: 3000, status: 'Effectué' },
-  { date: '01/07/2026', ref: 'BONUS-062026', desc: 'Clôture mensuelle des primes (Juin 2026 • ONE PLAN)', type: 'credit', amount: 3150, status: 'Validé & Versé' },
+  { date: '01/07/2026', ref: 'BONUS-062026', desc: 'Clôture mensuelle des primes (Juin 2026 • ONE PLAN V4)', type: 'credit', amount: 3150, status: 'Validé & Versé' },
   { date: '12/06/2026', ref: 'WD-CIH-550', desc: 'Virement bancaire vers CIH Bank (RIB *******3344)', type: 'debit', amount: 2500, status: 'Effectué' },
-  { date: '01/06/2026', ref: 'BONUS-052026', desc: 'Clôture mensuelle des primes (Mai 2026 • ONE PLAN)', type: 'credit', amount: 2950, status: 'Validé & Versé' },
+  { date: '01/06/2026', ref: 'BONUS-052026', desc: 'Clôture mensuelle des primes (Mai 2026 • ONE PLAN V4)', type: 'credit', amount: 2950, status: 'Validé & Versé' },
   { date: '15/05/2026', ref: 'WD-BCP-410', desc: 'Virement bancaire vers Banque Populaire (RIB *******7722)', type: 'debit', amount: 2500, status: 'Effectué' },
-  { date: '01/05/2026', ref: 'BONUS-042026', desc: 'Clôture mensuelle des primes (Avril 2026 • ONE PLAN)', type: 'credit', amount: 2700, status: 'Validé & Versé' },
-  { date: '01/04/2026', ref: 'BONUS-032026', desc: 'Clôture mensuelle des primes (Mars 2026 • ONE PLAN)', type: 'credit', amount: 2400, status: 'Validé & Versé' }
+  { date: '01/05/2026', ref: 'BONUS-042026', desc: 'Clôture mensuelle des primes (Avril 2026 • ONE PLAN V4)', type: 'credit', amount: 2700, status: 'Validé & Versé' },
+  { date: '01/04/2026', ref: 'BONUS-032026', desc: 'Clôture mensuelle des primes (Mars 2026 • ONE PLAN V4)', type: 'credit', amount: 2400, status: 'Validé & Versé' }
 ];
 
 console.log(`Generated ${MEMBERS_RAW.length} members and ${ORDERS_GENERATED.length} orders over 6 months!`);
 
-// Export as JSON or write to state.js
 const outputData = {
   members: MEMBERS_RAW,
   orders: ORDERS_GENERATED,
@@ -503,11 +512,10 @@ fs.writeFileSync(path.join(__dirname, 'mock_network_6months.json'), JSON.stringi
 console.log('Saved mock_network_6months.json successfully!');
 
 const jsContent = `/**
- * Routini eWorld MLM - Données Historiques Réelles sur 6 Mois
+ * Routini eWorld MLM - Données Historiques Réelles sur 6 Mois (ROUTINI ONE PLAN V4 - Septembre 2026)
  * 51 Membres Réseau Maroc + 135 Commandes (Mars 2026 - Septembre 2026) + Relevés Bancaires
  */
 window.ROUTINI_MOCK_DATA = ${JSON.stringify(outputData, null, 2)};
 `;
 fs.writeFileSync(path.join(__dirname, 'js', 'mock_data.js'), jsContent, 'utf-8');
 console.log('Saved js/mock_data.js successfully!');
-

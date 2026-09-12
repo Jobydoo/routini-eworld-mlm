@@ -42,15 +42,31 @@ class GenealogyController {
     const currentUser = window.stateManager.currentUser;
     if (!currentUser) return;
 
+    // Déplier automatiquement la racine de l'utilisateur connecté
+    this.expandedNodes.add(currentUser.code);
+
     const rootCode = window.stateManager.isOwner() ? 'ADMIN001' : currentUser.code;
     const treeData = window.stateManager.buildGenealogyTree(rootCode, 5);
 
     if (this.currentViewMode === 'tree') {
-      container.innerHTML = `
-        <div class="tree-canvas" id="treeCanvas">
-          ${treeData ? this.renderTreeNode(treeData) : '<p class="text-muted">Aucune descendance trouvée.</p>'}
-        </div>
-      `;
+      if (!treeData) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; max-width: 600px; margin: 40px auto;">
+            <div style="font-size: 2.5rem; color: var(--rtn-rose); margin-bottom: 12px;"><i class="fas fa-sitemap"></i></div>
+            <h4 style="font-weight: 800; color: var(--rtn-navy); margin-bottom: 6px;">Votre réseau commence ici</h4>
+            <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 16px;">Vous n'avez pas encore parrainé de filleuls directs. Invitez de nouveaux distributeurs pour développer vos 3 niveaux de commissions.</p>
+            <button class="btn-primary-auth" style="width: auto; margin: 0 auto; padding: 10px 20px;" onclick="window.app.switchView('sponsor')">
+              <i class="fas fa-user-plus"></i> Parrainer un Nouveau Partenaire (0 DH)
+            </button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="tree-canvas" id="treeCanvas">
+            ${this.renderTreeNode(treeData)}
+          </div>
+        `;
+      }
     } else {
       const downlines = window.stateManager.getAllDownlines(rootCode);
       container.innerHTML = this.renderTableView(currentUser, downlines);
@@ -200,7 +216,12 @@ class GenealogyController {
           <p style="font-size: 0.85rem;"><strong>Email :</strong> ${member.email}</p>
           <p style="font-size: 0.85rem;"><strong>Localisation :</strong> ${member.city}, ${member.country}</p>
           <p style="font-size: 0.85rem;"><strong>Date d'adhésion :</strong> ${member.joinDate}</p>
-          <p style="font-size: 0.85rem;"><strong>Statut Actif :</strong> ${window.stateManager.isMemberActive(member) ? '<span class="status-badge status-success">Qualifié Actif</span>' : '<span class="status-badge status-pending">En qualification</span>'}</p>
+          <p style="font-size: 0.85rem;"><strong>Statut Activité Mensuelle :</strong> ${(() => {
+            const act = window.stateManager.getActivityDetails(member);
+            return act.isActive 
+              ? `<span class="status-badge status-success">Actif Qualifié (${act.ppv}/${act.requiredPV} PV)</span>`
+              : `<span class="status-badge" style="background:#fee2e2; color:#b91c1c; font-weight:700;">Inactif aux commissions (${act.ppv}/${act.requiredPV} PV requis)</span>`;
+          })()}</p>
         </div>
 
         <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
@@ -216,9 +237,12 @@ class GenealogyController {
       </div>
 
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <button class="btn-primary-auth" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="window.app.switchAccount('${member.code}')">
-          <i class="fas fa-exchange-alt"></i> Se connecter en tant que ${member.name.split(' ')[0]}
-        </button>
+        ${window.stateManager.isOwner() ? `
+          <button class="btn-primary-auth" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="window.app.switchAccount('${member.code}')">
+            <i class="fas fa-exchange-alt"></i> Se connecter en tant que ${member.name.split(' ')[0]}
+          </button>
+        ` : ''}
+        <button type="button" class="btn-switch-account" onclick="window.app.closeModal()">Fermer</button>
       </div>
     `;
 
