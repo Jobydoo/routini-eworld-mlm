@@ -32,6 +32,24 @@ class AuthController {
       });
     }
 
+    const enforceNumericOnly = () => {
+      const isOwner = tabOwner && tabOwner.classList.contains('active');
+      if (!isOwner && codeInput) {
+        const cleaned = codeInput.value.replace(/[^0-9]/g, '');
+        if (codeInput.value !== cleaned) {
+          codeInput.value = cleaned;
+          if (window.app && window.app.showToast) {
+            window.app.showToast('L\'identifiant de connexion doit comporter des chiffres uniquement (aucune lettre autorisée).', 'warning');
+          }
+        }
+      }
+    };
+
+    if (codeInput) {
+      codeInput.addEventListener('input', enforceNumericOnly);
+      codeInput.addEventListener('paste', () => setTimeout(enforceNumericOnly, 10));
+    }
+
     if (tabClient) {
       tabClient.addEventListener('click', () => {
         tabClient.classList.add('active');
@@ -39,11 +57,13 @@ class AuthController {
         if (tabOwner) tabOwner.classList.remove('active');
         authCard.classList.remove('admin-mode');
         authCard.classList.add('client-mode');
-        authRoleLabel.textContent = 'Identifiant Client Privilège ou Email :';
-        codeInput.placeholder = 'Ex: CLT-818101 ou salma.bennani@...';
+        authRoleLabel.textContent = 'Identifiant Client Numérique (chiffres uniquement) :';
+        codeInput.placeholder = 'Ex: 818101 (chiffres uniquement)';
+        codeInput.setAttribute('inputmode', 'numeric');
+        codeInput.setAttribute('pattern', '[0-9]*');
         if (demoClientWrapper) demoClientWrapper.style.display = 'none';
         if (clientRegisterPromo) clientRegisterPromo.style.display = 'block';
-        codeInput.value = 'CLT-818101';
+        codeInput.value = '818101';
         passInput.value = 'client123';
         authSubmitBtn.className = 'btn-primary-auth btn-client-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-shopping-bag"></i> Connexion Espace Client Privilège';
@@ -57,8 +77,10 @@ class AuthController {
         if (tabOwner) tabOwner.classList.remove('active');
         authCard.classList.remove('admin-mode');
         authCard.classList.remove('client-mode');
-        authRoleLabel.textContent = 'Code Partenaire (9 chiffres) ou Email :';
-        codeInput.placeholder = 'Ex: 818204921 ou karim.benali@...';
+        authRoleLabel.textContent = 'Code Partenaire Numérique (9 chiffres uniquement) :';
+        codeInput.placeholder = 'Ex: 818204921 (chiffres uniquement)';
+        codeInput.setAttribute('inputmode', 'numeric');
+        codeInput.setAttribute('pattern', '[0-9]*');
         if (demoClientWrapper) demoClientWrapper.style.display = 'block';
         if (clientRegisterPromo) clientRegisterPromo.style.display = 'none';
         codeInput.value = '818204921';
@@ -77,6 +99,8 @@ class AuthController {
         authCard.classList.add('admin-mode');
         authRoleLabel.textContent = 'Identifiant Administrateur (Direction Routini) :';
         codeInput.placeholder = 'Ex: admin ou ADMIN001';
+        codeInput.removeAttribute('inputmode');
+        codeInput.removeAttribute('pattern');
         if (demoClientWrapper) demoClientWrapper.style.display = 'none';
         if (clientRegisterPromo) clientRegisterPromo.style.display = 'none';
         codeInput.value = 'admin';
@@ -194,19 +218,30 @@ class AuthController {
   handleClientRegisterSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
     const fullName = document.getElementById('regClientName').value.trim();
+    const cinEl = document.getElementById('regClientCin');
+    const cin = cinEl ? cinEl.value.trim() : '';
     const email = document.getElementById('regClientEmail').value.trim();
     const password = document.getElementById('regClientPassword').value.trim();
     const phone = document.getElementById('regClientPhone').value.trim();
     const city = document.getElementById('regClientCity').value.trim();
     const address = document.getElementById('regClientAddress').value.trim();
+    const refEl = document.getElementById('regClientReferral');
+    const referredBy = refEl ? refEl.value.trim() : '';
+
+    if (!cin) {
+      window.app.showToast('Le numéro de CIN ou pièce d\'identité est obligatoire pour l\'inscription.', 'warning');
+      return;
+    }
 
     const result = window.stateManager.registerDirectClient({
       fullName,
+      cin,
       email,
       password,
       phone,
       city,
-      address
+      address,
+      referredBy
     });
 
     if (result.success) {

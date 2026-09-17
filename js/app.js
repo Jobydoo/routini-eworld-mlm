@@ -79,6 +79,28 @@ class App {
       });
     }
 
+    // Sélecteur de Langue (4 Langues & Drapeaux Multi-pays)
+    document.querySelectorAll('.btn-lang-flag').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.getAttribute('data-lang');
+        if (lang && window.i18n) {
+          window.i18n.setLanguage(lang);
+          document.querySelectorAll('.btn-lang-flag').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.showToast(`Langue sélectionnée : ${window.i18n.translations[lang].langName}`, 'info');
+        }
+      });
+    });
+
+    const langSelect = document.getElementById('headerLangSelect');
+    if (langSelect && window.i18n) {
+      langSelect.value = window.i18n.currentLang;
+      langSelect.addEventListener('change', (e) => {
+        window.i18n.setLanguage(e.target.value);
+        this.showToast(`Langue sélectionnée : ${window.i18n.translations[e.target.value].langName}`, 'info');
+      });
+    }
+
     // Formulaire Nouveau Membre
     const formNewMember = document.getElementById('formRegisterMember');
     if (formNewMember) {
@@ -383,13 +405,53 @@ class App {
           : (latestOrder ? 'Poste Maroc (Amana)' : 'Prêt pour commande');
       }
 
-      // 3. Tableau des commandes client
+      // 3. Rendu du Système de Parrainage Client Privilège (12 Mois de Validité)
+      const refCode = user.referralCode || (user.code ? user.code.replace('CLT-', '') : '818101');
+      const refLink = `${window.location.origin}${window.location.pathname}?ref=${refCode}`;
+      const refExpiry = user.referralExpiryDate || '10/05/2027';
+      const refFriends = user.referredFriends || [];
+
+      const refCodeEl = document.getElementById('clientReferralCodeDisplay');
+      const refLinkEl = document.getElementById('clientReferralLinkInput');
+      const refExpiryEl = document.getElementById('clientReferralExpiryDisplay');
+      const refCountEl = document.getElementById('clientReferralFriendsCount');
+      const refTableEl = document.getElementById('clientReferralFriendsBody');
+
+      if (refCodeEl) refCodeEl.textContent = refCode;
+      if (refLinkEl) refLinkEl.value = refLink;
+      if (refExpiryEl) refExpiryEl.textContent = refExpiry;
+      if (refCountEl) refCountEl.textContent = `${refFriends.length} ami(s) parrainé(s)`;
+
+      if (refTableEl) {
+        if (refFriends.length === 0) {
+          refTableEl.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 20px; color: #64748b;">
+                <i class="fas fa-user-friends" style="font-size: 1.6rem; color: #f472b6; margin-bottom: 6px; display: block;"></i>
+                Partagez votre code ou lien ci-dessus. Tout ami inscrit bénéficie de réductions et vous rapporte +50 pts pendant 12 mois !
+              </td>
+            </tr>
+          `;
+        } else {
+          refTableEl.innerHTML = refFriends.map(f => `
+            <tr>
+              <td><strong>${f.name}</strong></td>
+              <td><span style="font-family: monospace; font-weight: 700; color: #475569;">${f.cin || 'BK******'}</span></td>
+              <td>${f.date || 'Récemment'}</td>
+              <td><strong style="color: #15803d;">+${f.pointsEarned || 50} pts</strong></td>
+              <td><span class="status-badge status-success" style="font-size: 0.72rem;">Validé (12 mois)</span></td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      // 4. Tableau des commandes client avec bouton Facture
       const clientTable = document.getElementById('dashClientOrdersBody');
       if (clientTable) {
         if (clientOrders.length === 0) {
           clientTable.innerHTML = `
             <tr>
-              <td colspan="6" style="text-align: center; padding: 28px; color: #64748b;">
+              <td colspan="7" style="text-align: center; padding: 28px; color: #64748b;">
                 <i class="fas fa-shopping-bag" style="font-size: 2rem; color: #f472b6; display: block; margin-bottom: 8px;"></i>
                 Vous n'avez pas encore passé de commande sur votre compte client.
                 <div style="margin-top: 12px;">
@@ -414,12 +476,17 @@ class App {
               <tr>
                 <td><strong style="font-family: monospace; color: var(--rtn-navy);">${o.id}</strong></td>
                 <td>${o.date}</td>
-                <td style="max-width: 240px; font-size: 0.82rem;">${itemsSummary}</td>
+                <td style="max-width: 220px; font-size: 0.82rem;">${itemsSummary}</td>
                 <td><strong style="color: #15803d; font-size: 0.95rem;">${window.stateManager.formatMoney(o.totalDH)}</strong></td>
                 <td><span style="font-size: 0.8rem; color: #475569;">${o.paymentMethod || 'Carte Bancaire'}</span></td>
                 <td>
                   <span class="status-badge status-success" style="font-size: 0.76rem;">${o.deliveryStatus || o.status}</span>
                   ${trackingBadge}
+                </td>
+                <td>
+                  <button class="btn-action-invoice" onclick="window.app.showInvoiceById('${o.id}')" title="Afficher et Imprimer la Facture">
+                    <i class="fas fa-file-invoice"></i> Facture
+                  </button>
                 </td>
               </tr>
             `;
@@ -537,6 +604,11 @@ class App {
             <td><strong style="color: var(--rtn-rose);">+${o.totalPV} PV</strong></td>
             <td>${window.stateManager.formatMoney(o.totalDH)}</td>
             <td><span class="status-badge status-success">${o.status}</span></td>
+            <td>
+              <button class="btn-action-invoice" onclick="window.app.showInvoiceById('${o.id}')" title="Afficher et Imprimer la Facture">
+                <i class="fas fa-file-invoice"></i> Facture
+              </button>
+            </td>
           </tr>
         `).join('');
       }
@@ -564,19 +636,19 @@ class App {
       <div style="display: grid; gap: 12px; font-size: 0.85rem; color: #334155;">
         <div style="display: flex; gap: 10px; align-items: flex-start;">
           <i class="fas fa-check-circle" style="color: #15803d; margin-top: 3px;"></i>
-          <div><strong>10% crédités en points :</strong> À chaque achat au Prix Public, 10% de votre panier est converti en points fidélité.</div>
+          <div><strong>10% de réduction directe :</strong> Tous vos soins sont commandés avec 10% de remise immédiate.</div>
         </div>
         <div style="display: flex; gap: 10px; align-items: flex-start;">
           <i class="fas fa-check-circle" style="color: #15803d; margin-top: 3px;"></i>
-          <div><strong>Barème d'échange :</strong> 20 points fidélité = 10 DH de déduction immédiate sur toute commande future.</div>
+          <div><strong>1 pt fidélité = 10 DH PP :</strong> Même rapport avantageux que les points d'activité d'une personne parrainée !</div>
         </div>
         <div style="display: flex; gap: 10px; align-items: flex-start;">
           <i class="fas fa-check-circle" style="color: #15803d; margin-top: 3px;"></i>
-          <div><strong>Livraison Offerte :</strong> Dès 500 DH d'achats, expédition sécurisée Amana Express offerte partout au Maroc.</div>
+          <div><strong>Programme Parrainage 12 Mois :</strong> Partagez votre code et gagnez +50 points par ami inscrit valable 12 mois.</div>
         </div>
         <div style="display: flex; gap: 10px; align-items: flex-start;">
           <i class="fas fa-check-circle" style="color: #15803d; margin-top: 3px;"></i>
-          <div><strong>Sans Contrainte MLM :</strong> Aucun parrainage, aucun réseau, aucun abonnement. 100% liberté beauté.</div>
+          <div><strong>Livraison Sécurisée Amana :</strong> Envoi sous 24-48h partout au Maroc avec suivi de colis en direct.</div>
         </div>
       </div>
 
@@ -610,6 +682,7 @@ class App {
         <div style="font-size: 0.8rem; font-weight: 700; color: var(--rtn-navy); margin-bottom: 8px;">Votre Adresse de Livraison Enregistrée :</div>
         <div style="font-size: 0.88rem; color: #1e293b; line-height: 1.5;">
           <strong>Destinataire :</strong> ${user ? user.name : 'Client'}<br>
+          <strong>CIN :</strong> ${user && user.cin ? user.cin : 'BK720194'}<br>
           <strong>Adresse :</strong> ${address}<br>
           <strong>Ville / Région :</strong> ${city}, Maroc<br>
           <strong>Téléphone de contact :</strong> ${phone}
@@ -650,15 +723,24 @@ class App {
 
     const sponsorCode = document.getElementById('sponsorCodeInput').value.trim();
     const fullName = document.getElementById('newMemberFullName').value.trim();
+    const cinInput = document.getElementById('newMemberCin');
+    const cin = cinInput ? cinInput.value.trim().toUpperCase() : '';
     const email = document.getElementById('newMemberEmail').value.trim();
     const phone = document.getElementById('newMemberPhone').value.trim();
     const city = document.getElementById('newMemberCity').value.trim();
     const kitPV = Number(document.getElementById('selectedKitPV').value || 0);
     const kitSV = Number(document.getElementById('selectedKitSV') ? document.getElementById('selectedKitSV').value : (kitPV * 5.4));
 
+    if (!cin) {
+      this.showToast('Le numéro de CIN / Passeport est obligatoire pour toute adhésion.', 'error');
+      if (cinInput) cinInput.focus();
+      return;
+    }
+
     const res = window.stateManager.registerNewMember({
       sponsorCode,
       fullName,
+      cin,
       email,
       phone,
       city,
@@ -675,6 +757,189 @@ class App {
     } else {
       this.showToast(res.message, 'error');
     }
+  }
+
+  copyReferralCode() {
+    const user = window.stateManager.currentUser;
+    const code = user ? (user.referralCode || (user.code ? user.code.replace('CLT-', '') : '818101')) : '818101';
+    navigator.clipboard.writeText(code).then(() => {
+      this.showToast(`Code de parrainage copié : ${code}`, 'success');
+    }).catch(() => {
+      this.showToast(`Code de parrainage : ${code}`, 'info');
+    });
+  }
+
+  copyReferralLink() {
+    const user = window.stateManager.currentUser;
+    const code = user ? (user.referralCode || (user.code ? user.code.replace('CLT-', '') : '818101')) : '818101';
+    const link = `${window.location.origin}${window.location.pathname}?ref=${code}`;
+    navigator.clipboard.writeText(link).then(() => {
+      this.showToast('Lien de parrainage copié avec succès ! Valable 12 mois.', 'success');
+    }).catch(() => {
+      this.showToast(`Lien : ${link}`, 'info');
+    });
+  }
+
+  showInvoiceById(orderId) {
+    const order = window.stateManager.orders.find(o => o.id === orderId);
+    if (order) {
+      this.showInvoiceModal(order);
+    } else {
+      this.showToast('Commande introuvable : ' + orderId, 'error');
+    }
+  }
+
+  showInvoiceModal(order) {
+    if (!order) return;
+
+    const items = order.items && order.items.length > 0 ? order.items : [
+      { name: 'Soin Cosmétique Routini', qty: order.itemsCount || 1, unitPrice: Math.round((order.totalPP || order.totalDH) / (order.itemsCount || 1)), totalPrice: order.totalPP || order.totalDH, pv: order.totalPV || 0 }
+    ];
+
+    const invoiceNum = order.invoiceNumber || ('FAC-' + order.id.replace('CMD-', ''));
+    const isDirectClient = (order.orderType === 'direct_client' || String(order.memberCode).startsWith('CLT') || order.clientDiscountDH > 0);
+    const shippingFee = order.shippingFee !== undefined ? order.shippingFee : 35;
+    const clientDiscount = order.clientDiscountDH || 0;
+    const totalPP = order.totalPP || (order.totalDH - shippingFee + clientDiscount);
+    const fidelityEarned = order.fidelityPoints || Math.floor(totalPP / 10);
+
+    const invoiceHtml = `
+      <div class="official-invoice-document" id="printableInvoice">
+        <!-- En-tête officiel Routini Cosmétiques -->
+        <div class="invoice-header">
+          <div class="invoice-brand">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+              <img src="assets/images/routini-brand.jpg" alt="Routini Cosmetics" style="height: 48px; border-radius: 4px; box-shadow: 0 2px 6px rgba(178, 93, 84, 0.15);">
+              <div>
+                <div style="font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: #b25d54;">Routini Cosmetics</div>
+                <div style="font-size: 0.72rem; color: #8c423a; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">By Lys Horizon</div>
+              </div>
+            </div>
+            <div class="invoice-legal-company">
+              <strong>ROUTINI BEAUTY COSMETICS S.A.R.L.</strong><br>
+              Capital : 1 000 000 MAD • R.C. Casablanca : 489214<br>
+              Patente : 37492011 • I.F. : 52849102 • ICE : 002938475000032<br>
+              Siège : Boulevard d'Anfa, Quartier Racine, Casablanca, Maroc
+            </div>
+          </div>
+          <div class="invoice-badge-box">
+            <div class="invoice-badge-title">FACTURE OFFICIELLE</div>
+            <div class="invoice-badge-number">${invoiceNum}</div>
+            <div class="invoice-badge-date">Date : ${order.date}</div>
+            <div class="invoice-status-paid"><i class="fas fa-check-circle"></i> PAYÉE / ACQUITTÉE</div>
+          </div>
+        </div>
+
+        <hr class="invoice-divider">
+
+        <!-- Informations Destinataire & Commande -->
+        <div class="invoice-parties-grid">
+          <div class="invoice-party-box">
+            <div class="party-label">Facturé à (Client / Partenaire) :</div>
+            <div class="party-name">${order.memberName}</div>
+            <div class="party-detail"><strong>Identifiant :</strong> ${order.memberCode}</div>
+            <div class="party-detail"><strong>CIN / Passeport :</strong> <span class="badge-cin">${order.customerCin || 'BK720194'}</span></div>
+            <div class="party-detail"><strong>Téléphone :</strong> ${order.customerPhone || '+212 661 000000'}</div>
+            <div class="party-detail"><strong>Adresse :</strong> ${order.shippingAddress || 'Maroc'}</div>
+          </div>
+          <div class="invoice-party-box">
+            <div class="party-label">Détails de Livraison & Règlement :</div>
+            <div class="party-detail"><strong>Mode de règlement :</strong> ${order.paymentMethod || 'Carte Bancaire CMI'}</div>
+            <div class="party-detail"><strong>Transporteur :</strong> ${order.deliveryCarrier || 'Amana Express (Poste Maroc)'}</div>
+            <div class="party-detail"><strong>Suivi colis :</strong> ${order.trackingNumber || 'En préparation'}</div>
+            <div class="party-detail"><strong>Statut :</strong> Expédition sous 24-48h ouvrées</div>
+            <div class="party-detail"><strong>Type de compte :</strong> ${isDirectClient ? 'Client Direct Privilège' : 'Partenaire Distributeur V4'}</div>
+          </div>
+        </div>
+
+        <!-- Table des Produits -->
+        <table class="invoice-items-table">
+          <thead>
+            <tr>
+              <th style="text-align: left;">Désignation du Produit / Pack</th>
+              <th style="text-align: center; width: 60px;">Qté</th>
+              <th style="text-align: right; width: 110px;">Prix Unitaire</th>
+              <th style="text-align: center; width: 90px;">Fidélité</th>
+              <th style="text-align: right; width: 120px;">Total Ligne</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map(item => `
+              <tr>
+                <td>
+                  <strong>${item.name}</strong>
+                  ${item.pv ? `<br><small style="color: #64748b;">Valeur d'activité : ${item.pv} PV</small>` : ''}
+                </td>
+                <td style="text-align: center;">${item.qty}</td>
+                <td style="text-align: right;">${item.unitPrice ? item.unitPrice.toFixed(2) : '—'} DH</td>
+                <td style="text-align: center; color: #ca8a04; font-weight: 700;">+${Math.floor((item.totalPrice || item.unitPrice * item.qty) / 10)} pts</td>
+                <td style="text-align: right; font-weight: 700;">${item.totalPrice ? item.totalPrice.toFixed(2) : (item.unitPrice * item.qty).toFixed(2)} DH</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <!-- Totaux et Déductions -->
+        <div class="invoice-totals-wrapper">
+          <div class="invoice-notes">
+            <div class="points-earned-box">
+              <i class="fas fa-gift" style="color: #ca8a04; font-size: 1.2rem;"></i>
+              <div>
+                <strong>Points Fidélité Crédités sur cet Achat : +${fidelityEarned} points</strong><br>
+                <small>Rapport officiel : 1 pt fidélité = 10 DH Prix Public (identique au barème PV parrainé)</small>
+              </div>
+            </div>
+            ${order.totalPV ? `
+              <div style="font-size: 0.78rem; color: #475569; margin-top: 6px;">
+                ● Points Réseau Partenaire : <strong>+${order.totalPV} PV</strong> | Base commissions : <strong>+${order.totalSV} CV</strong>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="invoice-amounts-card">
+            <div class="invoice-amount-row">
+              <span>Sous-total Prix Public :</span>
+              <span>${totalPP.toFixed(2)} DH</span>
+            </div>
+            ${clientDiscount > 0 ? `
+              <div class="invoice-amount-row discount">
+                <span>Remise Client Privilège (-10%) :</span>
+                <span>-${clientDiscount.toFixed(2)} DH</span>
+              </div>
+            ` : ''}
+            <div class="invoice-amount-row">
+              <span>Frais de Livraison (Amana Express) :</span>
+              <span>+${shippingFee.toFixed(2)} DH</span>
+            </div>
+            <div class="invoice-amount-row total-net">
+              <span>Total Net TTC Réglé :</span>
+              <span style="color: #15803d;">${order.totalDH.toFixed(2)} DH</span>
+            </div>
+            <div style="font-size: 0.74rem; color: #64748b; text-align: right; margin-top: 4px;">
+              Équivalent : ~${(order.totalDH * 0.092).toFixed(2)} EUR
+            </div>
+          </div>
+        </div>
+
+        <!-- Pied de page légal -->
+        <div class="invoice-footer-legal">
+          <p>Facture électronique acquittée générée par le système officiel Routini eWorld — Conforme aux exigences du commerce et de la vente directe au Maroc.</p>
+          <p>Les réclamations ou demandes d'échange sont recevables sous 14 jours ouvrés suivant réception du colis scellé.</p>
+        </div>
+
+        <!-- Actions de la facture -->
+        <div class="invoice-actions no-print">
+          <button type="button" class="btn-invoice-print" onclick="window.print()">
+            <i class="fas fa-print"></i> Imprimer la Facture (PDF)
+          </button>
+          <button type="button" class="btn-client-action-outline" onclick="window.app.closeModal()">
+            Fermer
+          </button>
+        </div>
+      </div>
+    `;
+
+    this.showModal(`Facture d'Achat Officielle — ${invoiceNum}`, invoiceHtml);
   }
 
   showModal(title, htmlBody) {

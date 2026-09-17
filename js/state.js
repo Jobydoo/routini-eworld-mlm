@@ -391,6 +391,13 @@ const DEFAULT_DIRECT_CLIENT = {
   city: "Rabat",
   address: "14 Avenue Mohammed VI, Souissi",
   country: "Maroc",
+  cin: "BK720194",
+  referralCode: "818101",
+  referralExpiryDate: "10/05/2027",
+  referredFriends: [
+    { code: "CLT-920112", name: "Houda Alami", date: "15/06/2026", ordersCount: 3, pointsEarned: 110 },
+    { code: "CLT-934502", name: "Yassine Mansour", date: "22/07/2026", ordersCount: 1, pointsEarned: 50 }
+  ],
   joinDate: "10/05/2026",
   ppv: 0,
   teamPV: 0,
@@ -645,8 +652,8 @@ class StateManager {
 
     const input = String(codeOrEmail).trim().toLowerCase();
 
-    // 1. Détection compte Administrateur / Direction
-    if (input === 'admin' || input === 'admin001') {
+    // 1. Détection compte Administrateur / Direction (Supporte 'admin', 'admin001' ou le code numérique '0000' / '000000')
+    if (input === 'admin' || input === 'admin001' || input === '0000' || input === '000000') {
       const admin = this.members.find(m => m.role === 'owner' || m.code === 'ADMIN001');
       if (admin) {
         if (password && password !== admin.password && password !== 'admin123') {
@@ -658,10 +665,12 @@ class StateManager {
       }
     }
 
-    // 2. Recherche par Code (Distributeur 818... ou Client CLT-...) ou par Email
+    // 2. Recherche par Code (Distributeur 818..., Client CLT-... ou chiffres seuls ex: 818101) ou par Email
     const member = this.members.find(m => 
       String(m.code).toLowerCase() === input || 
       String(m.id).toLowerCase() === input || 
+      (m.referralCode && String(m.referralCode).toLowerCase() === input) ||
+      ('clt-' + input) === String(m.code).toLowerCase() ||
       (m.email && m.email.toLowerCase() === input)
     );
 
@@ -876,6 +885,10 @@ class StateManager {
       return { success: false, message: 'Code parrain introuvable.' };
     }
 
+    if (!data.cin || !data.cin.trim()) {
+      return { success: false, message: 'Le numéro de CIN ou Passeport est obligatoire pour toute adhésion.' };
+    }
+
     let newCode;
     do {
       newCode = '818' + Math.floor(100000 + Math.random() * 900000);
@@ -887,6 +900,7 @@ class StateManager {
     const newMember = {
       id: newCode,
       code: newCode,
+      cin: data.cin.trim().toUpperCase(),
       name: data.fullName,
       email: data.email,
       role: 'distributor',
@@ -921,8 +935,13 @@ class StateManager {
   }
 
   registerDirectClient(data) {
-    if (!data || !data.fullName || !data.email) {
+    const nameVal = data ? (data.fullName || data.name || '').trim() : '';
+    if (!data || !nameVal || !data.email) {
       return { success: false, message: 'Veuillez renseigner votre nom complet et votre adresse email.' };
+    }
+
+    if (!data.cin || !data.cin.trim()) {
+      return { success: false, message: 'Le numéro de CIN ou pièce d\'identité est obligatoire pour l\'inscription.' };
     }
 
     const emailTrimmed = String(data.email).trim().toLowerCase();
@@ -939,22 +958,33 @@ class StateManager {
       newCode = 'CLT-' + Math.floor(100000 + Math.random() * 900000);
     } while (this.getMemberByCode(newCode));
 
+    const numericReferral = newCode.replace('CLT-', '');
+    const joinDate = new Date().toLocaleDateString('fr-FR');
+    // Échéance de parrainage à 12 mois (Slide / Demande Marketing Good)
+    const expiry = new Date(Date.now() + 365 * 24 * 3600 * 1000);
+    const referralExpiryDate = expiry.toLocaleDateString('fr-FR');
+
+    const clientName = (data.fullName || data.name || 'Client Privilège').trim();
     const newClient = {
       id: newCode,
       code: newCode,
-      name: data.fullName.trim(),
+      cin: data.cin.trim().toUpperCase(),
+      name: clientName,
       email: emailTrimmed,
       role: 'client',
       rankCode: 'CLIENT',
       rankName: 'Client Privilège',
-      sponsorCode: null, // STRICTEMENT SANS ARBRE NI PARRAINAGE
+      sponsorCode: null, // STRICTEMENT SANS ARBRE MLM
       sponsorName: 'Routini Boutique Directe',
       password: data.password || 'client123',
       phone: data.phone || '',
       city: data.city || 'Casablanca',
       address: data.address || '',
       country: data.country || 'Maroc',
-      joinDate: new Date().toLocaleDateString('fr-FR'),
+      joinDate: joinDate,
+      referralCode: numericReferral,
+      referralExpiryDate: referralExpiryDate,
+      referredFriends: [],
       ppv: 0,
       teamPV: 0,
       gpv: 0,
@@ -966,6 +996,29 @@ class StateManager {
       active: true
     };
 
+    // Gestion du parrainage entre clients directs (12 mois de validité)
+    if (data.referredBy) {
+      const refClean = String(data.referredBy).trim();
+      const referrer = this.members.find(m => 
+        (m.referralCode && m.referralCode === refClean) || 
+        m.code === refClean || 
+        m.code === ('CLT-' + refClean)
+      );
+      if (referrer) {
+        newClient.referredBy = referrer.code;
+        referrer.fidelityPoints = (referrer.fidelityPoints || 0) + 50; // Bonus parrainage ami
+        referrer.referredFriends = referrer.referredFriends || [];
+        referrer.referredFriends.unshift({
+          code: newCode,
+          name: newClient.name,
+          cin: newClient.cin,
+          date: joinDate,
+          ordersCount: 0,
+          pointsEarned: 50
+        });
+      }
+    }
+
     this.members.push(newClient);
     this.currentUser = newClient;
     this.saveState();
@@ -973,7 +1026,7 @@ class StateManager {
     return { 
       success: true, 
       client: newClient,
-      message: `Félicitations ${newClient.name} ! Votre compte Client Privilège a été créé avec le code ${newCode} (+50 points fidélité offerts).` 
+      message: `Félicitations ${newClient.name} ! Votre compte Client Privilège a été créé avec le code ${newCode} (CIN: ${newClient.cin}) (+50 points fidélité offerts).` 
     };
   }
 
@@ -1040,28 +1093,41 @@ class StateManager {
       totalItems += qty;
     }
 
-    // Montant à payer selon le canal de commande sélectionné
-    let totalDH = totalPM;
-    if (this.orderChannel === 'direct_client') {
-      totalDH = totalPP; // Client Direct paye 100% Prix Public
+    const isDirectClient = (this.orderChannel === 'direct_client');
+
+    // Remise 10% systématique pour le Client Direct (Demande Marketing Good)
+    const clientDiscountDH = isDirectClient ? Math.round(totalPP * 0.10) : 0;
+
+    // Pas de livraison offerte pour tout le monde (Frais fixes Amana Express 35 DH)
+    const shippingFee = totalItems > 0 ? 35 : 0;
+
+    // Montant de base hors livraison
+    let baseDH = totalPM;
+    if (isDirectClient) {
+      baseDH = totalPP - clientDiscountDH; // Prix Public avec 10% de réduction
     } else if (this.orderChannel === 'attached_client') {
-      totalDH = totalPP; // Client Rattaché paye Prix Public, et le Partner touche 10% cash
+      baseDH = totalPP; // Client Rattaché paye Prix Public, et le Partner touche 10% cash
     } else {
-      totalDH = totalPM; // Achat Perso Partenaire paye Prix Membre (90% PP)
+      baseDH = totalPM; // Achat Perso Partenaire paye Prix Membre (90% PP)
     }
 
-    const fidelityPoints = Math.floor(totalPP * 0.1);
+    // Total net à régler incluant les frais de livraison
+    const totalDH = baseDH + shippingFee;
+
+    // Même rapport entre points fidélité et prix qu'une personne parrainée (1 pt = 10 DH PP)
+    const fidelityPoints = Math.floor(totalPP / 10);
     const totalEUR = totalDH * this.eurRate;
 
     // Diagnostic de solidité financière (Slide 15 & 16)
-    // Sorties variables : N1 (10% CV) + N2 (5% CV) + N3 (3% CV) + Leadership Max (7% CV) = 25% du CV
-    // Sur 500 DH PP (450 DH PM / 270 DH CV) : Payout max = 67.50 DH, soit 15.0% du CA encaissé !
     const maxTheoreticalPayoutDH = totalSV * (0.10 + 0.05 + 0.03 + 0.07);
     const payoutRatioPercent = totalDH > 0 ? ((maxTheoreticalPayoutDH / totalDH) * 100).toFixed(1) : 0;
 
     return {
       totalPP,
       totalPM,
+      clientDiscountDH,
+      shippingFee,
+      baseDH,
       totalDH,
       totalEUR,
       totalPV,
@@ -1096,36 +1162,28 @@ class StateManager {
 
     // Capture des articles du panier
     const cartItems = this.cart.map(item => ({
+      id: item.product.id,
       name: item.product.name,
       qty: item.quantity,
-      price: effectiveChannel === 'partner_personal' ? (item.product.pricePM_DH || Math.round(item.product.priceRP_DH * 0.9)) : (item.product.priceRP_DH || 500)
+      unitPrice: effectiveChannel === 'partner_personal' ? (item.product.pricePM_DH || Math.round(item.product.priceRP_DH * 0.9)) : (item.product.priceRP_DH || 500),
+      totalPrice: (effectiveChannel === 'partner_personal' ? (item.product.pricePM_DH || Math.round(item.product.priceRP_DH * 0.9)) : (item.product.priceRP_DH || 500)) * item.quantity,
+      pv: item.product.pv || Math.round((item.product.priceRP_DH || 500) / 10)
     }));
 
-    // Traitement des compteurs selon les 3 parcours commerciaux (Slide 10) :
-    // 1. 'attached_client' (Client Rattaché) :
-    //    - Payé au Prix Public
-    //    - Le Partner vendeur touche 10% direct sur le CA vente
-    //    - Génère du CV réseau (N1/N2/N3) remontant à la hiérarchie de parrainage
-    // 2. 'partner_personal' (Achat Personnel Partenaire) :
-    //    - Payé au Prix Membre (90% PP)
-    //    - Pas d'auto-commission (Slide 5 : Le membre qui achète ne reçoit pas les 27 DH sur son propre achat)
-    //    - Crédite des PV personnels pour qualification mensuelle
-    // 3. 'direct_client' (Client Direct Routini) :
-    //    - Payé au Prix Public, pas de commission réseau automatique
     buyer.ppv = (buyer.ppv || 0) + totals.totalPV;
     buyer.fidelityPoints = (buyer.fidelityPoints || 0) + totals.fidelityPoints;
     buyer.gpv = (buyer.gpv || 0) + totals.totalPV;
 
     const orderId = isClientUser ? 'CMD-CLT-' + Math.floor(10000 + Math.random() * 90000) : 'CMD-RTN-' + Math.floor(10000 + Math.random() * 90000);
+    const invoiceNum = 'FAC-' + new Date().getFullYear() + '-' + Math.floor(10000 + Math.random() * 90000);
 
     if (effectiveChannel === 'attached_client') {
       buyer.monthlySalesDH = (buyer.monthlySalesDH || 0) + totals.totalDH;
       buyer.clientsCount = (buyer.clientsCount || 0) + 1;
       // Vendeur reçoit sa commission vente directe (10% du CA PP)
-      const directBonusDH = Math.round(totals.totalDH * 0.10);
+      const directBonusDH = Math.round(totals.totalPP * 0.10);
       buyer.walletDH = (buyer.walletDH || 0) + directBonusDH;
 
-      // Enregistrer la transaction crédit de commission de vente directe
       this.transactions.unshift({
         memberCode: buyer.code,
         date: new Date().toLocaleDateString('fr-FR'),
@@ -1136,12 +1194,10 @@ class StateManager {
         status: 'Validé & Versé'
       });
 
-      // La chaîne réseau (N1/N2/N3) commence au parrain direct (Slide 5 : "Les 27 DH vont à son parrain direct")
       if (buyer.sponsorCode) {
         this.propagatePointsUpstream(buyer.sponsorCode, totals.totalPV, totals.totalSV);
       }
     } else if (effectiveChannel === 'partner_personal') {
-      // Auto-achat : Pas de commission pour l'acheteur, remonte au parrain pour commissions réseau
       if (buyer.sponsorCode) {
         this.propagatePointsUpstream(buyer.sponsorCode, totals.totalPV, totals.totalSV);
       }
@@ -1166,12 +1222,18 @@ class StateManager {
     const isDirectClient = (effectiveChannel === 'direct_client' || isClientUser);
     const newOrder = {
       id: orderId,
+      invoiceNumber: invoiceNum,
       orderType: isDirectClient ? 'direct_client' : effectiveChannel,
       memberCode: buyer.code,
-      memberName: `${buyer.name} (${isDirectClient ? 'Client Direct' : effectiveChannel === 'attached_client' ? 'Client Rattaché' : 'Achat Perso'})`,
+      memberName: buyer.name,
+      customerCin: buyer.cin || 'BK' + Math.floor(100000 + Math.random() * 900000),
+      customerPhone: buyer.phone || '+212 661 000000',
       date: new Date().toLocaleDateString('fr-FR'),
       itemsCount: totals.totalItems,
       totalPP: totals.totalPP,
+      clientDiscountDH: totals.clientDiscountDH,
+      shippingFee: totals.shippingFee,
+      baseDH: totals.baseDH,
       totalDH: totals.totalDH,
       totalEUR: totals.totalEUR,
       totalPV: totals.totalPV,
@@ -1180,7 +1242,7 @@ class StateManager {
       paymentMethod: paymentMethod,
       shippingAddress: buyer.address ? `${buyer.address}, ${buyer.city}` : `${buyer.city || 'Maroc'}`,
       trackingNumber: isDirectClient ? 'AMN-CAS-' + Math.floor(10000 + Math.random() * 90000) : undefined,
-      deliveryCarrier: isDirectClient ? 'Amana Express (Poste Maroc)' : undefined,
+      deliveryCarrier: 'Amana Express (Poste Maroc)',
       status: isDirectClient ? 'En cours de préparation' : 'Validée & Expédiée',
       items: cartItems
     };
@@ -1212,7 +1274,11 @@ class StateManager {
       name: newProd.name.trim(),
       category: newProd.category || (isPack ? 'Packs & Rituels' : 'Soins Visage'),
       isPack: isPack,
-      badge: newProd.badge || (isPack ? 'Pack Spécial' : 'Nouveau'),
+      isPromo: Boolean(newProd.isPromo),
+      promoBadge: newProd.promoBadge ? newProd.promoBadge.trim() : (newProd.isPromo ? 'PROMO' : ''),
+      originalPriceRP: Number(newProd.originalPriceRP) || (newProd.isPromo ? Math.round(priceRP * 1.25) : priceRP),
+      includedProducts: newProd.includedProducts || [],
+      badge: newProd.badge || (newProd.isPromo ? (newProd.promoBadge || 'PROMO') : (isPack ? 'Pack Spécial' : 'Nouveau')),
       desc: newProd.desc ? newProd.desc.trim() : '',
       icon: newProd.icon || (isPack ? '🎁' : '✨'),
       priceRP_DH: priceRP,
@@ -1245,6 +1311,10 @@ class StateManager {
     prod.name = updatedData.name !== undefined ? updatedData.name.trim() : prod.name;
     prod.category = updatedData.category || prod.category;
     prod.isPack = updatedData.isPack !== undefined ? Boolean(updatedData.isPack) : (prod.category === 'Packs & Rituels');
+    prod.isPromo = updatedData.isPromo !== undefined ? Boolean(updatedData.isPromo) : prod.isPromo;
+    prod.promoBadge = updatedData.promoBadge !== undefined ? updatedData.promoBadge.trim() : prod.promoBadge;
+    prod.originalPriceRP = updatedData.originalPriceRP !== undefined ? Number(updatedData.originalPriceRP) : prod.originalPriceRP;
+    if (updatedData.includedProducts) prod.includedProducts = updatedData.includedProducts;
     prod.badge = updatedData.badge !== undefined ? updatedData.badge.trim() : prod.badge;
     prod.desc = updatedData.desc !== undefined ? updatedData.desc.trim() : prod.desc;
     prod.icon = updatedData.icon || prod.icon;
@@ -1261,6 +1331,22 @@ class StateManager {
 
     this.saveState();
     return { success: true, product: prod };
+  }
+
+  duplicateProduct(id) {
+    const prod = this.getProductById(id);
+    if (!prod) return { success: false, message: 'Produit introuvable.' };
+
+    const prefix = prod.isPack ? 'PACK-' : 'RTN-';
+    const newId = prefix + String(this.products.length + 1).padStart(3, '0') + '-C';
+    const clone = JSON.parse(JSON.stringify(prod));
+    clone.id = newId;
+    clone.name = prod.name + ' (Copie)';
+    if (clone.badge) clone.badge = clone.badge + ' (Copie)';
+
+    this.products.unshift(clone);
+    this.saveState();
+    return { success: true, product: clone };
   }
 
   deleteProduct(id) {

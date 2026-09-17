@@ -101,14 +101,20 @@ class AdminController {
 
     container.innerHTML = `
       <!-- En-tête Principal de Direction -->
-      <div class="admin-badge-ribbon" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+      <div class="admin-badge-ribbon">
         <div>
           <h3 style="color: #fff;"><i class="fas fa-crown" style="color: var(--rtn-gold);"></i> Direction Générale Routini — Contrôle Central ONE PLAN V4</h3>
-          <p style="color: #cbd5e1;">Gestion du catalogue (PM 90%, PV PP/10, CV 60%), solidité financière (Slide 15/16) et supervision du réseau.</p>
+          <p style="color: #cbd5e1;">Gestion du catalogue (PM 90%, PV PP/10, CV 60%), solidité financière et base de données cloud.</p>
         </div>
-        <span class="status-badge" style="background: #15803d; color: #fff; font-size: 0.82rem; font-weight: 700;">
-          <i class="fas fa-shield-alt"></i> Accès Fondateur Sécurisé
-        </span>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div class="db-status-chip offline" id="adminDbStatusChip" title="Statut de la base Neon Vercel Postgres">
+            <span class="db-status-dot"></span>
+            <span id="adminDbStatusText">Vercel Postgres : Prêt</span>
+          </div>
+          <button type="button" class="btn-action-refresh" onclick="window.dbSync && window.dbSync.initOrSyncCloud(true)" title="Synchroniser et initialiser la base cloud" style="background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(232, 200, 203, 0.3); padding: 6px 12px; border-radius: 6px; font-size: 0.76rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+            <i class="fas fa-database" style="color: var(--rtn-rose);"></i> <span>Sync Base Vercel</span>
+          </button>
+        </div>
       </div>
 
       <!-- Métriques Globales Entreprise -->
@@ -167,8 +173,16 @@ class AdminController {
               <i class="fas fa-search"></i>
               <input type="text" placeholder="Filtrer un soin ou pack..." value="${this.searchProductQuery}" oninput="window.adminController.setProductSearch(this.value)">
             </div>
-            <button class="btn-primary-auth" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="window.adminController.showAddProductModal()">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <div class="search-box" style="min-width: 180px;">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="Filtrer un produit ou pack..." value="${this.searchProductQuery}" oninput="window.adminController.setProductSearch(this.value)">
+            </div>
+            <button class="btn-primary-auth" style="width: auto; padding: 8px 14px; font-size: 0.82rem;" onclick="window.adminController.showAddSoloProductModal()">
               <i class="fas fa-plus"></i> Créer Nouveau Produit
+            </button>
+            <button class="btn-primary-auth" style="width: auto; padding: 8px 14px; font-size: 0.82rem; background: #15803d;" onclick="window.adminController.showAddPackModal()">
+              <i class="fas fa-gift"></i> Créer un Pack
             </button>
           </div>
         </div>
@@ -176,7 +190,7 @@ class AdminController {
         <div style="display: flex; gap: 8px; padding: 10px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
           <button class="filter-pill ${this.productFilter === 'ALL' ? 'active' : ''}" onclick="window.adminController.setProductFilter('ALL')">Tous (${window.stateManager.products.length})</button>
           <button class="filter-pill ${this.productFilter === 'PACKS' ? 'active' : ''}" onclick="window.adminController.setProductFilter('PACKS')">Packs & Rituels</button>
-          <button class="filter-pill ${this.productFilter === 'SOLO' ? 'active' : ''}" onclick="window.adminController.setProductFilter('SOLO')">Soins Individuels</button>
+          <button class="filter-pill ${this.productFilter === 'SOLO' ? 'active' : ''}" onclick="window.adminController.setProductFilter('SOLO')">Produits</button>
         </div>
 
         <div style="overflow-x: auto;">
@@ -184,7 +198,7 @@ class AdminController {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Soin ou Pack Routine</th>
+                <th>Produit ou Pack</th>
                 <th>Catégorie</th>
                 <th>Prix Public (PP)</th>
                 <th>Prix Membre (PM 90%)</th>
@@ -208,12 +222,16 @@ class AdminController {
                         <span style="font-size: 1.2rem;">${p.icon || '✨'}</span>
                         <div>
                           <strong>${p.name}</strong>
-                          ${p.badge ? `<span style="font-size: 0.68rem; background: #be185d; color: #fff; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">${p.badge}</span>` : ''}
+                          ${p.isPromo ? `<span style="font-size: 0.68rem; background: #dc2626; color: #fff; padding: 2px 6px; border-radius: 4px; margin-left: 4px; font-weight: 800;"><i class="fas fa-fire"></i> ${p.promoBadge || 'PROMO'}</span>` : ''}
+                          ${p.badge && !p.isPromo ? `<span style="font-size: 0.68rem; background: #be185d; color: #fff; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">${p.badge}</span>` : ''}
                         </div>
                       </div>
                     </td>
                     <td><span class="status-badge" style="background:#f1f5f9; color:#475569;">${p.category}</span></td>
-                    <td><strong>${pp} DH</strong></td>
+                    <td>
+                      <strong>${pp} DH</strong>
+                      ${p.isPromo && p.originalPriceRP && p.originalPriceRP > pp ? `<small style="display: block; text-decoration: line-through; color: #94a3b8; font-size: 0.72rem;">${p.originalPriceRP} DH</small>` : ''}
+                    </td>
                     <td style="color: #15803d; font-weight: 700;">${pm} DH</td>
                     <td><strong style="color: var(--rtn-rose);">${pv} PV</strong></td>
                     <td style="background: #fff1f2; font-weight: 800; color: #be185d;">
@@ -221,12 +239,15 @@ class AdminController {
                     </td>
                     <td>${p.stock}</td>
                     <td>
-                      <div style="display: flex; gap: 6px;">
-                        <button class="btn-switch-account" style="padding: 4px 8px; font-size: 0.75rem;" onclick="window.adminController.showEditProductModal('${p.id}')">
+                      <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                        <button class="btn-switch-account" style="padding: 4px 7px; font-size: 0.72rem;" onclick="window.adminController.showEditProductModal('${p.id}')" title="Modifier">
                           <i class="fas fa-edit"></i> Modifier
                         </button>
-                        <button class="btn-switch-account" style="color: #dc2626; border-color: #fca5a5; padding: 4px 8px;" title="Supprimer" onclick="window.adminController.handleDeleteProduct('${p.id}')">
-                          <i class="fas fa-trash-alt"></i>
+                        <button class="btn-switch-account" style="color: #0284c7; border-color: #bae6fd; padding: 4px 7px; font-size: 0.72rem;" onclick="window.adminController.handleDuplicateProduct('${p.id}')" title="Dupliquer">
+                          <i class="fas fa-clone"></i> Dupliquer
+                        </button>
+                        <button class="btn-switch-account" style="color: #dc2626; border-color: #fca5a5; padding: 4px 7px; font-size: 0.72rem;" title="Effacer" onclick="window.adminController.handleDeleteProduct('${p.id}')">
+                          <i class="fas fa-trash-alt"></i> Effacer
                         </button>
                       </div>
                     </td>
@@ -434,16 +455,12 @@ class AdminController {
     const pm = prod.pricePM_DH || Math.round(pp * 0.90);
     const pv = prod.pv || Math.round(pp / 10);
     const cv = prod.sv || Math.round(pm * 0.60);
+    const isPack = prod.isPack || prod.category === 'Packs & Rituels';
 
-    modalTitle.innerHTML = `<i class="fas fa-edit" style="color: var(--rtn-rose);"></i> Modifier les Barèmes V4 : ${prod.name}`;
+    modalTitle.innerHTML = `<i class="fas fa-edit" style="color: var(--rtn-rose);"></i> Modifier l'Article : ${prod.name}`;
 
     modalBody.innerHTML = `
       <form onsubmit="window.adminController.handleEditProductSubmit(event, '${prod.id}')">
-        <div style="background: #fdf2f8; border-left: 4px solid var(--rtn-rose); padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem;">
-          <strong>Règles Officielles V4 :</strong><br>
-          En saisissant le <strong>Prix Public (PP)</strong>, le Prix Membre (90%), les PV (PP/10) et la base CV (60% PM) se calculent automatiquement. Vous pouvez aussi ajuster manuellement chaque valeur.
-        </div>
-
         <div class="form-group">
           <label>Nom de l'Article :</label>
           <input type="text" id="editProdName" class="form-control" value="${prod.name}" required>
@@ -453,7 +470,7 @@ class AdminController {
           <div class="form-group">
             <label>Type & Catégorie :</label>
             <select id="editProdCategory" class="form-control">
-              <option value="Packs & Rituels" ${prod.category === 'Packs & Rituels' ? 'selected' : ''}>🎁 Packs & Rituels Beauté</option>
+              <option value="Packs & Rituels" ${isPack ? 'selected' : ''}>🎁 Packs & Rituels Beauté</option>
               <option value="Soins Visage" ${prod.category === 'Soins Visage' ? 'selected' : ''}>✨ Soins Visage & Sérums</option>
               <option value="Anti-Âge" ${prod.category === 'Anti-Âge' ? 'selected' : ''}>🌙 Anti-Âge & Nuit</option>
               <option value="Huiles Précieuses" ${prod.category === 'Huiles Précieuses' ? 'selected' : ''}>🌹 Huiles Précieuses</option>
@@ -467,38 +484,58 @@ class AdminController {
           </div>
         </div>
 
+        <!-- Section Promotion pour Pack ou Produit -->
+        <div style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label style="color: #be185d; font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" id="editProdIsPromo" ${prod.isPromo ? 'checked' : ''} onchange="document.getElementById('editPromoFields').style.display = this.checked ? 'grid' : 'none'">
+              🔥 Mettre cet article / pack en Promotion
+            </label>
+          </div>
+          <div id="editPromoFields" style="display: ${prod.isPromo ? 'grid' : 'none'}; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label style="font-size: 0.76rem; color: #9f1239;">Badge Promo (ex: PROMO -20%) :</label>
+              <input type="text" id="editProdPromoBadge" class="form-control" value="${prod.promoBadge || 'PROMO'}" placeholder="PROMO -20%">
+            </div>
+            <div class="form-group" style="margin: 0;">
+              <label style="font-size: 0.76rem; color: #9f1239;">Prix d'origine barré (DH) :</label>
+              <input type="number" id="editProdOrigRP" class="form-control" value="${prod.originalPriceRP || pp}">
+            </div>
+          </div>
+        </div>
+
         <div class="form-group">
-          <label>Description du Soin / Pack :</label>
+          <label>Description :</label>
           <textarea id="editProdDesc" class="form-control" rows="2" required>${prod.desc || ''}</textarea>
         </div>
 
-        <!-- Ligne Prix Public PP -->
+        <!-- Ligne Prix Public PP & Prix Membre -->
         <div class="form-grid-2" style="background: #f0fdf4; padding: 12px; border-radius: 8px; border: 1.5px solid #86efac; margin-bottom: 14px;">
           <div class="form-group" style="margin: 0;">
             <label style="color: #166534; font-weight: 700;">Prix Public PP (DH) :</label>
             <input type="number" id="editProdRP" class="form-control" value="${pp}" min="10" required oninput="window.adminController.autoCalcV4('edit')">
-            <small style="color: #15803d;">Prix de vente au détail recommandé</small>
+            <small style="color: #15803d;">Prix de vente conseillé (baisse possible)</small>
           </div>
 
           <div class="form-group" style="margin: 0;">
             <label style="color: #166534; font-weight: 700;">Prix Membre PM (90% PP) :</label>
             <input type="number" id="editProdPM" class="form-control" value="${pm}" min="10" required>
-            <small style="color: #15803d;">Prix payé par les membres (-10% remise)</small>
+            <small style="color: #15803d;">Prix membres (-10% remise)</small>
           </div>
         </div>
 
-        <!-- Ligne PV et CV -->
+        <!-- Ligne PV et CV (Possibilité d'augmenter les points PV) -->
         <div class="form-grid-2" style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 14px; border: 1.5px solid #e2e8f0;">
           <div class="form-group" style="margin: 0;">
-            <label style="color: var(--rtn-rose-dark); font-weight: 700;">Points PV (PP ÷ 10) :</label>
+            <label style="color: var(--rtn-rose-dark); font-weight: 700;">Points PV (Qualification) :</label>
             <input type="number" id="editProdPV" class="form-control" value="${pv}" min="1" step="1" required style="font-weight: 700; font-size: 1.05rem;">
-            <small style="color: #64748b;">Mesure l'activité & qualification grade</small>
+            <small style="color: #64748b;">Augmentation des points possible en promo</small>
           </div>
 
           <div class="form-group" style="margin: 0;">
             <label style="color: #be185d; font-weight: 700;">Base CV (60% PM) :</label>
             <input type="number" id="editProdSV" class="form-control" value="${cv}" min="1" step="1" required style="font-weight: 800; font-size: 1.05rem; border: 2px solid #f43f5e;">
-            <small style="color: #64748b;">Base de calcul des commissions N1/N2/N3/Leadership</small>
+            <small style="color: #64748b;">Base calcul des commissions</small>
           </div>
         </div>
 
@@ -509,14 +546,14 @@ class AdminController {
           </div>
           <div class="form-group">
             <label>Icône / Émoji :</label>
-            <input type="text" id="editProdIcon" class="form-control" value="${prod.icon || '✨'}" style="max-width: 100px;">
+            <input type="text" id="editProdIcon" class="form-control" value="${prod.icon || (isPack ? '🎁' : '✨')}" style="max-width: 100px;">
           </div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
           <button type="button" class="btn-switch-account" onclick="window.app.closeModal()">Annuler</button>
           <button type="submit" class="btn-primary-auth" style="width: auto; padding: 10px 24px; background: #be185d;">
-            <i class="fas fa-save"></i> Enregistrer les Modifications V4
+            <i class="fas fa-save"></i> Enregistrer les Modifications
           </button>
         </div>
       </form>
@@ -547,6 +584,9 @@ class AdminController {
 
     const category = document.getElementById('editProdCategory').value;
     const isPack = category === 'Packs & Rituels';
+    const isPromo = document.getElementById('editProdIsPromo').checked;
+    const promoBadge = document.getElementById('editProdPromoBadge') ? document.getElementById('editProdPromoBadge').value.trim() : '';
+    const origRP = document.getElementById('editProdOrigRP') ? Number(document.getElementById('editProdOrigRP').value) : null;
 
     const pp = Number(document.getElementById('editProdRP').value) || 500;
     const pm = Number(document.getElementById('editProdPM').value) || Math.round(pp * 0.90);
@@ -557,6 +597,9 @@ class AdminController {
       name: document.getElementById('editProdName').value,
       category: category,
       isPack: isPack,
+      isPromo: isPromo,
+      promoBadge: promoBadge,
+      originalPriceRP: origRP || pp,
       badge: document.getElementById('editProdBadge').value,
       desc: document.getElementById('editProdDesc').value,
       priceRP_DH: pp,
@@ -570,87 +613,79 @@ class AdminController {
 
     window.stateManager.updateProduct(productId, updatedData);
     window.app.closeModal();
-    window.app.showToast(`Article mis à jour selon ONE PLAN V4 (PP: ${pp} DH, PM: ${pm} DH, PV: ${pv}, CV: ${cv}) !`, 'success');
+    window.app.showToast(`Article mis à jour (PP: ${pp} DH, PV: ${pv}, Promo: ${isPromo ? 'Oui' : 'Non'}) !`, 'success');
     window.app.renderAllViews();
   }
 
-  showAddProductModal() {
+  // --- FORMULAIRE 1 : CRÉER UN PRODUIT INDIVIDUEL ---
+  showAddSoloProductModal() {
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     const modalContainer = document.getElementById('appModal');
 
-    modalTitle.innerHTML = `<i class="fas fa-plus-circle" style="color: #15803d;"></i> Créer un Nouveau Soin ou Pack Routini V4`;
+    modalTitle.innerHTML = `<i class="fas fa-plus-circle" style="color: #15803d;"></i> Créer un Nouveau Produit Individuel`;
 
     modalBody.innerHTML = `
-      <form onsubmit="window.adminController.handleAddProductSubmit(event)">
+      <form onsubmit="window.adminController.handleAddSoloProductSubmit(event)">
         <div class="form-grid-2">
           <div class="form-group">
-            <label>Type d'article :</label>
-            <select id="newProdType" class="form-control">
-              <option value="pack">🎁 Pack Routine Cosmétique (Rituel / Starter)</option>
-              <option value="solo" selected>✨ Soin Individuel (Crème, Sérum, Huile...)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
             <label>Catégorie :</label>
-            <select id="newProdCategory" class="form-control">
+            <select id="newSoloCategory" class="form-control">
               <option value="Soins Visage">✨ Soins Visage</option>
-              <option value="Packs & Rituels">🎁 Packs & Rituels</option>
               <option value="Anti-Âge">🌙 Anti-Âge & Nuit</option>
               <option value="Huiles Précieuses">🌹 Huiles Précieuses</option>
               <option value="Soins Corps">🧴 Soins Corps</option>
             </select>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label>Nom de l'Article :</label>
-          <input type="text" id="newProdName" class="form-control" placeholder="Ex: Sérum Niacinamide 10% & Zinc" required>
+          <div class="form-group">
+            <label>Nom du Produit :</label>
+            <input type="text" id="newSoloName" class="form-control" placeholder="Ex: Sérum Niacinamide 10% & Zinc" required>
+          </div>
         </div>
 
         <div class="form-group">
           <label>Description :</label>
-          <textarea id="newProdDesc" class="form-control" rows="2" placeholder="Bienfaits, principes actifs..." required></textarea>
+          <textarea id="newSoloDesc" class="form-control" rows="2" placeholder="Bienfaits, actifs, conseils..." required></textarea>
         </div>
 
         <div class="form-grid-2" style="background: #f0fdf4; padding: 12px; border-radius: 8px; border: 1.5px solid #86efac; margin-bottom: 14px;">
           <div class="form-group" style="margin:0;">
             <label style="color: #166534; font-weight:700;">Prix Public PP (DH) :</label>
-            <input type="number" id="newProdRP" class="form-control" value="500" min="10" required oninput="window.adminController.autoCalcV4('new')">
+            <input type="number" id="newProdRP" class="form-control" value="350" min="10" required oninput="window.adminController.autoCalcV4('new')">
           </div>
           <div class="form-group" style="margin:0;">
             <label style="color: #166534; font-weight:700;">Prix Membre PM (90% PP) :</label>
-            <input type="number" id="newProdPM" class="form-control" value="450" min="10" required>
+            <input type="number" id="newProdPM" class="form-control" value="315" min="10" required>
           </div>
         </div>
 
         <div class="form-grid-2" style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 14px; border: 1.5px solid #e2e8f0;">
           <div class="form-group" style="margin:0;">
             <label style="color: var(--rtn-rose-dark); font-weight:700;">Points PV (PP ÷ 10) :</label>
-            <input type="number" id="newProdPV" class="form-control" value="50" min="1" required>
+            <input type="number" id="newProdPV" class="form-control" value="35" min="1" required>
           </div>
           <div class="form-group" style="margin:0;">
             <label style="color: #be185d; font-weight:700;">Base CV (60% PM) :</label>
-            <input type="number" id="newProdSV" class="form-control" value="270" min="1" required style="border: 2px solid #f43f5e;">
+            <input type="number" id="newProdSV" class="form-control" value="189" min="1" required style="border: 2px solid #f43f5e;">
           </div>
         </div>
 
         <div class="form-grid-2">
           <div class="form-group">
             <label>Stock Initial :</label>
-            <input type="number" id="newProdStock" class="form-control" value="60" min="1" required>
+            <input type="number" id="newSoloStock" class="form-control" value="60" min="1" required>
           </div>
           <div class="form-group">
             <label>Émoji / Icône :</label>
-            <input type="text" id="newProdIcon" class="form-control" value="✨" style="max-width: 100px;">
+            <input type="text" id="newSoloIcon" class="form-control" value="✨" style="max-width: 100px;">
           </div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
           <button type="button" class="btn-switch-account" onclick="window.app.closeModal()">Annuler</button>
           <button type="submit" class="btn-primary-auth" style="width: auto; padding: 10px 24px;">
-            <i class="fas fa-check"></i> Créer et Publier dans la Boutique
+            <i class="fas fa-check"></i> Créer et Publier le Produit
           </button>
         </div>
       </form>
@@ -659,41 +694,395 @@ class AdminController {
     modalContainer.classList.add('active');
   }
 
-  handleAddProductSubmit(e) {
+  handleAddSoloProductSubmit(e) {
     e.preventDefault();
 
-    const category = document.getElementById('newProdCategory').value;
-    const isPack = document.getElementById('newProdType').value === 'pack' || category === 'Packs & Rituels';
-
-    const pp = Number(document.getElementById('newProdRP').value) || 500;
+    const category = document.getElementById('newSoloCategory').value;
+    const pp = Number(document.getElementById('newProdRP').value) || 350;
     const pm = Number(document.getElementById('newProdPM').value) || Math.round(pp * 0.90);
     const pv = Number(document.getElementById('newProdPV').value) || Math.round(pp / 10);
     const cv = Number(document.getElementById('newProdSV').value) || Math.round(pm * 0.60);
 
     const productData = {
-      name: document.getElementById('newProdName').value,
+      name: document.getElementById('newSoloName').value,
       category: category,
-      isPack: isPack,
-      badge: isPack ? 'Pack Spécial' : 'Nouveau',
-      desc: document.getElementById('newProdDesc').value,
+      isPack: false,
+      badge: 'Nouveau',
+      desc: document.getElementById('newSoloDesc').value,
       priceRP_DH: pp,
       pricePM_DH: pm,
       pv: pv,
       sv: cv,
-      stock: Number(document.getElementById('newProdStock').value) || 60,
-      icon: document.getElementById('newProdIcon').value || (isPack ? '🎁' : '✨')
+      stock: Number(document.getElementById('newSoloStock').value) || 60,
+      icon: document.getElementById('newSoloIcon').value || '✨'
     };
 
     window.stateManager.addProduct(productData);
     window.app.closeModal();
-    window.app.showToast(`Nouveau soin « ${productData.name} » ajouté au catalogue officiel !`, 'success');
+    window.app.showToast(`Nouveau produit « ${productData.name} » ajouté au catalogue !`, 'success');
     window.app.renderAllViews();
+  }
+
+  // --- FORMULAIRE 2 : CRÉER UN PACK (Avec sélection de produits existants) ---
+  showAddPackModal() {
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalContainer = document.getElementById('appModal');
+
+    modalTitle.innerHTML = `<i class="fas fa-gift" style="color: #15803d;"></i> Créer un Pack de Produits Routini`;
+
+    const soloProducts = window.stateManager.products.filter(p => !p.isPack && p.category !== 'Packs & Rituels');
+
+    modalBody.innerHTML = `
+      <form onsubmit="window.adminController.handleAddPackSubmit(event)">
+        <div class="form-group">
+          <label>Nom du Pack :</label>
+          <input type="text" id="newPackName" class="form-control" placeholder="Ex: Pack Routine Éclat & Fermeté" required>
+        </div>
+
+        <div class="form-group">
+          <label>Description du Pack :</label>
+          <textarea id="newPackDesc" class="form-control" rows="2" placeholder="Description des rituels inclus, conseils beauté..." required></textarea>
+        </div>
+
+        <!-- Sélection dynamique des produits existants -->
+        <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <label style="font-weight: 800; color: var(--rtn-navy); display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="fas fa-boxes" style="color: var(--rtn-rose);"></i> Sélectionner les produits à inclure dans ce Pack :</span>
+            <small style="color: #64748b; font-weight: normal;">Cochez les produits</small>
+          </label>
+          <div style="max-height: 180px; overflow-y: auto; margin-top: 10px; display: flex; flex-direction: column; gap: 6px; padding-right: 4px;">
+            ${soloProducts.map(p => `
+              <label style="display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 12px; cursor: pointer; font-size: 0.82rem; transition: background 0.15s;" onmouseover="this.style.background='#fdf2f8'" onmouseout="this.style.background='#fff'">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <input type="checkbox" class="pack-product-checkbox" data-product-id="${p.id}" data-price="${p.priceRP_DH || 350}" onchange="window.adminController.recalcPackTotal()">
+                  <span>${p.icon || '✨'} <strong>${p.name}</strong></span>
+                </div>
+                <span style="font-weight: 700; color: #15803d;">${p.priceRP_DH || 350} DH</span>
+              </label>
+            `).join('')}
+          </div>
+
+          <!-- Total cumulé calculé des produits -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1.5px dashed #cbd5e1; font-size: 0.9rem;">
+            <strong>Prix Total Cumulé des Produits Sélectionnés :</strong>
+            <span id="packCalculatedTotalText" style="font-size: 1.15rem; font-weight: 800; color: #0f172a;">0 DH</span>
+          </div>
+        </div>
+
+        <!-- Manipulation du Prix du Pack (Prix Spécial / Réduit) -->
+        <div class="form-grid-2" style="background: #f0fdf4; padding: 12px; border-radius: 8px; border: 1.5px solid #86efac; margin-bottom: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label style="color: #166534; font-weight: 700;">Prix Public Vendu du Pack (PP en DH) :</label>
+            <input type="number" id="packPriceRP" class="form-control" value="0" min="10" required oninput="window.adminController.autoCalcPackFromRP()">
+            <small style="color: #15803d;">Vous pouvez ajuster / baisser ce prix</small>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label style="color: #166534; font-weight: 700;">Prix Membre Pack (90% PP) :</label>
+            <input type="number" id="packPricePM" class="form-control" value="0" min="10" required>
+            <small style="color: #15803d;">Prix payé par les membres</small>
+          </div>
+        </div>
+
+        <!-- Section Promotion pour le Pack -->
+        <div style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
+          <label style="color: #be185d; font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="packIsPromo" onchange="document.getElementById('packPromoFields').style.display = this.checked ? 'grid' : 'none'">
+            🔥 Mettre ce pack en Promotion spéciale
+          </label>
+          <div id="packPromoFields" style="display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label style="font-size: 0.76rem; color: #9f1239;">Badge Promotionnel :</label>
+              <input type="text" id="packPromoBadge" class="form-control" value="PROMO SPÉCIALE" placeholder="Ex: OFFRE -25%">
+            </div>
+            <div class="form-group" style="margin: 0;">
+              <label style="font-size: 0.76rem; color: #9f1239;">Prix initial barré (DH) :</label>
+              <input type="number" id="packOrigPrice" class="form-control" value="0" placeholder="Prix d'origine">
+            </div>
+          </div>
+        </div>
+
+        <!-- Ligne PV et CV (Avec possibilité d'augmenter les points en promo) -->
+        <div class="form-grid-2" style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 14px; border: 1.5px solid #e2e8f0;">
+          <div class="form-group" style="margin: 0;">
+            <label style="color: var(--rtn-rose-dark); font-weight: 700;">Points PV (Qualification) :</label>
+            <input type="number" id="packPV" class="form-control" value="0" min="1" step="1" required style="font-weight: 700; font-size: 1.05rem;">
+            <small style="color: #64748b;">Augmenter les PV pour rendre le pack attractif</small>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label style="color: #be185d; font-weight: 700;">Base CV (60% PM) :</label>
+            <input type="number" id="packSV" class="form-control" value="0" min="1" step="1" required style="font-weight: 800; font-size: 1.05rem; border: 2px solid #f43f5e;">
+            <small style="color: #64748b;">Base de calcul commissions</small>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Stock Disponible :</label>
+            <input type="number" id="packStock" class="form-control" value="40" min="1" required>
+          </div>
+          <div class="form-group">
+            <label>Émoji du Pack :</label>
+            <input type="text" id="packIcon" class="form-control" value="🎁" style="max-width: 100px;">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn-switch-account" onclick="window.app.closeModal()">Annuler</button>
+          <button type="submit" class="btn-primary-auth" style="width: auto; padding: 10px 24px; background: #15803d;">
+            <i class="fas fa-check"></i> Créer et Publier le Pack
+          </button>
+        </div>
+      </form>
+    `;
+
+    modalContainer.classList.add('active');
+  }
+
+  recalcPackTotal() {
+    let totalSum = 0;
+    const checked = document.querySelectorAll('.pack-product-checkbox:checked');
+    checked.forEach(cb => {
+      totalSum += Number(cb.getAttribute('data-price')) || 0;
+    });
+
+    const sumText = document.getElementById('packCalculatedTotalText');
+    if (sumText) sumText.textContent = `${totalSum} DH`;
+
+    const rpInput = document.getElementById('packPriceRP');
+    const origInput = document.getElementById('packOrigPrice');
+
+    if (rpInput && (!rpInput.value || Number(rpInput.value) === 0 || Number(rpInput.dataset.auto) !== 0)) {
+      rpInput.value = totalSum;
+      this.autoCalcPackFromRP();
+    }
+    if (origInput) {
+      origInput.value = totalSum;
+    }
+  }
+
+  autoCalcPackFromRP() {
+    const rpInput = document.getElementById('packPriceRP');
+    const pmInput = document.getElementById('packPricePM');
+    const pvInput = document.getElementById('packPV');
+    const cvInput = document.getElementById('packSV');
+
+    if (!rpInput) return;
+    const pp = Number(rpInput.value) || 0;
+    const pm = Math.round(pp * 0.90);
+    const pv = Math.round(pp / 10);
+    const cv = Math.round(pm * 0.60);
+
+    if (pmInput) pmInput.value = pm;
+    if (pvInput) pvInput.value = pv;
+    if (cvInput) cvInput.value = cv;
+  }
+
+  handleAddPackSubmit(e) {
+    e.preventDefault();
+
+    const checkedBoxes = document.querySelectorAll('.pack-product-checkbox:checked');
+    if (checkedBoxes.length === 0) {
+      window.app.showToast('Veuillez sélectionner au moins un produit à inclure dans le pack.', 'warning');
+      return;
+    }
+
+    const includedProducts = [];
+    checkedBoxes.forEach(cb => {
+      includedProducts.push(cb.getAttribute('data-product-id'));
+    });
+
+    const pp = Number(document.getElementById('packPriceRP').value) || 500;
+    const pm = Number(document.getElementById('packPricePM').value) || Math.round(pp * 0.90);
+    const pv = Number(document.getElementById('packPV').value) || Math.round(pp / 10);
+    const cv = Number(document.getElementById('packSV').value) || Math.round(pm * 0.60);
+
+    const isPromo = document.getElementById('packIsPromo').checked;
+    const promoBadge = document.getElementById('packPromoBadge').value.trim() || 'PROMO';
+    const origPrice = Number(document.getElementById('packOrigPrice').value) || pp;
+
+    const packData = {
+      name: document.getElementById('newPackName').value,
+      category: 'Packs & Rituels',
+      isPack: true,
+      isPromo: isPromo,
+      promoBadge: promoBadge,
+      originalPriceRP: origPrice,
+      includedProducts: includedProducts,
+      badge: isPromo ? promoBadge : 'Pack Spécial',
+      desc: document.getElementById('newPackDesc').value,
+      priceRP_DH: pp,
+      pricePM_DH: pm,
+      pv: pv,
+      sv: cv,
+      stock: Number(document.getElementById('packStock').value) || 40,
+      icon: document.getElementById('packIcon').value || '🎁'
+    };
+
+    window.stateManager.addProduct(packData);
+    window.app.closeModal();
+    window.app.showToast(`Nouveau pack « ${packData.name} » créé avec ${includedProducts.length} produits (Prix: ${pp} DH, PV: ${pv}) !`, 'success');
+    window.app.renderAllViews();
+  }
+
+  showEditProductModal(productId) {
+    const p = window.stateManager.getProductById(productId);
+    if (!p) {
+      window.app.showToast('Article introuvable.', 'error');
+      return;
+    }
+
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalContainer = document.getElementById('appModal');
+
+    modalTitle.innerHTML = `<i class="fas fa-edit" style="color: var(--rtn-rose);"></i> Modifier : ${p.name} (${p.id})`;
+
+    const pp = p.priceRP_DH || 500;
+    const pm = p.pricePM_DH || Math.round(pp * 0.9);
+    const pv = p.pv || Math.round(pp / 10);
+    const cv = p.sv || Math.round(pm * 0.6);
+    const isPromo = Boolean(p.isPromo);
+    const promoBadge = p.promoBadge || 'PROMO SPÉCIALE';
+    const origPrice = p.originalPriceRP || (isPromo ? Math.round(pp * 1.25) : pp);
+
+    modalBody.innerHTML = `
+      <form onsubmit="window.adminController.handleEditProductSubmit(event, '${p.id}')">
+        <div class="form-group">
+          <label>Nom du Produit ou Pack :</label>
+          <input type="text" id="editProdName" class="form-control" value="${p.name.replace(/"/g, '&quot;')}" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Catégorie :</label>
+            <select id="editProdCategory" class="form-control">
+              <option value="Packs & Rituels" ${p.category === 'Packs & Rituels' || p.isPack ? 'selected' : ''}>Packs & Rituels Beauté</option>
+              <option value="Soins Visage" ${p.category === 'Soins Visage' ? 'selected' : ''}>Soins Visage</option>
+              <option value="Soins Anti-Âge" ${p.category === 'Soins Anti-Âge' ? 'selected' : ''}>Soins Anti-Âge</option>
+              <option value="Nettoyants & Démaquillants" ${p.category === 'Nettoyants & Démaquillants' ? 'selected' : ''}>Nettoyants & Démaquillants</option>
+              <option value="Soins Corps & Huiles" ${p.category === 'Soins Corps & Huiles' ? 'selected' : ''}>Soins Corps & Huiles</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Stock Disponible :</label>
+            <input type="number" id="editProdStock" class="form-control" value="${p.stock || 50}" min="0" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description :</label>
+          <textarea id="editProdDesc" class="form-control" rows="2" required>${p.desc || ''}</textarea>
+        </div>
+
+        <!-- Section Prix & Réduction -->
+        <div class="form-grid-2" style="background: #f0fdf4; padding: 12px; border-radius: 8px; border: 1.5px solid #86efac; margin-bottom: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label style="color: #166534; font-weight: 700;">Prix Public Vente (PP en DH) :</label>
+            <input type="number" id="editProdPriceRP" class="form-control" value="${pp}" min="10" required oninput="document.getElementById('editProdPricePM').value = Math.round(this.value * 0.9);">
+            <small style="color: #15803d;">Prix de vente aux clients</small>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label style="color: #166534; font-weight: 700;">Prix Membre (90% PP) :</label>
+            <input type="number" id="editProdPricePM" class="form-control" value="${pm}" min="10" required>
+            <small style="color: #15803d;">Prix payé par les membres</small>
+          </div>
+        </div>
+
+        <!-- Section Promotionnelle (Activer / Désactiver Promotion, Prix barré, Badge) -->
+        <div style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
+          <label style="color: #be185d; font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="editProdIsPromo" ${isPromo ? 'checked' : ''} onchange="document.getElementById('editPromoFields').style.display = this.checked ? 'grid' : 'none'">
+            🔥 Mettre cet article / pack en Promotion
+          </label>
+          <div id="editPromoFields" style="display: ${isPromo ? 'grid' : 'none'}; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label style="font-size: 0.76rem; color: #9f1239;">Badge Promotionnel :</label>
+              <input type="text" id="editProdPromoBadge" class="form-control" value="${promoBadge}" placeholder="Ex: PROMO SPÉCIALE">
+            </div>
+            <div class="form-group" style="margin: 0;">
+              <label style="font-size: 0.76rem; color: #9f1239;">Prix d'origine barré (DH) :</label>
+              <input type="number" id="editProdOrigPrice" class="form-control" value="${origPrice}" placeholder="Prix barré">
+            </div>
+          </div>
+          <small style="display:block; color: #9f1239; font-size: 0.72rem; margin-top: 6px;">
+            Conseil : Vous pouvez baisser le prix et augmenter les points pour rendre le pack attractif.
+          </small>
+        </div>
+
+        <!-- Points PV et Base CV -->
+        <div class="form-grid-2" style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 14px; border: 1.5px solid #e2e8f0;">
+          <div class="form-group" style="margin: 0;">
+            <label style="color: var(--rtn-rose-dark); font-weight: 700;">Points PV (Activité / Volume) :</label>
+            <input type="number" id="editProdPV" class="form-control" value="${pv}" min="1" step="1" required style="font-weight: 700; font-size: 1.05rem;">
+            <small style="color: #64748b;">Augmentez les PV pour les promos</small>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label style="color: #be185d; font-weight: 700;">Base CV Commissions (60% PM) :</label>
+            <input type="number" id="editProdSV" class="form-control" value="${cv}" min="1" step="1" required style="font-weight: 800; font-size: 1.05rem; border: 2px solid #f472b6;">
+            <small style="color: #64748b;">Base de calcul des primes réseau</small>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn-switch-account" onclick="window.app.closeModal()">Annuler</button>
+          <button type="submit" class="btn-primary-auth" style="width: auto; padding: 10px 24px;">
+            <i class="fas fa-save"></i> Enregistrer les Modifications
+          </button>
+        </div>
+      </form>
+    `;
+
+    modalContainer.classList.add('active');
+  }
+
+  handleEditProductSubmit(e, productId) {
+    e.preventDefault();
+    const isPromo = document.getElementById('editProdIsPromo').checked;
+    const pp = Number(document.getElementById('editProdPriceRP').value);
+    const pm = Number(document.getElementById('editProdPricePM').value);
+    const pv = Number(document.getElementById('editProdPV').value);
+    const cv = Number(document.getElementById('editProdSV').value);
+    const promoBadge = document.getElementById('editProdPromoBadge') ? document.getElementById('editProdPromoBadge').value.trim() : 'PROMO';
+    const origPrice = Number(document.getElementById('editProdOrigPrice') ? document.getElementById('editProdOrigPrice').value : pp);
+
+    const updatedData = {
+      name: document.getElementById('editProdName').value.trim(),
+      category: document.getElementById('editProdCategory').value,
+      desc: document.getElementById('editProdDesc').value.trim(),
+      stock: Number(document.getElementById('editProdStock').value) || 50,
+      priceRP_DH: pp,
+      pricePM_DH: pm,
+      pv: pv,
+      sv: cv,
+      isPromo: isPromo,
+      promoBadge: isPromo ? promoBadge : '',
+      originalPriceRP: isPromo ? origPrice : pp
+    };
+
+    window.stateManager.updateProduct(productId, updatedData);
+    window.app.closeModal();
+    window.app.showToast(`Article « ${updatedData.name} » mis à jour avec succès !`, 'success');
+    this.render();
+    window.app.renderAllViews();
+  }
+
+  handleDuplicateProduct(productId) {
+    const res = window.stateManager.duplicateProduct(productId);
+    if (res.success) {
+      window.app.showToast(`Article dupliqué avec succès : ${res.product.name} (${res.product.id})`, 'success');
+      this.render();
+      window.app.renderAllViews();
+    } else {
+      window.app.showToast(res.message || 'Erreur duplication', 'error');
+    }
   }
 
   handleDeleteProduct(productId) {
     if (confirm('Voulez-vous vraiment retirer cet article du catalogue Routini ?')) {
       window.stateManager.deleteProduct(productId);
       window.app.showToast('Article supprimé du catalogue.', 'success');
+      this.render();
       window.app.renderAllViews();
     }
   }

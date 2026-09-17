@@ -6,6 +6,9 @@
   <title>Routini eWorld - ROUTINI ONE PLAN (Version 4 • Septembre 2026)</title>
   <meta name="description" content="Portail officiel Routini eWorld pour la gestion du réseau MLM beauté, arbre généalogique, suivi des PV/CV, boutique cosmétique et commissions selon le ROUTINI ONE PLAN Version 4.">
   
+  <!-- Favicon Officiel Routini Cosmetics -->
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+
   <!-- Polices Google Fonts & Icônes FontAwesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,30 +34,30 @@
         <i class="fas fa-crown"></i> Direction (ADMIN)
       </button>
       <button class="btn-switch-account" data-target-code="818204921" onclick="window.app.switchAccount('818204921')">
-        <i class="fas fa-gem" style="color: #ec4899;"></i> Karim (Ambassador 7%)
+        <i class="fas fa-gem" style="color: var(--rtn-rose);"></i> Karim (Ambassador 7%)
       </button>
       <button class="btn-switch-account" data-target-code="818206330" onclick="window.app.switchAccount('818206330')">
-        <i class="fas fa-gem" style="color: #3b82f6;"></i> Mehdi (Diamond 5%)
+        <i class="fas fa-gem" style="color: var(--rtn-gold);"></i> Mehdi (Diamond 5%)
       </button>
       <button class="btn-switch-account" data-target-code="818210552" onclick="window.app.switchAccount('818210552')">
-        <i class="fas fa-star" style="color: #f59e0b;"></i> Nadia (Manager 3%)
+        <i class="fas fa-star" style="color: var(--rtn-gold);"></i> Nadia (Manager 3%)
       </button>
       <button class="btn-switch-account" data-target-code="818217123" onclick="window.app.switchAccount('818217123')">
-        <i class="fas fa-award" style="color: #10b981;"></i> Siham (Leader 2%)
+        <i class="fas fa-award" style="color: var(--rtn-rose-dark);"></i> Siham (Leader 2%)
       </button>
       <button class="btn-switch-account" data-target-code="818229345" onclick="window.app.switchAccount('818229345')">
-        <i class="fas fa-cubes" style="color: #0ea5e9;"></i> Ibtissam (Builder 1%)
+        <i class="fas fa-cubes" style="color: var(--rtn-rose);"></i> Ibtissam (Builder 1%)
       </button>
       <button class="btn-switch-account" data-target-code="818243789" onclick="window.app.switchAccount('818243789')">
-        <i class="fas fa-user-check" style="color: #22c55e;"></i> Najat (Partner Actif)
+        <i class="fas fa-user-check" style="color: var(--rtn-green);"></i> Najat (Partner Actif)
       </button>
-      <button class="btn-switch-account" style="border-color: #fca5a5; background: #fff1f2;" data-target-code="818252678" onclick="window.app.switchAccount('818252678')" title="Tester la règle de non-versement pour activité < 50 PV (Slide 8/15)">
-        <i class="fas fa-user-clock" style="color: #ef4444;"></i> Driss (Inactif < 50 PV)
+      <button class="btn-switch-account" style="border-color: rgba(178, 93, 84, 0.4);" data-target-code="818252678" onclick="window.app.switchAccount('818252678')" title="Tester la règle de non-versement pour activité < 50 PV (Slide 8/15)">
+        <i class="fas fa-user-clock" style="color: var(--rtn-rose);"></i> Driss (Inactif &lt; 50 PV)
       </button>
-      <button class="btn-switch-account" style="background: rgba(244, 114, 182, 0.25); border-color: #f472b6; font-weight: 600;" data-target-code="CLT-818101" onclick="window.app.switchAccount('CLT-818101')" title="Tester l'espace client sans arbre">
-        <i class="fas fa-shopping-bag" style="color: #f472b6;"></i> Salma (Client Direct)
+      <button class="btn-switch-account" style="background: rgba(178, 93, 84, 0.15); border-color: rgba(178, 93, 84, 0.4);" data-target-code="CLT-818101" onclick="window.app.switchAccount('CLT-818101')" title="Tester l'espace client sans arbre">
+        <i class="fas fa-shopping-bag" style="color: var(--rtn-rose);"></i> Salma (Client Direct)
       </button>
-      <button class="btn-switch-account" style="background: rgba(239, 68, 68, 0.35); border-color: #ef4444; color: #fff; font-weight: 700; margin-left: 6px;" onclick="window.authController.logout()" title="Revenir à l'écran de connexion / Menu principal">
+      <button class="btn-switch-account" style="background: rgba(255, 255, 255, 0.15); color: #fff; font-weight: 700; margin-left: 6px;" onclick="window.authController.logout()" title="Revenir à l'écran de connexion / Menu principal">
         <i class="fas fa-door-open"></i> Menu d'Accueil
       </button>
     </div>
@@ -66,14 +69,27 @@
   <section class="auth-wrapper" id="authSection">
     <div class="auth-card" id="authCard">
       <div class="auth-header">
-        <div class="brand-logo-area">
-          <div class="routini-logo-box">Routini</div>
-          <div class="routini-logo-text">
-            <h1>eWorld</h1>
-            <span>Cosmétiques & Soins d'Excellence</span>
-          </div>
+        <div class="brand-logo-img-box">
+          <img src="assets/images/routini-brand.jpg" alt="Routini COSMETICS By Lys Horizon" class="brand-logo-img">
         </div>
-        <p>Portail Sécurisé Intégré des Distributeurs & de la Direction Générale</p>
+        <div class="brand-official-tagline">Portail Officiel • eWorld MLM</div>
+        <p>Espace Sécurisé des Partenaires & de la Direction Générale</p>
+        
+        <!-- Sélecteur 4 Langues & Drapeaux Multi-pays (Marketing Good) -->
+        <div class="auth-lang-selector" style="display: flex; justify-content: center; gap: 8px; margin-top: 10px;">
+          <button type="button" class="btn-lang-flag active" data-lang="fr" title="Français (Maroc)">
+            <span>🇲🇦</span> <small>FR</small>
+          </button>
+          <button type="button" class="btn-lang-flag" data-lang="en" title="English">
+            <span>🇬🇧</span> <small>EN</small>
+          </button>
+          <button type="button" class="btn-lang-flag" data-lang="ar" title="العربية (المغرب / الخليج)">
+            <span>🇸🇦</span> <small>AR</small>
+          </button>
+          <button type="button" class="btn-lang-flag" data-lang="es" title="Español">
+            <span>🇪🇸</span> <small>ES</small>
+          </button>
+        </div>
       </div>
 
       <!-- Onglets d'accès (Client Direct vs Distributeur vs Administrateur / Direction) -->
@@ -190,10 +206,10 @@
     <!-- Barre Latérale de Navigation (Sidebar) -->
     <aside class="sidebar" id="appSidebar">
       <div class="sidebar-header">
-        <div class="routini-logo-box" style="padding: 2px 8px; font-size: 1.1rem;">R</div>
+        <img src="assets/images/routini-icon.png" alt="Routini Cosmetics" class="sidebar-brand-logo-img">
         <div class="sidebar-brand-name">
           Routini
-          <small>Cosmétiques & MLM</small>
+          <small>By Lys Horizon</small>
         </div>
       </div>
 
@@ -306,10 +322,20 @@
             <span id="headerClientLoyaltyText">340 Pts Fidélité</span>
           </div>
 
-          <!-- Indicateur Langue -->
-          <div class="lang-badge" title="Langue officielle du portail">
-            <span style="font-size: 1rem; margin-right: 4px;">🇲🇦</span>
-            <span>FR</span>
+          <!-- Sélecteur 4 Langues Multi-Drapeaux (FR, EN, AR, ES) -->
+          <div class="header-lang-selector" style="display: flex; gap: 4px; align-items: center; background: #f8fafc; padding: 3px 6px; border-radius: 20px; border: 1px solid #e2e8f0;">
+            <button type="button" class="btn-lang-flag active" data-lang="fr" title="Français (Maroc)">
+              <span>🇲🇦</span> <small>FR</small>
+            </button>
+            <button type="button" class="btn-lang-flag" data-lang="en" title="English">
+              <span>🇬🇧</span> <small>EN</small>
+            </button>
+            <button type="button" class="btn-lang-flag" data-lang="ar" title="العربية (RTL)">
+              <span>🇸🇦</span> <small>AR</small>
+            </button>
+            <button type="button" class="btn-lang-flag" data-lang="es" title="Español">
+              <span>🇪🇸</span> <small>ES</small>
+            </button>
           </div>
 
           <!-- Bouton Rapide Revenir au Menu / Changer de Profil -->
@@ -406,6 +432,7 @@
                       <th>Points (PV)</th>
                       <th>Montant Payé</th>
                       <th>Statut</th>
+                      <th>Facture</th>
                     </tr>
                   </thead>
                   <tbody id="dashRecentOrdersBody">
@@ -524,10 +551,80 @@
                       <th>Montant Payé (TTC)</th>
                       <th>Mode de Règlement</th>
                       <th>Suivi Colis & Statut</th>
+                      <th>Facture</th>
                     </tr>
                   </thead>
                   <tbody id="dashClientOrdersBody">
                     <!-- Rempli dynamiquement par app.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Section Parrainage Client Privilège (12 Mois de Validité) -->
+            <div class="data-table-card" id="clientReferralCard" style="margin-top: 20px; border: 1.5px solid #fbcfe8; background: linear-gradient(180deg, #fff 0%, #fdf2f8 100%);">
+              <div class="table-header-bar" style="border-bottom: 1px solid #fce7f3;">
+                <div>
+                  <h3 style="display: flex; align-items: center; gap: 8px; color: #9d174d;">
+                    <i class="fas fa-gift" style="color: #be185d;"></i>
+                    Programme de Parrainage Client Privilège (12 Mois de Validité)
+                  </h3>
+                  <p style="font-size: 0.78rem; color: #64748b; margin-top: 2px;">
+                    Partagez vos rituels beauté : vos ami(e)s reçoivent -10% immédiat et +50 pts, et vous cumulez +50 points fidélité par personne inscrite pendant 12 mois !
+                  </p>
+                </div>
+                <span class="status-badge status-success" style="font-size: 0.78rem; padding: 4px 10px;">
+                  <i class="fas fa-shield-alt"></i> Validité : 12 Mois
+                </span>
+              </div>
+
+              <!-- Bloc Codes et Liens Partageables -->
+              <div style="padding: 16px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #fbcfe8; box-shadow: 0 2px 6px rgba(190, 24, 93, 0.05);">
+                  <label style="font-size: 0.75rem; font-weight: 700; color: #9d174d; text-transform: uppercase;">Votre Code Parrainage Personnel</label>
+                  <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px;">
+                    <div id="clientReferralCodeDisplay" style="font-family: monospace; font-size: 1.25rem; font-weight: 800; color: #be185d; letter-spacing: 2px; background: #fdf2f8; padding: 6px 14px; border-radius: 6px; flex: 1; text-align: center; border: 1px dashed #f472b6;">
+                      818101
+                    </div>
+                    <button type="button" class="btn-client-action" style="padding: 8px 14px; font-size: 0.78rem; width: auto;" onclick="window.app.copyReferralCode()">
+                      <i class="fas fa-copy"></i> Copier Code
+                    </button>
+                  </div>
+                  <small style="color: #64748b; font-size: 0.72rem; display: block; margin-top: 6px;">Transmettez ce code à vos ami(e)s pour leur inscription.</small>
+                </div>
+
+                <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #fbcfe8; box-shadow: 0 2px 6px rgba(190, 24, 93, 0.05);">
+                  <label style="font-size: 0.75rem; font-weight: 700; color: #9d174d; text-transform: uppercase;">Lien Direct d'Invitation (1-Clic)</label>
+                  <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px;">
+                    <input type="text" id="clientReferralLinkInput" readonly value="https://routini.ma/?ref=818101" style="font-size: 0.78rem; padding: 8px 10px; border-radius: 6px; border: 1px solid #e2e8f0; flex: 1; background: #f8fafc; font-family: monospace; color: #334155;">
+                    <button type="button" class="btn-client-action" style="padding: 8px 14px; font-size: 0.78rem; width: auto;" onclick="window.app.copyReferralLink()">
+                      <i class="fas fa-link"></i> Copier Lien
+                    </button>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.72rem; color: #64748b;">
+                    <span><i class="fas fa-calendar-check" style="color: #10b981;"></i> Fin de validité des gains : <strong id="clientReferralExpiryDisplay">10/05/2027</strong></span>
+                    <span id="clientReferralFriendsCount" style="color: #9d174d; font-weight: 700;">2 ami(s) parrainé(s)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tableau des Amis Parrainés -->
+              <div style="padding: 0 20px 20px; overflow-x: auto;">
+                <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--rtn-navy); margin-bottom: 8px;">
+                  <i class="fas fa-users" style="color: #be185d;"></i> Amis Inscrits sous Votre Parrainage Direct
+                </h4>
+                <table class="custom-table" style="font-size: 0.82rem;">
+                  <thead>
+                    <tr>
+                      <th>Nom & Prénom</th>
+                      <th>N° CIN / Passeport</th>
+                      <th>Date d'Inscription</th>
+                      <th>Gain Obtenu</th>
+                      <th>Statut Validité</th>
+                    </tr>
+                  </thead>
+                  <tbody id="clientReferralFriendsBody">
+                    <!-- Rempli par app.js -->
                   </tbody>
                 </table>
               </div>
@@ -642,10 +739,14 @@
 
               <!-- Section Candidat -->
               <h4 style="font-size: 0.95rem; font-weight: 700; margin: 20px 0 14px; color: var(--rtn-navy);">2. Informations Personnelles du Nouveau Partenaire</h4>
-              <div class="form-grid-2">
+              <div class="form-grid-3">
                 <div class="form-group">
-                  <label>Nom Complet (CIN / Passeport) :</label>
+                  <label>Nom Complet du Partenaire :</label>
                   <input type="text" id="newMemberFullName" class="form-control" placeholder="Ex: Kenza Bennani" required>
+                </div>
+                <div class="form-group">
+                  <label>Numéro de CIN / Passeport <span style="color:#dc2626;">*</span> :</label>
+                  <input type="text" id="newMemberCin" class="form-control" placeholder="Ex: BK720194" required style="text-transform: uppercase;">
                 </div>
                 <div class="form-group">
                   <label>Adresse Email :</label>
@@ -753,14 +854,26 @@
         </div>
 
         <form id="formRegisterClient" onsubmit="window.authController.handleClientRegisterSubmit(event)">
-          <div class="form-group">
-            <label for="regClientName">Nom et Prénom :</label>
-            <input type="text" id="regClientName" class="form-control" placeholder="Ex: Salma Bennani" required>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label for="regClientName">Nom et Prénom :</label>
+              <input type="text" id="regClientName" class="form-control" placeholder="Ex: Salma Bennani" required>
+            </div>
+            <div class="form-group">
+              <label for="regClientCin">N° CIN / Passeport <span style="color:#dc2626;">*</span> :</label>
+              <input type="text" id="regClientCin" class="form-control" placeholder="Ex: BK720194" required style="text-transform: uppercase;">
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="regClientEmail">Adresse Email :</label>
-            <input type="email" id="regClientEmail" class="form-control" placeholder="salma.bennani@gmail.com" required>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label for="regClientEmail">Adresse Email :</label>
+              <input type="email" id="regClientEmail" class="form-control" placeholder="salma.bennani@gmail.com" required>
+            </div>
+            <div class="form-group">
+              <label for="regClientReferral">Code Parrainage Ami (Optionnel) :</label>
+              <input type="text" id="regClientReferral" class="form-control" placeholder="Ex: 818101 (chiffres)">
+            </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
@@ -819,9 +932,11 @@
   <!-- Conteneur des Toasts -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Scripts JS Applicatifs (Modulaires V4) -->
+  <!-- Scripts JS Applicatifs (Modulaires V4 & i18n) -->
+  <script src="js/i18n.js?v=9.0"></script>
   <script src="js/mock_data.js?v=9.0"></script>
   <script src="js/state.js?v=9.0"></script>
+  <script src="js/db_sync.js?v=9.0"></script>
   <script src="js/auth.js?v=9.0"></script>
   <script src="js/genealogy.js?v=9.0"></script>
   <script src="js/shop.js?v=9.0"></script>

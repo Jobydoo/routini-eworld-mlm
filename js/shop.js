@@ -53,18 +53,25 @@ class ShopController {
       const pm = p.pricePM_DH || p.priceDP_DH || Math.round(pp * 0.90);
       const pv = p.pv || Math.round(pp / 10);
       const cv = p.sv || Math.round(pm * 0.60);
+      const isPromo = Boolean(p.isPromo);
+      const origPP = p.originalPriceRP || (isPromo ? Math.round(pp * 1.25) : null);
+      const savingDH = (origPP && origPP > pp) ? (origPP - pp) : 0;
 
       return `
-        <div class="product-card ${p.isPack ? 'product-card-pack' : ''}">
+        <div class="product-card ${p.isPack ? 'product-card-pack' : ''}" style="${isPromo ? 'border: 2px solid #f43f5e; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.15);' : ''}">
           <div class="product-image-box" style="${p.isPack ? 'background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);' : ''}">
             <span class="product-badge-pv" title="1 PV = 10 DH Prix Public">${pv} PV</span>
             <span class="product-badge-sv" title="Commission Value = 60% du Prix Membre">${cv} CV</span>
-            <div class="product-icon-art">${p.icon || '✨'}</div>
+            ${isPromo ? `<span style="position: absolute; bottom: 8px; left: 8px; background: #dc2626; color: #fff; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"><i class="fas fa-fire"></i> ${p.promoBadge || 'PROMO'}</span>` : ''}
+            <div class="product-icon-art">${p.icon || (p.isPack ? '🎁' : '✨')}</div>
           </div>
           <div class="product-info">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px;">
               <span class="product-category">${p.category}</span>
-              ${p.badge ? `<span style="font-size: 0.7rem; background: #be185d; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 700;">${p.badge}</span>` : ''}
+              <div style="display: flex; gap: 4px;">
+                ${isPromo ? `<span style="font-size: 0.68rem; background: #dc2626; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${p.promoBadge || 'PROMO'}</span>` : ''}
+                ${p.badge && !isPromo ? `<span style="font-size: 0.7rem; background: #be185d; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 700;">${p.badge}</span>` : ''}
+              </div>
             </div>
             <h4 class="product-title">${p.name}</h4>
             <p class="product-desc">${p.desc}</p>
@@ -76,9 +83,16 @@ class ShopController {
               </div>
               <div class="price-retail" title="Prix Vente Public Recommandé (PP)">
                 ${window.stateManager.formatMoney(pp)}
-                <small style="display: block; font-size: 0.65rem; color: #64748b;">Prix Public</small>
+                ${savingDH > 0 ? `<small style="display: block; text-decoration: line-through; color: #94a3b8; font-size: 0.7rem;">${origPP} DH</small>` : '<small style="display: block; font-size: 0.65rem; color: #64748b;">Prix Public</small>'}
               </div>
             </div>
+
+            ${savingDH > 0 ? `
+              <div style="background: #fff1f2; border: 1px dashed #f43f5e; border-radius: 6px; padding: 4px 8px; margin: 6px 0; font-size: 0.72rem; color: #9f1239; font-weight: 700; display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="fas fa-tags"></i> Économie immédiate :</span>
+                <span>-${savingDH} DH (${Math.round((savingDH / origPP) * 100)}%)</span>
+              </div>
+            ` : ''}
 
             <!-- Formules en direct sous le produit -->
             <div style="margin: 8px 0; padding: 6px 8px; background: #f8fafc; border-radius: 6px; font-size: 0.72rem; color: #475569; display: flex; justify-content: space-between;">
@@ -87,12 +101,12 @@ class ShopController {
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #64748b; margin-bottom: 10px;">
-              <span><i class="fas fa-gift" style="color: var(--rtn-gold);"></i> Fidélité : +${Math.floor(pp * 0.1)} pts</span>
+              <span><i class="fas fa-gift" style="color: var(--rtn-gold);"></i> Fidélité : +${Math.floor(pp / 10)} pts</span>
               <span>Stock : <strong>${p.stock}</strong></span>
             </div>
 
-            <button class="btn-add-cart" style="${p.isPack ? 'background: #14532d;' : ''}" onclick="window.shopController.handleAddToCart('${p.id}')">
-              <i class="fas fa-cart-plus"></i> ${p.isPack ? 'Ajouter ce Pack' : 'Ajouter au Panier'}
+            <button class="btn-add-cart" style="${isPromo ? 'background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);' : (p.isPack ? 'background: #14532d;' : '')}" onclick="window.shopController.handleAddToCart('${p.id}')">
+              <i class="fas fa-cart-plus"></i> ${p.isPack ? (isPromo ? 'Profiter de ce Pack Promo' : 'Ajouter ce Pack') : 'Ajouter au Panier'}
             </button>
           </div>
         </div>
@@ -198,6 +212,19 @@ class ShopController {
               <span>Sous-total articles :</span>
               <strong>${window.stateManager.formatMoney(totals.totalPP)}</strong>
             </div>
+
+            ${totals.clientDiscountDH > 0 ? `
+              <div class="total-row" style="background: #fdf2f8; padding: 6px 8px; border-radius: 4px; border: 1px dashed #f472b6;">
+                <span style="color: #be185d; font-weight: 700;"><i class="fas fa-tag"></i> Remise Client Direct (-10%) :</span>
+                <strong style="color: #be185d; font-size: 0.95rem;">-${window.stateManager.formatMoney(totals.clientDiscountDH)}</strong>
+              </div>
+            ` : ''}
+
+            <div class="total-row" style="background: #f8fafc; padding: 6px 8px; border-radius: 4px;">
+              <span style="color: #475569;"><i class="fas fa-truck" style="color: #0284c7;"></i> Frais de Livraison (Amana Express) :</span>
+              <strong style="color: #0284c7;">+${window.stateManager.formatMoney(totals.shippingFee)}</strong>
+            </div>
+
             ${!isClient ? `
               <div class="total-row">
                 <span>Points Activité (PV = PP ÷ 10) :</span>
@@ -208,18 +235,21 @@ class ShopController {
                 <strong style="color: #be185d; font-size: 0.95rem;">+${totals.totalSV} CV</strong>
               </div>
             ` : ''}
-            <div class="total-row" style="${isClient ? 'background: #fdf2f8; padding: 6px 8px; border-radius: 4px;' : ''}">
-              <span style="${isClient ? 'color: #9d174d; font-weight: 700;' : ''}"><i class="fas fa-gift" style="color: #be185d;"></i> Points Fidélité Gagnés :</span>
-              <strong style="color: #be185d; font-size: 0.95rem;">+${totals.fidelityPoints} pts</strong>
+
+            <div class="total-row" style="${isClient ? 'background: #fefce8; padding: 6px 8px; border-radius: 4px; border: 1px solid #fef08a;' : ''}">
+              <span style="${isClient ? 'color: #854d0e; font-weight: 700;' : ''}"><i class="fas fa-gift" style="color: #ca8a04;"></i> Points Fidélité Gagnés (1 pt = 10 DH PP) :</span>
+              <strong style="color: #ca8a04; font-size: 0.95rem;">+${totals.fidelityPoints} pts</strong>
             </div>
+
             ${this.currentOrderChannel === 'attached_client' ? `
               <div class="total-row" style="background: #f0fdf4; padding: 6px 8px; border-radius: 4px;">
                 <span style="color: #15803d; font-weight: 700;">Gain Direct Vendeur (10% PP) :</span>
                 <strong style="color: #15803d;">+${window.stateManager.formatMoney(commEstimate)}</strong>
               </div>
             ` : ''}
+
             <div class="total-row grand-total">
-              <span>Montant Total à Payer :</span>
+              <span>Montant Total Net TTC à Payer :</span>
               <span style="color: #15803d; font-size: 1.15rem;">${window.stateManager.formatMoney(totals.totalDH)}</span>
             </div>
           </div>
@@ -279,13 +309,18 @@ class ShopController {
     }
 
     if (window.stateManager.isClient()) {
-      window.app.showToast(`Commande ${result.order.id} confirmée ! Votre colis est en cours de préparation chez Routini (+${result.order.fidelityPoints} pts fidélité gagnés).`, 'success');
+      window.app.showToast(`Commande ${result.order.id} confirmée ! Facture générée avec succès (+${result.order.fidelityPoints} pts fidélité gagnés).`, 'success');
     } else {
-      window.app.showToast(`Commande ${result.order.id} validée avec succès ! Points PV et CV comptabilisés.`, 'success');
+      window.app.showToast(`Commande ${result.order.id} validée avec succès ! Facture disponible, points PV/CV comptabilisés.`, 'success');
     }
 
     this.render();
     window.app.renderAllViews();
+
+    // Affichage immédiat de la Facture officielle (Demande Marketing Good)
+    if (window.app && typeof window.app.showInvoiceModal === 'function') {
+      window.app.showInvoiceModal(result.order);
+    }
   }
 }
 
