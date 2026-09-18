@@ -25,39 +25,49 @@
        ======================================================================== -->
   <div class="quick-role-bar" id="quickRoleBar" style="display: none;">
     <div class="role-info">
+      <div class="quick-brand-tag" title="Routini Cosmetics - By Lys Horizon">
+        <img src="assets/images/routini-icon.png" alt="Routini" class="quick-logo-badge">
+        <span class="quick-brand-title">Routini</span>
+      </div>
       <span class="role-badge-tag" id="quickCurrentRoleTag">PROPRIÉTAIRE</span>
-      <span>Session active : <strong id="quickCurrentUserName">Direction Générale Routini (ADMIN001)</strong></span>
+      <span>Session : <strong id="quickCurrentUserName">Direction Générale Routini (ADMIN001)</strong></span>
     </div>
     <div class="role-actions">
-      <span style="font-size: 0.75rem; opacity: 0.85;">Tester un profil V4 :</span>
-      <button class="btn-switch-account owner-btn" data-target-code="ADMIN001" onclick="window.app.switchAccount('ADMIN001')">
+      <!-- Bouton Direction (ADMIN) conservé distinctement -->
+      <button class="btn-switch-account owner-btn" id="quickBtnAdmin" data-target-code="ADMIN001" onclick="window.app.switchAccount('ADMIN001')">
         <i class="fas fa-crown"></i> Direction (ADMIN)
       </button>
-      <button class="btn-switch-account" data-target-code="818204921" onclick="window.app.switchAccount('818204921')">
-        <i class="fas fa-gem" style="color: var(--rtn-rose);"></i> Karim (Ambassador 7%)
-      </button>
-      <button class="btn-switch-account" data-target-code="818206330" onclick="window.app.switchAccount('818206330')">
-        <i class="fas fa-gem" style="color: var(--rtn-gold);"></i> Mehdi (Diamond 5%)
-      </button>
-      <button class="btn-switch-account" data-target-code="818210552" onclick="window.app.switchAccount('818210552')">
-        <i class="fas fa-star" style="color: var(--rtn-gold);"></i> Nadia (Manager 3%)
-      </button>
-      <button class="btn-switch-account" data-target-code="818217123" onclick="window.app.switchAccount('818217123')">
-        <i class="fas fa-award" style="color: var(--rtn-rose-dark);"></i> Siham (Leader 2%)
-      </button>
-      <button class="btn-switch-account" data-target-code="818229345" onclick="window.app.switchAccount('818229345')">
-        <i class="fas fa-cubes" style="color: var(--rtn-rose);"></i> Ibtissam (Builder 1%)
-      </button>
-      <button class="btn-switch-account" data-target-code="818243789" onclick="window.app.switchAccount('818243789')">
-        <i class="fas fa-user-check" style="color: var(--rtn-green);"></i> Najat (Partner Actif)
-      </button>
-      <button class="btn-switch-account" style="border-color: rgba(178, 93, 84, 0.4);" data-target-code="818252678" onclick="window.app.switchAccount('818252678')" title="Tester la règle de non-versement pour activité < 50 PV (Slide 8/15)">
-        <i class="fas fa-user-clock" style="color: var(--rtn-rose);"></i> Driss (Inactif &lt; 50 PV)
-      </button>
-      <button class="btn-switch-account" style="background: rgba(178, 93, 84, 0.15); border-color: rgba(178, 93, 84, 0.4);" data-target-code="CLT-818101" onclick="window.app.switchAccount('CLT-818101')" title="Tester l'espace client sans arbre">
-        <i class="fas fa-shopping-bag" style="color: var(--rtn-rose);"></i> Salma (Client Direct)
-      </button>
-      <button class="btn-switch-account" style="background: rgba(255, 255, 255, 0.15); color: #fff; font-weight: 700; margin-left: 6px;" onclick="window.authController.logout()" title="Revenir à l'écran de connexion / Menu principal">
+
+      <!-- Flèche descendante avec tous les autres membres (Distributeurs, Rangs MLM & Clients Directs) -->
+      <div class="quick-members-dropdown-wrapper" id="quickMembersDropdownWrapper">
+        <button type="button" class="btn-switch-account btn-dropdown-toggle" id="btnToggleMembersDropdown" onclick="window.app.toggleMembersDropdown(event)">
+          <i class="fas fa-users" style="color: var(--rtn-rose);"></i>
+          <span id="quickSelectedMemberLabel">Changer de profil (Tous les membres)</span>
+          <i class="fas fa-chevron-down fleche-desc" id="dropdownChevronIcon"></i>
+        </button>
+        <div class="quick-members-dropdown-panel" id="quickMembersDropdownPanel" style="display: none;">
+          <div class="dropdown-search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="inputSearchQuickMember" placeholder="Rechercher nom, code, rang, ville..." oninput="window.app.filterQuickMembers(this.value)">
+          </div>
+          <div class="dropdown-category-pills">
+            <button type="button" class="cat-pill active" onclick="window.app.filterMembersByCategory('all', event)">Tous</button>
+            <button type="button" class="cat-pill" onclick="window.app.filterMembersByCategory('AMBASSADOR', event)">💎 Ambassadeur</button>
+            <button type="button" class="cat-pill" onclick="window.app.filterMembersByCategory('DIAMOND', event)">🔷 Diamond</button>
+            <button type="button" class="cat-pill" onclick="window.app.filterMembersByCategory('MANAGER', event)">⭐ Manager</button>
+            <button type="button" class="cat-pill" onclick="window.app.filterMembersByCategory('LEADER', event)">🎖️ Leader</button>
+            <button type="button" class="cat-pill" onclick="window.app.filterMembersByCategory('BUILDER', event)">📦 Builder</button>
+            <button type="button" class="cat-pill" onclick="window.app.filterMembersByCategory('PARTNER', event)">👤 Partner</button>
+            <button type="button" class="cat-pill" onclick="window.app.filterMembersByCategory('client', event)">🛍️ Client Direct</button>
+          </div>
+          <div class="dropdown-members-list" id="quickMembersListContainer">
+            <!-- Rendu dynamique par app.js de tous les 51 membres avec rang, ville et statut -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu d'Accueil / Déconnexion -->
+      <button class="btn-switch-account" style="background: rgba(255, 255, 255, 0.15); color: #fff; font-weight: 700;" onclick="window.authController.logout()" title="Revenir à l'écran de connexion / Menu principal">
         <i class="fas fa-door-open"></i> Menu d'Accueil
       </button>
     </div>
@@ -206,11 +216,12 @@
     <!-- Barre Latérale de Navigation (Sidebar) -->
     <aside class="sidebar" id="appSidebar">
       <div class="sidebar-header">
-        <img src="assets/images/routini-icon.png" alt="Routini Cosmetics" class="sidebar-brand-logo-img">
-        <div class="sidebar-brand-name">
-          Routini
-          <small>By Lys Horizon</small>
+        <div class="sidebar-brand-box">
+          <img src="assets/images/routini-brand.jpg" alt="Routini Cosmetics By Lys Horizon" class="sidebar-brand-full-img">
         </div>
+        <button type="button" class="btn-close-sidebar-mobile" id="btnCloseSidebarMobile" onclick="window.app.closeMobileSidebar()" aria-label="Fermer le menu mobile">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
       <!-- Fiche Profil Utilisateur Connecté -->
@@ -291,9 +302,12 @@
       <!-- En-tête Supérieur Fixe -->
       <header class="main-header">
         <div class="header-left">
-          <button class="btn-toggle-sidebar" id="btnToggleSidebar" aria-label="Menu Mobile">
+          <button class="btn-toggle-sidebar" id="btnToggleSidebar" aria-label="Menu Mobile" onclick="window.app.toggleMobileSidebar()">
             <i class="fas fa-bars"></i>
           </button>
+          <a href="#" class="header-brand-logo-link" onclick="window.app.switchView('dashboard'); return false;" title="Routini Cosmetics - Accueil">
+            <img src="assets/images/routini-brand.jpg" alt="Routini Cosmetics By Lys Horizon" class="header-brand-logo-img">
+          </a>
           <div class="header-page-title">
             <h2 id="headerTitleText">Tableau de Bord eWorld</h2>
             <p id="headerDescText">Aperçu général de vos performances et qualifications Routini</p>
@@ -450,14 +464,17 @@
           <div id="dashClientSection" style="display: none;">
             <!-- Bannière de Bienvenue Espace Client Privilège -->
             <div class="client-welcome-banner">
-              <div>
-                <h2>
-                  <i class="fas fa-sparkles" style="color: #fef08a;"></i>
-                  Bienvenue dans votre Espace Client Privilège Routini
-                </h2>
-                <p>
-                  Profitez de l'excellence de nos rituels cosmétiques sans contrainte de réseau MLM, suivez vos livraisons Amana en direct et cumulez vos points fidélité.
-                </p>
+              <div class="client-banner-brand-left">
+                <img src="assets/images/routini-icon.png" alt="Routini Cosmetics" class="client-banner-icon">
+                <div>
+                  <h2>
+                    <i class="fas fa-sparkles" style="color: #fef08a;"></i>
+                    Bienvenue dans votre Espace Client Privilège Routini
+                  </h2>
+                  <p>
+                    Profitez de l'excellence de nos rituels cosmétiques sans contrainte de réseau MLM, suivez vos livraisons Amana en direct et cumulez vos points fidélité.
+                  </p>
+                </div>
               </div>
               <div class="client-loyalty-pill">
                 <div class="pts-number" id="dashClientFidelityPts">340 pts</div>
@@ -827,6 +844,33 @@
 
       </div>
     </main>
+
+    <!-- Voile d'ombrage Mobile pour fermeture de la sidebar au tap -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="window.app.closeMobileSidebar()"></div>
+
+    <!-- Barre de Navigation Mobile Inférieure Fixe (Bottom Navigation Bar) -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+      <a href="#" class="mobile-nav-link active" id="mobileNavDashboard" data-view="dashboard" onclick="window.app.switchView('dashboard'); return false;">
+        <i class="fas fa-th-large"></i>
+        <span>Accueil</span>
+      </a>
+      <a href="#" class="mobile-nav-link mlm-mobile-link" id="mobileNavGenealogy" data-view="genealogy" onclick="window.app.switchView('genealogy'); return false;">
+        <i class="fas fa-sitemap"></i>
+        <span>Réseau</span>
+      </a>
+      <a href="#" class="mobile-nav-link" id="mobileNavShop" data-view="shop" onclick="window.app.switchView('shop'); return false;">
+        <i class="fas fa-spa"></i>
+        <span>Boutique</span>
+      </a>
+      <a href="#" class="mobile-nav-link mlm-mobile-link" id="mobileNavBonus" data-view="bonus" onclick="window.app.switchView('bonus'); return false;">
+        <i class="fas fa-wallet"></i>
+        <span>Commissions</span>
+      </a>
+      <a href="#" class="mobile-nav-link" id="mobileNavMenu" onclick="window.app.toggleMobileSidebar(); return false;">
+        <i class="fas fa-bars"></i>
+        <span>Menu</span>
+      </a>
+    </nav>
   </div>
 
   <!-- ========================================================================

@@ -54,9 +54,17 @@ class App {
     const btnToggle = document.getElementById('btnToggleSidebar');
     if (btnToggle) {
       btnToggle.addEventListener('click', () => {
-        document.getElementById('appSidebar').classList.toggle('mobile-open');
+        this.toggleMobileSidebar();
       });
     }
+
+    // Fermeture automatique du menu déroulant des membres au clic extérieur
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('quickMembersDropdownWrapper');
+      if (dropdown && !dropdown.contains(e.target)) {
+        this.closeMembersDropdown();
+      }
+    });
 
     // Sélecteur de Devise (DH / EUR)
     const currencySelect = document.getElementById('currencySelect');
@@ -124,6 +132,9 @@ class App {
   }
 
   switchView(viewName) {
+    this.closeMobileSidebar();
+    this.closeMembersDropdown();
+
     const isClient = window.stateManager.isClient();
 
     // RÈGLE STRICTE DIRECT CLIENT : Aucun accès aux sections MLM (Arbre, Commissions, Parrainage, Admin)
@@ -153,6 +164,22 @@ class App {
 
     if (targetSection) targetSection.style.display = 'block';
     if (targetNav) targetNav.classList.add('active');
+
+    // Mise à jour de la barre de navigation mobile basse
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    mobileNavLinks.forEach(l => {
+      const linkView = l.getAttribute('data-view');
+      if (linkView === viewName) {
+        l.classList.add('active');
+      } else if (linkView) {
+        l.classList.remove('active');
+      }
+    });
+
+    // Masquer les onglets MLM sur mobile pour les clients
+    document.querySelectorAll('.mlm-mobile-link').forEach(link => {
+      link.style.display = isClient ? 'none' : 'flex';
+    });
 
     this.updateHeaderTitle(viewName);
 
@@ -290,26 +317,176 @@ class App {
     }
   }
 
+  toggleMobileSidebar() {
+    const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (!sidebar) return;
+    const isOpen = sidebar.classList.toggle('mobile-open');
+    if (backdrop) {
+      if (isOpen) {
+        backdrop.classList.add('active');
+      } else {
+        backdrop.classList.remove('active');
+      }
+    }
+  }
+
+  closeMobileSidebar() {
+    const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('active');
+  }
+
+  toggleMembersDropdown(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const panel = document.getElementById('quickMembersDropdownPanel');
+    const wrapper = document.getElementById('quickMembersDropdownWrapper');
+    if (!panel || !wrapper) return;
+
+    const isVisible = panel.style.display === 'block';
+    if (isVisible) {
+      this.closeMembersDropdown();
+    } else {
+      panel.style.display = 'block';
+      wrapper.classList.add('open');
+      this.renderQuickMembersDropdown(this._currentMemberQuery || '', this._currentMemberCategory || 'all');
+      const searchInput = document.getElementById('inputSearchQuickMember');
+      if (searchInput) {
+        setTimeout(() => searchInput.focus(), 60);
+      }
+    }
+  }
+
+  closeMembersDropdown() {
+    const panel = document.getElementById('quickMembersDropdownPanel');
+    const wrapper = document.getElementById('quickMembersDropdownWrapper');
+    if (panel) panel.style.display = 'none';
+    if (wrapper) wrapper.classList.remove('open');
+  }
+
+  renderQuickMembersDropdown(query = '', category = 'all') {
+    const container = document.getElementById('quickMembersListContainer');
+    if (!container) return;
+
+    const members = (window.stateManager && window.stateManager.members) || [];
+    const currentUser = window.stateManager ? window.stateManager.currentUser : null;
+    const q = (query || '').toLowerCase().trim();
+
+    // Tous les comptes SAUF ADMIN001 qui a son bouton dédié distinct pour la Direction
+    let list = members.filter(m => m.code !== 'ADMIN001');
+
+    if (category && category !== 'all') {
+      if (category === 'client') {
+        list = list.filter(m => m.role === 'client' || m.rankCode === 'CLIENT');
+      } else {
+        list = list.filter(m => m.rankCode === category);
+      }
+    }
+
+    if (q) {
+      list = list.filter(m => 
+        (m.name && m.name.toLowerCase().includes(q)) ||
+        (m.code && m.code.toLowerCase().includes(q)) ||
+        (m.rankName && m.rankName.toLowerCase().includes(q)) ||
+        (m.rankCode && m.rankCode.toLowerCase().includes(q)) ||
+        (m.city && m.city.toLowerCase().includes(q))
+      );
+    }
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="padding: 24px; text-align: center; color: rgba(255,255,255,0.5); font-size: 0.8rem;">
+          <i class="fas fa-search" style="font-size: 1.2rem; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+          Aucun membre trouvé pour "${query}"
+        </div>
+      `;
+      return;
+    }
+
+    const rankColors = {
+      AMBASSADOR: { bg: 'rgba(236, 72, 153, 0.25)', color: '#f472b6', label: '💎 Ambassador 7%' },
+      DIAMOND: { bg: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa', label: '🔷 Diamond 5%' },
+      MANAGER: { bg: 'rgba(245, 158, 11, 0.25)', color: '#fbbf24', label: '⭐ Manager 3%' },
+      LEADER: { bg: 'rgba(16, 185, 129, 0.25)', color: '#34d399', label: '🎖️ Leader 2%' },
+      BUILDER: { bg: 'rgba(14, 165, 233, 0.25)', color: '#38bdf8', label: '📦 Builder 1%' },
+      PARTNER: { bg: 'rgba(148, 163, 184, 0.25)', color: '#cbd5e1', label: '👤 Partner Actif' },
+      CLIENT: { bg: 'rgba(190, 24, 93, 0.25)', color: '#f472b6', label: '🛍️ Client Direct' }
+    };
+
+    container.innerHTML = list.map(m => {
+      const isCurrent = currentUser && (currentUser.code === m.code || currentUser.id === m.id);
+      const initial = (m.name || 'M').charAt(0).toUpperCase();
+      const rCode = m.role === 'client' ? 'CLIENT' : (m.rankCode || 'PARTNER');
+      const rMeta = rankColors[rCode] || { bg: 'rgba(255,255,255,0.1)', color: '#fff', label: m.rankName || rCode };
+      const pvDisplay = m.role === 'client' ? `${m.fidelityPoints || 0} Pts Fidélité` : `${m.ppv || 0} PPV • ${m.city || 'Maroc'}`;
+
+      return `
+        <div class="dropdown-member-item ${isCurrent ? 'active' : ''}" onclick="window.app.handleSelectQuickMember('${m.code}')">
+          <div class="m-info-left">
+            <div class="m-avatar" style="${isCurrent ? 'background: #fff; color: var(--rtn-rose);' : ''}">${initial}</div>
+            <div class="m-text">
+              <div class="m-name">${m.name}</div>
+              <div class="m-meta">${m.code} • ${pvDisplay}</div>
+            </div>
+          </div>
+          <span class="m-rank-tag" style="background: ${rMeta.bg}; color: ${rMeta.color};">
+            ${rMeta.label}
+          </span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  handleSelectQuickMember(code) {
+    this.closeMembersDropdown();
+    this.switchAccount(code);
+  }
+
+  filterQuickMembers(query) {
+    this._currentMemberQuery = query;
+    this.renderQuickMembersDropdown(this._currentMemberQuery, this._currentMemberCategory || 'all');
+  }
+
+  filterMembersByCategory(category, event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+    }
+    this._currentMemberCategory = category;
+    this.renderQuickMembersDropdown(this._currentMemberQuery || '', this._currentMemberCategory);
+  }
+
   updateQuickRoleBar() {
     const quickBar = document.getElementById('quickRoleBar');
     if (!quickBar) return;
 
-    // Toujours garder la barre rapide active dès qu'une session existe,
-    // afin de pouvoir tester tous les profils et passer de l'un à l'autre en 1 clic
     quickBar.style.display = 'flex';
 
     const currentUser = window.stateManager.currentUser;
     const currentNameEl = document.getElementById('quickCurrentUserName');
     const currentRoleTag = document.getElementById('quickCurrentRoleTag');
+    const selectedMemberLabel = document.getElementById('quickSelectedMemberLabel');
 
     if (currentUser && currentNameEl) {
       currentNameEl.textContent = `${currentUser.name} (${currentUser.code})`;
       if (currentUser.role === 'owner') {
         currentRoleTag.textContent = 'DIRECTION FONDATRICE';
-        currentRoleTag.style.background = '#0f172a';
+        currentRoleTag.style.background = 'var(--rtn-navy)';
+        if (selectedMemberLabel) {
+          selectedMemberLabel.textContent = 'Changer de profil (51 membres)';
+        }
       } else if (currentUser.role === 'client') {
         currentRoleTag.textContent = 'CLIENT PRIVILÈGE (SANS ARBRE)';
-        currentRoleTag.style.background = '#be185d';
+        currentRoleTag.style.background = 'var(--rtn-rose)';
+        if (selectedMemberLabel) {
+          selectedMemberLabel.textContent = `${currentUser.name} (Client Direct)`;
+        }
       } else {
         const rate = currentUser.rankCode === 'AMBASSADOR' ? '7%' :
                      currentUser.rankCode === 'DIAMOND' ? '5%' :
@@ -317,7 +494,29 @@ class App {
                      currentUser.rankCode === 'LEADER' ? '2%' :
                      currentUser.rankCode === 'BUILDER' ? '1%' : 'N1 (10% CV)';
         currentRoleTag.textContent = `${currentUser.rankCode} (${rate}) — V4`;
-        currentRoleTag.style.background = currentUser.rankCode === 'BUILDER' ? '#0ea5e9' : '#0284c7';
+        currentRoleTag.style.background = 'var(--rtn-rose-dark)';
+        if (selectedMemberLabel) {
+          selectedMemberLabel.textContent = `${currentUser.name} (${currentUser.rankCode})`;
+        }
+      }
+    }
+
+    // Gestion de l'état actif sur les boutons de la barre rapide
+    const btnAdmin = document.getElementById('quickBtnAdmin');
+    if (btnAdmin) {
+      if (currentUser && currentUser.code === 'ADMIN001') {
+        btnAdmin.classList.add('active');
+      } else {
+        btnAdmin.classList.remove('active');
+      }
+    }
+
+    const btnDropdown = document.getElementById('btnToggleMembersDropdown');
+    if (btnDropdown) {
+      if (currentUser && currentUser.code !== 'ADMIN001') {
+        btnDropdown.classList.add('active');
+      } else {
+        btnDropdown.classList.remove('active');
       }
     }
 
@@ -325,7 +524,7 @@ class App {
       const target = btn.getAttribute('data-target-code');
       if (target && currentUser && (target === currentUser.code || target === currentUser.id)) {
         btn.classList.add('active');
-      } else {
+      } else if (target) {
         btn.classList.remove('active');
       }
     });
