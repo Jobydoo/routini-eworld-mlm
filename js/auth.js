@@ -67,6 +67,7 @@ class AuthController {
         passInput.value = 'client123';
         authSubmitBtn.className = 'btn-primary-auth btn-client-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-shopping-bag"></i> Connexion Espace Client Privilège';
+        if (window.i18n && window.i18n.currentLang !== 'fr') window.i18n.translateDOM();
       });
     }
 
@@ -87,6 +88,7 @@ class AuthController {
         passInput.value = 'routini123';
         authSubmitBtn.className = 'btn-primary-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Connexion Espace Distributeur';
+        if (window.i18n && window.i18n.currentLang !== 'fr') window.i18n.translateDOM();
       });
     }
 
@@ -107,6 +109,7 @@ class AuthController {
         passInput.value = 'admin123';
         authSubmitBtn.className = 'btn-primary-auth btn-owner-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-crown"></i> Connexion Direction Générale (Admin)';
+        if (window.i18n && window.i18n.currentLang !== 'fr') window.i18n.translateDOM();
       });
     }
 
@@ -200,6 +203,9 @@ class AuthController {
     if (modal) {
       modal.style.display = 'flex';
       modal.classList.add('active');
+      if (window.i18n && window.i18n.currentLang !== 'fr') {
+        window.i18n.translateDOM();
+      }
     }
   }
 
@@ -260,8 +266,15 @@ class AuthController {
     window.stateManager.saveState();
 
     document.getElementById('appMainLayout').style.display = 'none';
-    document.getElementById('quickRoleBar').style.display = 'none';
+    const quickBar = document.getElementById('quickRoleBar');
+    if (quickBar) quickBar.style.display = 'none';
+    document.body.classList.remove('has-quick-bar');
+    document.documentElement.style.setProperty('--quick-bar-height', '0px');
     document.getElementById('authSection').style.display = 'flex';
+
+    if (window.i18n) {
+      window.i18n.translateDOM();
+    }
 
     window.app.showToast('Vous avez été déconnecté avec succès.', 'warning');
   }
