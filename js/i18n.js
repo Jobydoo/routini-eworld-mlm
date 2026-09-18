@@ -795,7 +795,13 @@ class I18nManager {
       "Carte Bancaire CMI (Maroc)": { en: "Credit Card CMI (Morocco)", ar: "بطاقة بنكية CMI (المغرب)", es: "Tarjeta Bancaria CMI (Marruecos)" },
       "Paiement à la Livraison (COD)": { en: "Cash on Delivery (COD)", ar: "الدفع عند الاستلام", es: "Pago Contra Reembolso" },
       "Carte Bancaire": { en: "Credit Card", ar: "بطاقة بنكية", es: "Tarjeta Bancaria" },
-      "Virement Bancaire": { en: "Bank Transfer", ar: "تحويل بنكي", es: "Transferencia Bancaria" }
+      "Virement Bancaire": { en: "Bank Transfer", ar: "تحويل بنكي", es: "Transferencia Bancaria" },
+      "Vercel Postgres : Prêt (Mode Local Actif)": { en: "Vercel Postgres: Ready (Active Local Mode)", ar: "فيرسيل بوستجريس: جاهز (وضع محلي نشط)", es: "Vercel Postgres: Listo (Modo Local Activo)" },
+      "Vercel Postgres : Prêt (Mode Local)": { en: "Vercel Postgres: Ready (Local Mode)", ar: "فيرسيل بوستجريس: جاهز (وضع محلي)", es: "Vercel Postgres: Listo (Modo Local)" },
+      "Vercel Postgres : Connecté": { en: "Vercel Postgres: Connected", ar: "فيرسيل بوستجريس: متصل", es: "Vercel Postgres: Conectado" },
+      "Synchronisation Cloud": { en: "Cloud Synchronization", ar: "مزامنة سحابية", es: "Sincronización en la Nube" },
+      "Synchroniser maintenant": { en: "Sync now", ar: "مزامنة الآن", es: "Sincronizar ahora" },
+      "Base de Données Vercel Postgres": { en: "Vercel Postgres Database", ar: "قاعدة بيانات فيرسيل بوستجريس", es: "Base de Datos Vercel Postgres" }
     };
   }
 
