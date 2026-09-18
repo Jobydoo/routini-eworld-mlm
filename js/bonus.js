@@ -586,6 +586,10 @@ class BonusController {
         </div>
       </div>
     `;
+
+    if (window.i18n && window.i18n.currentLang !== 'fr') {
+      window.i18n.translateDOM();
+    }
   }
 
   set10kBasket(val) {

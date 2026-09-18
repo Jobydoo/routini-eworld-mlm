@@ -574,6 +574,229 @@ class I18nManager {
         admin_pack_promo_badge: 'Distintivo de Promoción (ej: PROMO -20%):'
       }
     };
+
+    // Dictionnaire direct de phrases pour traduction automatique et intégrale de toute l'application
+    this.phraseMap = {
+      // Navigation
+      "Navigation Principale": { en: "Main Navigation", ar: "التنقل الرئيسي", es: "Navegación Principal" },
+      "Tableau de Bord": { en: "Dashboard", ar: "لوحة التحكم", es: "Panel de Control" },
+      "Arbre Généalogique": { en: "Genealogy Tree", ar: "شجرة الشبكة", es: "Árbol Genealógico" },
+      "Boutique Cosmétiques": { en: "Cosmetics Store", ar: "متجر مستحضرات التجميل", es: "Tienda de Cosméticos" },
+      "Commissions & E-Point": { en: "Commissions & E-Point", ar: "العمولات والمحفظة", es: "Comisiones y E-Point" },
+      "Nouveau Distributeur": { en: "New Distributor", ar: "موزع جديد", es: "Nuevo Distribuidor" },
+      "Direction Routini": { en: "Routini Governance", ar: "إدارة روتيني", es: "Dirección Routini" },
+      "Direction Générale": { en: "General Management", ar: "الإدارة العامة", es: "Dirección General" },
+      "Déconnexion": { en: "Sign Out", ar: "تسجيل الخروج", es: "Cerrar Sesión" },
+      "Changer de Profil (Menu)": { en: "Switch Profile (Menu)", ar: "تبديل الحساب (القائمة)", es: "Cambiar de Perfil (Menú)" },
+      "Changer de Compte": { en: "Switch Account", ar: "تبديل الحساب", es: "Cambiar de Cuenta" },
+      "Mes Commandes & Livraisons": { en: "My Orders & Deliveries", ar: "طلباتي والتوصيل", es: "Mis Pedidos y Entregas" },
+      "Mes Points Fidélité": { en: "My Loyalty Points", ar: "نقاط الولاء", es: "Mis Puntos de Fidelidad" },
+      "Réseau": { en: "Network", ar: "الشبكة", es: "Red" },
+      "Owner": { en: "Owner", ar: "المالك", es: "Owner" },
+      "Accueil": { en: "Home", ar: "الرئيسية", es: "Inicio" },
+      "Boutique": { en: "Store", ar: "المتجر", es: "Tienda" },
+      "Gains": { en: "Earnings", ar: "الأرباح", es: "Ganancias" },
+      "Menu": { en: "Menu", ar: "القائمة", es: "Menú" },
+
+      // En-tête & Barre rapide
+      "Tableau de Bord eWorld": { en: "eWorld Dashboard", ar: "لوحة تحكم إي-وورلد", es: "Panel de Control eWorld" },
+      "Aperçu général de vos performances et qualifications Routini": { en: "Overview of your Routini performance and qualifications", ar: "نظرة عامة على أدائك ومؤهلاتك روتيني", es: "Resumen de su rendimiento y calificaciones" },
+      "Direction (ADMIN)": { en: "Management (ADMIN)", ar: "الإدارة (مشرف)", es: "Dirección (ADMIN)" },
+      "Changer de profil (Tous les membres)": { en: "Switch profile (All members)", ar: "تغيير الحساب (جميع الأعضاء)", es: "Cambiar de perfil (Todos los miembros)" },
+      "Changer de profil (51 membres)": { en: "Switch profile (51 members)", ar: "تغيير الحساب (51 عضواً)", es: "Cambiar de perfil (51 miembros)" },
+      "Menu d'Accueil": { en: "Home Menu", ar: "القائمة الرئيسية", es: "Menú Principal" },
+      "Session :": { en: "Session:", ar: "الجلسة:", es: "Sesión:" },
+      "Session active :": { en: "Active session:", ar: "الجلسة النشطة:", es: "Sesión activa:" },
+      "DIRECTION FONDATRICE": { en: "FOUNDING MANAGEMENT", ar: "الإدارة التأسيسية", es: "DIRECCIÓN FUNDADORA" },
+      "CLIENT PRIVILÈGE (SANS ARBRE)": { en: "PRIVILEGE CUSTOMER (NO TREE)", ar: "عميل مميز (بدون شجرة)", es: "CLIENTE PRIVILEGIADO (SIN ÁRBOL)" },
+      "PROPRIÉTAIRE": { en: "OWNER", ar: "المالك", es: "PROPIETARIO" },
+      "Tous": { en: "All", ar: "الكل", es: "Todos" },
+      "Ambassadeur": { en: "Ambassador", ar: "سفير", es: "Embajador" },
+      "Diamond": { en: "Diamond", ar: "ماسي", es: "Diamante" },
+      "Manager": { en: "Manager", ar: "مدير", es: "Gerente" },
+      "Leader": { en: "Leader", ar: "قائد", es: "Líder" },
+      "Builder": { en: "Builder", ar: "بانٍ", es: "Constructor" },
+      "Partner": { en: "Partner", ar: "شريك", es: "Socio" },
+      "Client Direct": { en: "Direct Customer", ar: "عميل مباشر", es: "Cliente Directo" },
+
+      // Qualifications & Métriques
+      "Statut de Qualification Mensuelle": { en: "Monthly Qualification Status", ar: "حالة التأهيل الشهري", es: "Estado de Calificación Mensual" },
+      "Objectif vers le prochain palier d'honneur :": { en: "Goal for next honor rank:", ar: "الهدف نحو الرتبة الفخرية التالية:", es: "Objetivo hacia el siguiente rango de honor:" },
+      "Progression PGPV": { en: "PGPV Progress", ar: "تقدم نقاط الفريق", es: "Progreso PGPV" },
+      "Points Personnels (PPV)": { en: "Personal Points (PPV)", ar: "النقاط الشخصية (PPV)", es: "Puntos Personales (PPV)" },
+      "Volume Équipe (PV)": { en: "Team Volume (PV)", ar: "حجم الفريق (PV)", es: "Volumen de Equipo (PV)" },
+      "Base Commissions (SV / CV)": { en: "Commission Base (SV / CV)", ar: "أساس العمولات (SV / CV)", es: "Base de Comisiones (SV / CV)" },
+      "Portefeuille E-Point": { en: "E-Point Wallet", ar: "محفظة النقاط الإلكترونية", es: "Billetera E-Point" },
+      "Distributeur Actif Qualifié": { en: "Qualified Active Distributor", ar: "موزع نشط ومؤهل", es: "Distribuidor Activo Calificado" },
+      "Distributeur Inactif (< 50 PV)": { en: "Inactive Distributor (< 50 PV)", ar: "موزع غير نشط (< 50 PV)", es: "Distribuidor Inactivo (< 50 PV)" },
+      "Descendance active": { en: "Active downlines", ar: "الأعضاء النشطون", es: "Descendencia activa" },
+      "Base officielle N1/N2/N3 & Leadership": { en: "Official N1/N2/N3 & Leadership base", ar: "الأساس الرسمي N1/N2/N3 والقيادة", es: "Base oficial N1/N2/N3 y Liderazgo" },
+      "Disponible immédiatement": { en: "Available immediately", ar: "متاح فورياً", es: "Disponible de inmediato" },
+      "Dernières Commandes Cosmétiques Validées": { en: "Latest Validated Cosmetics Orders", ar: "آخر طلبات مستحضرات التجميل المؤكدة", es: "Últimos Pedidos Validados" },
+      "Commander des Cosmétiques": { en: "Order Cosmetics", ar: "طلب مستحضرات التجميل", es: "Pedir Cosméticos" },
+      "Réf. Commande": { en: "Order Ref", ar: "مرجع الطلب", es: "Ref. Pedido" },
+      "Date": { en: "Date", ar: "التاريخ", es: "Fecha" },
+      "Distributeur": { en: "Distributor", ar: "الموزع", es: "Distribuidor" },
+      "Points (PV)": { en: "Points (PV)", ar: "النقاط (PV)", es: "Puntos (PV)" },
+      "Montant Payé": { en: "Amount Paid", ar: "المبلغ المدفوع", es: "Importe Pagado" },
+      "Statut": { en: "Status", ar: "الحالة", es: "Estado" },
+      "Facture": { en: "Invoice", ar: "فاتورة", es: "Factura" },
+
+      // Espace Client
+      "Bienvenue dans votre Espace Client Privilège Routini": { en: "Welcome to your Routini Privilege Customer Space", ar: "مرحباً بكم في مساحة العميل المميز روتيني", es: "Bienvenido a su Espacio Cliente Privilegiado Routini" },
+      "Profitez de l'excellence de nos rituels cosmétiques sans contrainte de réseau MLM, suivez vos livraisons Amana en direct et cumulez vos points fidélité.": {
+        en: "Enjoy the excellence of our cosmetic rituals without MLM network constraints, track your Amana shipments live, and earn loyalty points.",
+        ar: "استمتعوا بتميز طقوسنا التجميلية دون قيود الشبكة، وتابعوا شحناتكم مباشرة واكسبوا نقاط الولاء.",
+        es: "Disfrute de la excelencia de nuestros rituales cosméticos sin restricciones de red MLM, siga sus envíos de Amana en vivo y acumule puntos de fidelidad."
+      },
+      "Solde Fidélité": { en: "Loyalty Balance", ar: "رصيد الولاء", es: "Saldo de Fidelidad" },
+      "de réduction": { en: "discount", ar: "خصم", es: "de descuento" },
+      "Points Fidélité": { en: "Loyalty Points", ar: "نقاط الولاء", es: "Puntos de Fidelidad" },
+      "Commandes Beauté": { en: "Beauty Orders", ar: "طلبات الجمال", es: "Pedidos de Belleza" },
+      "Dernière Livraison": { en: "Latest Delivery", ar: "آخر شحنة", es: "Última Entrega" },
+      "Barème Réduction": { en: "Discount Scale", ar: "جدول الخصم", es: "Escala de Descuento" },
+      "10% du montant reversé en points fidélité": { en: "10% of amount returned in loyalty points", ar: "10% من المبلغ يُسترد كنقاط ولاء", es: "10% del importe devuelto en puntos de fidelidad" },
+      "Soins et rituels commandés": { en: "Skincare and rituals ordered", ar: "المستحضرات والطقوس المطلوبة", es: "Tratamientos y rituales pedidos" },
+      "En cours d'expédition": { en: "Shipping in progress", ar: "قيد الشحن", es: "En curso de envío" },
+      "Livrée": { en: "Delivered", ar: "تم التسليم", es: "Entregada" },
+      "20 Pts = 10 DH": { en: "20 Pts = 10 MAD", ar: "20 نقطة = 10 دراهم", es: "20 Pts = 10 DH" },
+      "Déductible directement sur vos commandes": { en: "Directly deductible on your orders", ar: "تُخصم مباشرة من طلباتكم", es: "Deducible directamente en sus pedidos" },
+      "Commander des Soins & Packs": { en: "Order Skincare & Packs", ar: "طلب المستحضرات والمجموعات", es: "Pedir Cuidados y Packs" },
+      "Détails Points & Avantages": { en: "Points & Benefits Details", ar: "تفاصيل النقاط والمزايا", es: "Detalles de Puntos y Ventajas" },
+      "Mes Commandes Récents & Suivis Amana Express": { en: "My Recent Orders & Amana Express Tracking", ar: "طلباتي الأخيرة وتتبع أمانة إكسبريس", es: "Mis Pedidos Recientes y Seguimiento Amana Express" },
+
+      // Connexion & Auth
+      "Portail Officiel • eWorld MLM": { en: "Official Portal • eWorld MLM", ar: "البوابة الرسمية • إي-وورلد", es: "Portal Oficial • eWorld MLM" },
+      "Espace Sécurisé des Partenaires & de la Direction Générale": { en: "Secure Space for Partners & General Management", ar: "المساحة الآمنة للشركاء والإدارة العامة", es: "Espacio Seguro de Socios y Dirección General" },
+      "Espace Client": { en: "Customer Space", ar: "مساحة العميل", es: "Espacio Cliente" },
+      "Espace Distributeur": { en: "Distributor Space", ar: "مساحة الموزع", es: "Espacio Distribuidor" },
+      "Identifiant Administrateur :": { en: "Administrator ID:", ar: "معرف المشرف:", es: "ID Administrador:" },
+      "Identifiant 100% Numérique (chiffres uniquement) :": { en: "100% Numeric Identifier (digits only):", ar: "المعرف الرقمي (أرقام فقط):", es: "Identificador 100% Numérico (solo dígitos):" },
+      "Code Client (chiffres) :": { en: "Customer ID (digits):", ar: "رمز العميل (أرقام):", es: "Código de Cliente (dígitos):" },
+      "Mot de passe :": { en: "Password:", ar: "كلمة المرور:", es: "Contraseña:" },
+      "Mémoriser mes identifiants": { en: "Remember my credentials", ar: "تذكر بياناتي", es: "Recordar mis datos" },
+      "Connexion Direction Générale (Admin)": { en: "Login General Management (Admin)", ar: "دخول الإدارة العامة (مشرف)", es: "Entrar Dirección General (Admin)" },
+      "Connexion Espace Distributeur": { en: "Login Distributor Space", ar: "دخول مساحة الموزع", es: "Entrar Espacio Distribuidor" },
+      "Connexion Espace Client Privilège": { en: "Login Privilege Customer Space", ar: "دخول مساحة العميل المميز", es: "Entrar Espacio Cliente Privilegiado" },
+      "Nouveau Client Privilège Routini ?": { en: "New Routini Privilege Customer?", ar: "عميل مميز جديد لدى روتيني؟", es: "¿Nuevo Cliente Privilegiado Routini?" },
+      "Commandez directement avec 10% de réduction et cumulez vos points fidélité !": {
+        en: "Order directly with 10% discount and earn loyalty points!",
+        ar: "اطلب مباشرة بخصم 10% واجمع نقاط الولاء!",
+        es: "¡Pida directamente con 10% de descuento y acumule puntos de fidelidad!"
+      },
+      "Créer mon Compte Client (Gratuit)": { en: "Create Customer Account (Free)", ar: "إنشاء حساب عميل (مجاناً)", es: "Crear Cuenta de Cliente (Gratis)" },
+      "Connexion Rapide Démo :": { en: "Quick Demo Login:", ar: "تسجيل دخول تجريبي سريع:", es: "Inicio Rápido Demo:" },
+
+      // Boutique & Panier
+      "Catalogue Soins & Rituels Cosmétiques": { en: "Skincare & Cosmetics Catalog", ar: "كتالوج العناية ومستحضرات التجميل", es: "Catálogo de Cuidados y Cosméticos" },
+      "Tous les Soins": { en: "All Products", ar: "جميع المستحضرات", es: "Todos los Productos" },
+      "Sérums & Huiles": { en: "Serums & Oils", ar: "السيروم والزيوت", es: "Sérums y Aceites" },
+      "Crèmes & Visage": { en: "Creams & Face", ar: "الكريمات والوجه", es: "Cremas y Rostro" },
+      "Packs & Rituels": { en: "Packs & Rituals", ar: "الباقات والمجموعات", es: "Packs y Rituales" },
+      "Ajouter au Panier": { en: "Add to Cart", ar: "أضف إلى السلة", es: "Añadir al Carrito" },
+      "Ajouter ce Pack": { en: "Add this Pack", ar: "أضف هذه الباقة", es: "Añadir este Pack" },
+      "Votre Panier Routini": { en: "Your Routini Cart", ar: "سلتك روتيني", es: "Su Carrito Routini" },
+      "Votre panier est vide.": { en: "Your cart is empty.", ar: "سلتك فارغة.", es: "Su carrito está vacío." },
+      "Sous-total articles :": { en: "Items subtotal:", ar: "المجموع الفرعي:", es: "Subtotal artículos:" },
+      "Remise Client Privilège (-10%) :": { en: "Privilege Customer Discount (-10%):", ar: "خصم العميل المميز (-10%):", es: "Descuento Cliente Privilegiado (-10%):" },
+      "Frais de Livraison Amana Express (Fixe) :": { en: "Amana Express Delivery Fees (Fixed):", ar: "مصاريف شحن أمانة إكسبريس (ثابتة):", es: "Gastos de Envío Amana Express (Fijo):" },
+      "Total Net TTC à Régler :": { en: "Total Net to Pay:", ar: "الإجمالي الصافي للدفع:", es: "Total Neto a Pagar:" },
+      "Points Fidélité Gagnés :": { en: "Loyalty Points Earned:", ar: "نقاط الولاء المكتسبة:", es: "Puntos de Fidelidad Ganados:" },
+      "Valider et Confirmer la Commande": { en: "Validate and Confirm Order", ar: "تأكيد وإرسال الطلب", es: "Validar y Confirmar el Pedido" },
+      "Vider le Panier": { en: "Clear Cart", ar: "إفراغ السلة", es: "Vaciar el Carrito" },
+
+      // Facture & Modales
+      "Facture Officielle Routini eWorld": { en: "Official Routini eWorld Invoice", ar: "فاتورة رسمية روتيني إي-وورلد", es: "Factura Oficial Routini eWorld" },
+      "Imprimer / Télécharger PDF": { en: "Print / Download PDF", ar: "طباعة / تحميل PDF", es: "Imprimir / Descargar PDF" },
+      "Articles & Soins": { en: "Items & Care", ar: "المستحضرات والمنتجات", es: "Artículos y Cuidados" },
+      "Quantité": { en: "Quantity", ar: "الكمية", es: "Cantidad" },
+      "Prix Unitaire": { en: "Unit Price", ar: "سعر الوحدة", es: "Precio Unitario" },
+      "Total Ligne": { en: "Line Total", ar: "مجموع السطر", es: "Total Línea" },
+      "Annuler": { en: "Cancel", ar: "إلغاء", es: "Cancelar" },
+      "Fermer": { en: "Close", ar: "إغلاق", es: "Cerrar" },
+      "Valider": { en: "Confirm", ar: "تأكيد", es: "Confirmar" },
+      "Rechercher nom, code, rang, ville...": { en: "Search name, ID, rank, city...", ar: "بحث عن الاسم، الرمز، الرتبة، المدينة...", es: "Buscar nombre, código, rango, ciudad..." },
+      "Mon Espace Client Privilège Routini": { en: "My Routini Privilege Customer Space", ar: "مساحة العميل المميز روتيني", es: "Mi Espacio Cliente Privilegiado Routini" },
+      "Suivi de vos commandes soins, expéditions Amana Express et solde fidélité": { en: "Tracking your skincare orders, Amana shipments and loyalty balance", ar: "تتبع طلبات العناية، شحنات أمانة ورصيد الولاء", es: "Seguimiento de sus pedidos, envíos Amana y saldo de fidelidad" },
+      "Tableau de Bord ROUTINI ONE PLAN V4": { en: "ROUTINI ONE PLAN V4 Dashboard", ar: "لوحة تحكم روتيني ون بلان V4", es: "Panel de Control ROUTINI ONE PLAN V4" },
+      "Aperçu général de vos performances, ventes et qualifications (Septembre 2026)": { en: "Overview of your performance, sales and qualifications (September 2026)", ar: "نظرة عامة على أدائك ومبيعاتك ومؤهلاتك (سبتمبر 2026)", es: "Resumen de su rendimiento, ventas y calificaciones" },
+      "Arbre Généalogique & Réseau": { en: "Genealogy Tree & Network", ar: "شجرة الشبكة والأعضاء", es: "Árbol Genealógico y Red" },
+      "Suivi sur 3 niveaux (N1 10%, N2 5%, N3 3%) et bonus Leadership (1% à 7%)": { en: "3-level tracking (L1 10%, L2 5%, L3 3%) & Leadership bonus (1% to 7%)", ar: "متابعة 3 مستويات (N1 10%, N2 5%, N3 3%) وعلاوة القيادة (1% إلى 7%)", es: "Seguimiento en 3 niveles (N1 10%, N2 5%, N3 3%) y bono de Liderazgo (1% al 7%)" },
+      "Boutique Soins & Packs Routines": { en: "Skincare & Routine Packs Store", ar: "متجر العناية ومجموعات الطقوس", es: "Tienda de Cuidados y Packs de Rutinas" },
+      "Boutique Cosmétiques & Packs Routines": { en: "Cosmetics Store & Routine Packs", ar: "متجر مستحضرات التجميل والطقوس", es: "Tienda de Cosméticos y Packs de Rutinas" },
+      "Commandez vos rituels au Prix Public avec livraison express et points fidélité": { en: "Order rituals at Retail Price with express delivery & loyalty points", ar: "اطلب طقوسك بسعر الجمهور مع توصيل سريع ونقاط ولاء", es: "Pida sus rituales al Precio Público con envío exprés y puntos de fidelidad" },
+      "Soins de beauté au Prix Membre (90% PP), points PV (PP/10) et CV (60% PM)": { en: "Beauty care at Member Price (90% RP), PV points (RP/10) and CV (60% MP)", ar: "مستحضرات بسعر العضو (90% PP)، ونقاط PV ونقاط CV (60% PM)", es: "Cosméticos al Precio Miembro (90% PP), puntos PV (PP/10) y CV (60% PM)" },
+      "Portefeuille E-Point & Commissions": { en: "E-Point Wallet & Commissions", ar: "محفظة النقاط الإلكترونية والعمولات", es: "Billetera E-Point y Comisiones" },
+      "Simulations officielles 3 mois (Slide 11), objectif 10 000 DH (Slide 13) et relevés": { en: "Official 3-month simulations (Slide 11), 10,000 MAD goal (Slide 13) and statements", ar: "محاكاة 3 أشهر الرسمية، هدف 10,000 درهم وكشوفات الحساب", es: "Simulaciones oficiales de 3 meses, meta de 10.000 DH y extractos" },
+      "Parrainage & Inscription Partenaire (0 DH)": { en: "Partner Sponsorship & Registration (0 MAD)", ar: "رعاية وتسجيل الشركاء (0 درهم)", es: "Patrocinio e Inscripción de Socio (0 DH)" },
+      "Adhésion gratuite sans achat forcé • Seule la vente de soins déclenche la prime": { en: "Free membership without forced purchase • Skincare sales only trigger bonus", ar: "تسجيل مجاني بدون شراء إجباري • مبيعات المستحضرات تفعل المكافأة", es: "Inscripción gratuita sin compra obligatoria • Solo las ventas activan el bono" },
+      "Direction Générale Routini": { en: "Routini General Management", ar: "الإدارة العامة روتيني", es: "Dirección General Routini" },
+      "Contrôle central, barème V4 (PM 90%, CV 60%), stress test financier et solidité": { en: "Central governance, V4 scale (MP 90%, CV 60%), financial stress testing", ar: "التحكم المركزي، جدول V4 واختبارات القوة والمتانة المالية", es: "Control central, baremo V4 (PM 90%, CV 60%), test de solidez financiera" },
+      "Star Diamond": { en: "Star Diamond", ar: "نجم ماسي", es: "Diamante Estrella" },
+      "Star Ruby": { en: "Star Ruby", ar: "نجم ياقوتي", es: "Rubí Estrella" },
+      "Star Agent": { en: "Star Agent", ar: "وكيل نجم", es: "Agente Estrella" },
+      "Client Privilège": { en: "Privilege Customer", ar: "عميل مميز", es: "Cliente Privilegiado" },
+      "● Actif Qualifié": { en: "● Qualified Active", ar: "● نشط ومؤهل", es: "● Activo Calificado" },
+      "● Distributeur Actif Qualifié": { en: "● Qualified Active Distributor", ar: "● موزع نشط ومؤهل", es: "● Distribuidor Activo Calificado" },
+      "⚠ Inactif": { en: "⚠ Inactive", ar: "⚠ غير نشط", es: "⚠ Inactivo" },
+      "complété": { en: "completed", ar: "مكتمل", es: "completado" },
+      "Filleuls": { en: "Downlines", ar: "الأعضاء", es: "Afiliados" },
+      "actifs": { en: "active", ar: "نشط", es: "activos" },
+      "Aucun colis": { en: "No parcel", ar: "لا توجد طرود", es: "Sin paquete" },
+      "Prêt pour commande": { en: "Ready to order", ar: "جاهز للطلب", es: "Listo para pedir" },
+      "Poste Maroc (Amana)": { en: "Morocco Post (Amana)", ar: "بريد المغرب (أمانة)", es: "Correos Marruecos (Amana)" },
+      "ami(s) parrainé(s)": { en: "referred friend(s)", ar: "صديق محال", es: "amigo(s) patrocinado(s)" },
+      "Validé (12 mois)": { en: "Validated (12 months)", ar: "مؤكد (12 شهراً)", es: "Validado (12 meses)" },
+      "Vous n'avez pas encore passé de commande sur votre compte client.": { en: "You haven't placed any orders on your customer account yet.", ar: "لم تقم بأي طلب على حسابك بعد.", es: "Aún no ha realizado ningún pedido en su cuenta de cliente." },
+      "Découvrir les Soins & Rituels": { en: "Discover Skincare & Rituals", ar: "اكتشاف المستحضرات والطقوس", es: "Descubrir Cuidados y Rituales" },
+      "soin(s) de beauté": { en: "beauty product(s)", ar: "منتجات تجميل", es: "producto(s) de belleza" },
+      "Prix Membre (90% PP)": { en: "Member Price (90% RP)", ar: "سعر العضو (90% PP)", es: "Precio Miembro (90% PP)" },
+      "Prix Public": { en: "Retail Price", ar: "سعر الجمهور", es: "Precio Público" },
+      "Économie immédiate :": { en: "Immediate saving:", ar: "توفير فوري:", es: "Ahorro inmediato:" },
+      "Remise :": { en: "Discount:", ar: "الخصم:", es: "Descuento:" },
+      "Base com. :": { en: "Com. base:", ar: "أساس العمولة:", es: "Base com.:" },
+      "Fidélité :": { en: "Loyalty:", ar: "الولاء:", es: "Fidelidad:" },
+      "Stock :": { en: "Stock:", ar: "المخزون:", es: "Stock:" },
+      "Profiter de ce Pack Promo": { en: "Get this Promo Pack", ar: "الاستفادة من هذه الباقة الترويجية", es: "Aprovechar este Pack Promo" },
+      "Canal de commande :": { en: "Order channel:", ar: "قناة الطلب:", es: "Canal de pedido:" },
+      "Client Rattaché": { en: "Attached Customer", ar: "عميل مرتبط", es: "Cliente Vinculado" },
+      "Achat Partenaire": { en: "Partner Purchase", ar: "شراء شريك", es: "Compra Socio" },
+      "Prix Vente Public Recommandé (PP)": { en: "Recommended Retail Price (RP)", ar: "سعر البيع للجمهور الموصى به", es: "Precio Venta Público Recomendado (PP)" },
+      "Commission Value = 60% du Prix Membre": { en: "Commission Value = 60% of Member Price", ar: "قيمة العمولة = 60% من سعر العضو", es: "Commission Value = 60% del Precio Miembro" },
+      "1 PV = 10 DH Prix Public": { en: "1 PV = 10 MAD Retail Price", ar: "1 PV = 10 دراهم سعر الجمهور", es: "1 PV = 10 DH Precio Público" },
+      "Commandez directement sans parrainage ni réseau MLM.": { en: "Order directly without sponsorship or MLM network.", ar: "اطلب مباشرة بدون استضافة أو شبكة تسويق.", es: "Pida directamente sin patrocinio ni red MLM." },
+      "+50 points fidélité offerts": { en: "+50 loyalty points offered", ar: "+50 نقطة ولاء مهداة", es: "+50 puntos de fidelidad de regalo" },
+      "immédiatement à l'inscription !": { en: "immediately upon registration!", ar: "مباشرة عند التسجيل!", es: "¡inmediatamente al registrarse!" },
+      "Choisir un profil client pour tester :": { en: "Choose a demo profile to test:", ar: "اختر حساباً تجريبياً للاختبار:", es: "Elegir un perfil de prueba:" },
+      "Pré-remplit automatiquement le code et le mot de passe du partenaire.": { en: "Automatically prefills partner code and password.", ar: "يملأ تلقائياً رمز وكلمة مرور الشريك.", es: "Rellena automáticamente el código y la contraseña." },
+      "Réseau actif : 50 membres • 6 mois": { en: "Active network: 50 members • 6 months", ar: "شبكة نشطة: 50 عضواً • 6 أشهر", es: "Red activa: 50 miembros • 6 meses" },
+      "Connexion Rapide en 1-Clic :": { en: "1-Click Quick Login:", ar: "تسجيل دخول سريع بنقرة واحدة:", es: "Conexión Rápida en 1 Clic:" },
+      "Niveau 1": { en: "Level 1", ar: "المستوى 1", es: "Nivel 1" },
+      "Niveau 2": { en: "Level 2", ar: "المستوى 2", es: "Nivel 2" },
+      "Niveau 3": { en: "Level 3", ar: "المستوى 3", es: "Nivel 3" },
+      "Niveau": { en: "Level", ar: "المستوى", es: "Nivel" },
+      "Génération": { en: "Generation", ar: "الجيل", es: "Generación" },
+      "Palier Suprême 7% Leadership": { en: "Supreme Level 7% Leadership", ar: "المستوى الأعلى 7% قيادة", es: "Nivel Supremo 7% Liderazgo" },
+      "Simulations Officielles 3 Mois": { en: "Official 3-Month Simulations", ar: "محاكاة 3 أشهر الرسمية", es: "Simulaciones Oficiales 3 Meses" },
+      "Mois 1": { en: "Month 1", ar: "الشهر 1", es: "Mes 1" },
+      "Mois 2": { en: "Month 2", ar: "الشهر 2", es: "Mes 2" },
+      "Mois 3": { en: "Month 3", ar: "الشهر 3", es: "Mes 3" },
+      "Total Commissions Reversées": { en: "Total Commissions Paid", ar: "مجموع العمولات المصروفة", es: "Total Comisiones Pagadas" },
+      "Chiffre d'Affaires Global Réseau": { en: "Global Network Turnover", ar: "رقم المعاملات الإجمالي للشبكة", es: "Facturación Global de la Red" },
+      "Solidité Financière & Stress Test": { en: "Financial Strength & Stress Test", ar: "القوة والمتانة المالية واختبار الضغط", es: "Solidez Financiera y Test de Estrés" },
+      "Créer un Nouveau Produit": { en: "Create New Product", ar: "إنشاء منتج جديد", es: "Crear Nuevo Producto" },
+      "Créer un Pack de Produits": { en: "Create Product Pack", ar: "إنشاء باقة منتجات", es: "Crear Pack de Productos" },
+      "Gestion des Distributeurs & Rangs": { en: "Distributors & Ranks Management", ar: "إدارة الموزعين والرتب", es: "Gestión de Distribuidores y Rangos" },
+      "Modifier": { en: "Edit", ar: "تعديل", es: "Modificar" },
+      "Supprimer": { en: "Delete", ar: "حذف", es: "Eliminar" },
+      "Dupliquer": { en: "Duplicate", ar: "نسخ", es: "Duplicar" },
+      "Actif": { en: "Active", ar: "نشط", es: "Activo" },
+      "Inactif": { en: "Inactive", ar: "غير نشط", es: "Inactivo" },
+      "Carte Bancaire CMI (Maroc)": { en: "Credit Card CMI (Morocco)", ar: "بطاقة بنكية CMI (المغرب)", es: "Tarjeta Bancaria CMI (Marruecos)" },
+      "Paiement à la Livraison (COD)": { en: "Cash on Delivery (COD)", ar: "الدفع عند الاستلام", es: "Pago Contra Reembolso" },
+      "Carte Bancaire": { en: "Credit Card", ar: "بطاقة بنكية", es: "Tarjeta Bancaria" },
+      "Virement Bancaire": { en: "Bank Transfer", ar: "تحويل بنكي", es: "Transferencia Bancaria" }
+    };
   }
 
   setLanguage(lang) {
@@ -581,22 +804,43 @@ class I18nManager {
     this.currentLang = lang;
     localStorage.setItem('ROUTINI_LANG', lang);
 
-    const doc = document.documentElement;
-    const body = document.body;
-    const currentConfig = this.translations[lang];
-
-    doc.setAttribute('lang', lang);
-    doc.setAttribute('dir', currentConfig.dir);
-    if (currentConfig.dir === 'rtl') {
-      body.classList.add('rtl-mode');
+    const isRTL = lang === 'ar';
+    document.documentElement.setAttribute('lang', lang);
+    document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+    if (isRTL) {
+      document.body.classList.add('rtl-mode');
     } else {
-      body.classList.remove('rtl-mode');
+      document.body.classList.remove('rtl-mode');
     }
 
+    // 1. Re-rendre les vues (ce qui régénère le DOM avec les textes frais)
+    if (window.app && window.app.renderAllViews) {
+      window.app.renderAllViews();
+    } else {
+      this.translateDOM();
+    }
+
+    // 2. Traduire l'ensemble de l'arbre DOM
     this.translateDOM();
 
-    if (window.app) {
-      window.app.renderAllViews();
+    // 3. Mettre à jour l'état visuel actif de tous les sélecteurs de langue
+    document.querySelectorAll('.btn-lang-flag').forEach(b => {
+      if (b.getAttribute('data-lang') === lang) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    // 4. Toast de confirmation
+    const langNames = {
+      fr: 'Langue activée : Français 🇲🇦',
+      en: 'Language activated: English 🇬🇧',
+      ar: 'تم تفعيل اللغة: العربية 🇸🇦',
+      es: 'Idioma activado: Español 🇪🇸'
+    };
+    if (window.app && window.app.showToast) {
+      window.app.showToast(langNames[lang] || lang, 'info');
     }
   }
 
@@ -605,24 +849,201 @@ class I18nManager {
     return dict[key] || (this.translations.fr[key] || fallback || key);
   }
 
+  findFrenchOrigin(text) {
+    if (!this._reverseMap) {
+      this._reverseMap = {};
+      for (const [fr, dict] of Object.entries(this.phraseMap)) {
+        for (const [l, trans] of Object.entries(dict)) {
+          if (trans && typeof trans === 'string') {
+            this._reverseMap[trans.trim()] = fr;
+          }
+        }
+      }
+    }
+    return this._reverseMap[text] || null;
+  }
+
   translateDOM() {
+    const lang = this.currentLang;
+    const isRTL = lang === 'ar';
+    const doc = document.documentElement;
+    const body = document.body;
+
+    doc.setAttribute('lang', lang);
+    doc.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+    if (isRTL) {
+      body.classList.add('rtl-mode');
+    } else {
+      body.classList.remove('rtl-mode');
+    }
+
+    // 1. [data-i18n]
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (key) {
-        const translation = this.t(key);
-        if (el.tagName === 'INPUT' && el.getAttribute('placeholder')) {
-          el.setAttribute('placeholder', translation);
+        const tr = this.t(key);
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+          el.setAttribute('placeholder', tr);
         } else {
-          el.textContent = translation;
+          el.textContent = tr;
         }
       }
     });
 
-    const currentFlagEl = document.getElementById('currentLangFlag');
-    const currentCodeEl = document.getElementById('currentLangCode');
-    if (currentFlagEl) currentFlagEl.textContent = this.translations[this.currentLang].flag;
-    if (currentCodeEl) currentCodeEl.textContent = this.currentLang.toUpperCase();
+    // 2. [data-i18n-placeholder]
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (key) el.setAttribute('placeholder', this.t(key));
+    });
+
+    // 3. Traduction intégrale via TreeWalker sur tous les nœuds de texte
+    this.translateAllTextNodes(lang);
+
+    // 4. Traduction des placeholders et inputs
+    this.translateInputsAndTooltips(lang);
+
+    // 5. Mettre à jour l'état actif sur les drapeaux
+    document.querySelectorAll('.btn-lang-flag').forEach(b => {
+      if (b.getAttribute('data-lang') === lang) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    // 6. Synchroniser avec les titres d'en-tête
+    if (window.app && window.app.updateHeaderTitle) {
+      window.app.updateHeaderTitle(window.app.currentView || 'dashboard');
+    }
+  }
+
+  translateAllTextNodes(lang) {
+    if (!this.phraseMap) return;
+
+    const rootContainers = [
+      document.getElementById('quickRoleBar'),
+      document.getElementById('authSection'),
+      document.getElementById('appMainLayout'),
+      document.getElementById('appModal'),
+      document.getElementById('modalRegisterClient'),
+      document.querySelector('.mobile-bottom-nav')
+    ].filter(Boolean);
+
+    rootContainers.forEach(container => {
+      const walker = document.createTreeWalker(
+        container,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: (node) => {
+            const parent = node.parentElement;
+            if (!parent) return NodeFilter.FILTER_REJECT;
+            const tag = parent.tagName;
+            if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'CODE') return NodeFilter.FILTER_REJECT;
+            if (parent.closest('.header-lang-selector, .quick-lang-selector, .auth-lang-selector')) return NodeFilter.FILTER_REJECT;
+            if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        }
+      );
+
+      let textNode;
+      while ((textNode = walker.nextNode())) {
+        const raw = textNode.nodeValue;
+        const trimmed = raw.trim();
+
+        if (textNode._frOrig === undefined) {
+          if (this.phraseMap[trimmed]) {
+            textNode._frOrig = trimmed;
+          } else {
+            const matchedFr = this.findFrenchOrigin(trimmed);
+            textNode._frOrig = matchedFr || trimmed;
+          }
+        }
+
+        const fr = textNode._frOrig;
+        if (!fr) continue;
+
+        if (lang === 'fr') {
+          if (trimmed !== fr) {
+            textNode.nodeValue = raw.replace(trimmed, fr);
+          }
+        } else if (this.phraseMap[fr] && this.phraseMap[fr][lang]) {
+          const translated = this.phraseMap[fr][lang];
+          if (trimmed !== translated) {
+            textNode.nodeValue = raw.replace(trimmed, translated);
+          }
+        }
+      }
+    });
+  }
+
+  translateInputsAndTooltips(lang) {
+    if (!this.phraseMap) return;
+
+    // Placeholders
+    document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(inp => {
+      if (inp._frOrigPh === undefined) {
+        const ph = (inp.getAttribute('placeholder') || '').trim();
+        if (this.phraseMap[ph]) {
+          inp._frOrigPh = ph;
+        } else {
+          inp._frOrigPh = this.findFrenchOrigin(ph) || ph;
+        }
+      }
+      const frPh = inp._frOrigPh;
+      if (!frPh) return;
+
+      if (lang === 'fr') {
+        inp.setAttribute('placeholder', frPh);
+      } else if (this.phraseMap[frPh] && this.phraseMap[frPh][lang]) {
+        inp.setAttribute('placeholder', this.phraseMap[frPh][lang]);
+      }
+    });
+
+    // Boutons de formulaires (submit / button avec value)
+    document.querySelectorAll('input[type="submit"], input[type="button"]').forEach(btn => {
+      const val = (btn.value || '').trim();
+      if (!btn._frOrigVal) {
+        btn._frOrigVal = this.phraseMap[val] ? val : (this.findFrenchOrigin(val) || val);
+      }
+      const frVal = btn._frOrigVal;
+      if (!frVal) return;
+
+      if (lang === 'fr') {
+        btn.value = frVal;
+      } else if (this.phraseMap[frVal] && this.phraseMap[frVal][lang]) {
+        btn.value = this.phraseMap[frVal][lang];
+      }
+    });
+
+    // Tooltips [title]
+    document.querySelectorAll('[title]').forEach(el => {
+      const t = (el.getAttribute('title') || '').trim();
+      if (!t) return;
+      if (el.closest('.header-lang-selector, .quick-lang-selector, .auth-lang-selector')) return;
+
+      if (!el._frOrigTitle) {
+        el._frOrigTitle = this.phraseMap[t] ? t : (this.findFrenchOrigin(t) || t);
+      }
+      const frT = el._frOrigTitle;
+      if (!frT) return;
+
+      if (lang === 'fr') {
+        el.setAttribute('title', frT);
+      } else if (this.phraseMap[frT] && this.phraseMap[frT][lang]) {
+        el.setAttribute('title', this.phraseMap[frT][lang]);
+      }
+    });
   }
 }
 
 window.i18n = new I18nManager();
+
+// Initialisation dès chargement du DOM
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.i18n) window.i18n.translateDOM();
+  });
+} else {
+  if (window.i18n) window.i18n.translateDOM();
+}

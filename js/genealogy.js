@@ -171,6 +171,10 @@ class GenealogyController {
       const downlines = window.stateManager.getAllDownlines(rootCode);
       container.innerHTML = this.renderTableView(currentUser, downlines);
     }
+
+    if (window.i18n && window.i18n.currentLang !== 'fr') {
+      window.i18n.translateDOM();
+    }
   }
 
   renderTreeNode(node) {

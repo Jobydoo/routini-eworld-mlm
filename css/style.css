@@ -59,6 +59,15 @@
 
   --sidebar-width: 270px;
   --header-height: 72px;
+  --quick-bar-height: 52px;
+}
+
+body.has-quick-bar {
+  --quick-bar-height: 52px;
+}
+
+body:not(.has-quick-bar) {
+  --quick-bar-height: 0px;
 }
 
 * {
@@ -80,16 +89,19 @@ html, body {
 .quick-role-bar {
   background: linear-gradient(90deg, #241a1c 0%, #352528 100%);
   color: #fff;
-  padding: 8px 16px;
+  padding: 8px 18px;
   font-size: 0.8rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
-  border-bottom: 1px solid rgba(232, 200, 203, 0.15);
+  border-bottom: 1px solid rgba(232, 200, 203, 0.18);
   z-index: 1000;
-  position: relative;
+  position: sticky;
+  top: 0;
+  min-height: 52px;
+  box-sizing: border-box;
 }
 
 .quick-role-bar .role-info {
@@ -647,11 +659,12 @@ html, body {
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 0;
+  top: var(--quick-bar-height, 52px);
+  height: calc(100vh - var(--quick-bar-height, 52px));
   bottom: 0;
   left: 0;
-  z-index: 900;
-  transition: var(--transition-normal);
+  z-index: 950;
+  transition: top 0.2s ease, transform var(--transition-normal);
   box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
 }
@@ -908,17 +921,19 @@ html, body {
 }
 
 .main-header {
-  height: var(--header-height);
+  height: auto;
+  min-height: 66px;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
+  padding: 10px 24px;
   position: sticky;
-  top: 0;
-  z-index: 800;
+  top: var(--quick-bar-height, 52px);
+  z-index: 900;
   box-shadow: var(--shadow-sm);
+  transition: top 0.2s ease;
 }
 
 .header-left {
@@ -2989,13 +3004,18 @@ body.rtl-mode .invoice-badge-box {
   .sidebar {
     transform: translateX(-100%);
     position: fixed;
-    top: 0;
+    top: 0 !important;
+    height: 100vh !important;
     bottom: 0;
     left: 0;
     width: 290px;
-    z-index: 900;
+    z-index: 10005 !important;
     box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sidebar-backdrop {
+    z-index: 10004 !important;
   }
 
   .sidebar.mobile-open {
@@ -3024,8 +3044,10 @@ body.rtl-mode .invoice-badge-box {
   }
 
   .main-header {
-    padding: 0 12px;
-    height: 60px;
+    padding: 6px 12px;
+    min-height: 56px;
+    height: auto;
+    top: var(--quick-bar-height, 52px);
   }
 
   .header-left {
@@ -3188,6 +3210,100 @@ body.rtl-mode .invoice-badge-box {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+/* ==========================================================================
+   MODE RTL ARABE (العربية)
+   ========================================================================== */
+.rtl-mode {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, Tahoma, Arial, sans-serif;
+}
+
+.rtl-mode .sidebar {
+  left: auto;
+  right: 0;
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.rtl-mode .main-wrapper {
+  margin-left: 0;
+  margin-right: var(--sidebar-width);
+}
+
+.rtl-mode .header-left {
+  flex-direction: row;
+}
+
+.rtl-mode .header-brand-logo-link {
+  margin-right: 0;
+  margin-left: 12px;
+}
+
+.rtl-mode .nav-item {
+  text-align: right;
+}
+
+.rtl-mode .nav-badge {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.rtl-mode .fleche-desc {
+  margin-left: 0;
+  margin-right: 4px;
+}
+
+.rtl-mode .quick-members-dropdown-panel {
+  left: auto;
+  right: 0;
+}
+
+.rtl-mode .dropdown-member-item .m-rank-tag {
+  margin-left: 0;
+  margin-right: 6px;
+}
+
+.rtl-mode .dropdown-member-item .m-text {
+  text-align: right;
+}
+
+.rtl-mode .input-with-icon .input-icon {
+  left: auto;
+  right: 14px;
+}
+
+.rtl-mode .input-with-icon input,
+.rtl-mode .form-control {
+  padding: 11px 40px 11px 14px;
+  text-align: right;
+}
+
+.rtl-mode .custom-table th,
+.rtl-mode .custom-table td {
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .rtl-mode .sidebar {
+    transform: translateX(100%);
+    right: 0;
+    left: auto;
+  }
+
+  .rtl-mode .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .rtl-mode .main-wrapper {
+    margin-right: 0 !important;
+  }
+
+  .rtl-mode .quick-members-dropdown-panel {
+    right: 10px;
+    left: 10px;
   }
 }
 

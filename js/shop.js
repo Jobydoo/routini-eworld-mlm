@@ -284,6 +284,10 @@ class ShopController {
         `}
       </div>
     `;
+
+    if (window.i18n && window.i18n.currentLang !== 'fr') {
+      window.i18n.translateDOM();
+    }
   }
 
   handleAddToCart(productId) {

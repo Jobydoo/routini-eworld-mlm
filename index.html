@@ -33,6 +33,22 @@
       <span>Session : <strong id="quickCurrentUserName">Direction Générale Routini (ADMIN001)</strong></span>
     </div>
     <div class="role-actions">
+      <!-- Sélecteur 4 Langues Rapide (Accessible partout directement sur la barre supérieure) -->
+      <div class="quick-lang-selector" style="display: flex; gap: 4px; align-items: center; background: rgba(255, 255, 255, 0.12); padding: 2px 6px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.25);">
+        <button type="button" class="btn-lang-flag active" data-lang="fr" onclick="window.i18n.setLanguage('fr')" title="Français (Maroc)">
+          <span>🇲🇦</span> <small>FR</small>
+        </button>
+        <button type="button" class="btn-lang-flag" data-lang="en" onclick="window.i18n.setLanguage('en')" title="English">
+          <span>🇬🇧</span> <small>EN</small>
+        </button>
+        <button type="button" class="btn-lang-flag" data-lang="ar" onclick="window.i18n.setLanguage('ar')" title="العربية (RTL)">
+          <span>🇸🇦</span> <small>AR</small>
+        </button>
+        <button type="button" class="btn-lang-flag" data-lang="es" onclick="window.i18n.setLanguage('es')" title="Español">
+          <span>🇪🇸</span> <small>ES</small>
+        </button>
+      </div>
+
       <!-- Bouton Direction (ADMIN) conservé distinctement -->
       <button class="btn-switch-account owner-btn" id="quickBtnAdmin" data-target-code="ADMIN001" onclick="window.app.switchAccount('ADMIN001')">
         <i class="fas fa-crown"></i> Direction (ADMIN)
@@ -87,16 +103,16 @@
         
         <!-- Sélecteur 4 Langues & Drapeaux Multi-pays (Marketing Good) -->
         <div class="auth-lang-selector" style="display: flex; justify-content: center; gap: 8px; margin-top: 10px;">
-          <button type="button" class="btn-lang-flag active" data-lang="fr" title="Français (Maroc)">
+          <button type="button" class="btn-lang-flag active" data-lang="fr" onclick="window.i18n.setLanguage('fr')" title="Français (Maroc)">
             <span>🇲🇦</span> <small>FR</small>
           </button>
-          <button type="button" class="btn-lang-flag" data-lang="en" title="English">
+          <button type="button" class="btn-lang-flag" data-lang="en" onclick="window.i18n.setLanguage('en')" title="English">
             <span>🇬🇧</span> <small>EN</small>
           </button>
-          <button type="button" class="btn-lang-flag" data-lang="ar" title="العربية (المغرب / الخليج)">
+          <button type="button" class="btn-lang-flag" data-lang="ar" onclick="window.i18n.setLanguage('ar')" title="العربية (المغرب / الخليج)">
             <span>🇸🇦</span> <small>AR</small>
           </button>
-          <button type="button" class="btn-lang-flag" data-lang="es" title="Español">
+          <button type="button" class="btn-lang-flag" data-lang="es" onclick="window.i18n.setLanguage('es')" title="Español">
             <span>🇪🇸</span> <small>ES</small>
           </button>
         </div>
@@ -338,16 +354,16 @@
 
           <!-- Sélecteur 4 Langues Multi-Drapeaux (FR, EN, AR, ES) -->
           <div class="header-lang-selector" style="display: flex; gap: 4px; align-items: center; background: #f8fafc; padding: 3px 6px; border-radius: 20px; border: 1px solid #e2e8f0;">
-            <button type="button" class="btn-lang-flag active" data-lang="fr" title="Français (Maroc)">
+            <button type="button" class="btn-lang-flag active" data-lang="fr" onclick="window.i18n.setLanguage('fr')" title="Français (Maroc)">
               <span>🇲🇦</span> <small>FR</small>
             </button>
-            <button type="button" class="btn-lang-flag" data-lang="en" title="English">
+            <button type="button" class="btn-lang-flag" data-lang="en" onclick="window.i18n.setLanguage('en')" title="English">
               <span>🇬🇧</span> <small>EN</small>
             </button>
-            <button type="button" class="btn-lang-flag" data-lang="ar" title="العربية (RTL)">
+            <button type="button" class="btn-lang-flag" data-lang="ar" onclick="window.i18n.setLanguage('ar')" title="العربية (RTL)">
               <span>🇸🇦</span> <small>AR</small>
             </button>
-            <button type="button" class="btn-lang-flag" data-lang="es" title="Español">
+            <button type="button" class="btn-lang-flag" data-lang="es" onclick="window.i18n.setLanguage('es')" title="Español">
               <span>🇪🇸</span> <small>ES</small>
             </button>
           </div>

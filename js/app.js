@@ -87,27 +87,17 @@ class App {
       });
     }
 
-    // Sélecteur de Langue (4 Langues & Drapeaux Multi-pays)
-    document.querySelectorAll('.btn-lang-flag').forEach(btn => {
-      btn.addEventListener('click', () => {
+    // Sélecteur de Langue (4 Langues & Drapeaux Multi-pays - Délégation Globale)
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-lang-flag, [data-lang]');
+      if (btn) {
+        e.preventDefault();
         const lang = btn.getAttribute('data-lang');
         if (lang && window.i18n) {
           window.i18n.setLanguage(lang);
-          document.querySelectorAll('.btn-lang-flag').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          this.showToast(`Langue sélectionnée : ${window.i18n.translations[lang].langName}`, 'info');
         }
-      });
+      }
     });
-
-    const langSelect = document.getElementById('headerLangSelect');
-    if (langSelect && window.i18n) {
-      langSelect.value = window.i18n.currentLang;
-      langSelect.addEventListener('change', (e) => {
-        window.i18n.setLanguage(e.target.value);
-        this.showToast(`Langue sélectionnée : ${window.i18n.translations[e.target.value].langName}`, 'info');
-      });
-    }
 
     // Formulaire Nouveau Membre
     const formNewMember = document.getElementById('formRegisterMember');
@@ -196,27 +186,73 @@ class App {
     } else if (viewName === 'dashboard') {
       this.renderDashboard();
     }
+
+    if (window.i18n) {
+      window.i18n.translateDOM();
+    }
   }
 
   updateHeaderTitle(viewName) {
     const isClient = window.stateManager.isClient();
+    const lang = (window.i18n && window.i18n.currentLang) || 'fr';
 
     const titles = {
-      dashboard: isClient
-        ? { title: 'Mon Espace Client Privilège Routini', desc: 'Suivi de vos commandes soins, expéditions Amana Express et solde fidélité' }
-        : { title: 'Tableau de Bord ROUTINI ONE PLAN V4', desc: 'Aperçu général de vos performances, ventes et qualifications (Septembre 2026)' },
-      genealogy: { title: 'Arbre Généalogique & Réseau', desc: 'Suivi sur 3 niveaux (N1 10%, N2 5%, N3 3%) et bonus Leadership (1% à 7%)' },
-      shop: isClient
-        ? { title: 'Boutique Soins & Packs Routines', desc: 'Commandez vos rituels au Prix Public avec livraison express et points fidélité' }
-        : { title: 'Boutique Cosmétiques & Packs Routines', desc: 'Soins de beauté au Prix Membre (90% PP), points PV (PP/10) et CV (60% PM)' },
-      bonus: { title: 'Portefeuille E-Point & Commissions', desc: 'Simulations officielles 3 mois (Slide 11), objectif 10 000 DH (Slide 13) et relevés' },
-      sponsor: { title: 'Parrainage & Inscription Partenaire (0 DH)', desc: 'Adhésion gratuite sans achat forcé • Seule la vente de soins déclenche la prime' },
-      admin: { title: 'Direction Générale Routini', desc: 'Contrôle central, barème V4 (PM 90%, CV 60%), stress test financier et solidité' }
+      fr: {
+        dashboard: isClient
+          ? { title: 'Mon Espace Client Privilège Routini', desc: 'Suivi de vos commandes soins, expéditions Amana Express et solde fidélité' }
+          : { title: 'Tableau de Bord ROUTINI ONE PLAN V4', desc: 'Aperçu général de vos performances, ventes et qualifications (Septembre 2026)' },
+        genealogy: { title: 'Arbre Généalogique & Réseau', desc: 'Suivi sur 3 niveaux (N1 10%, N2 5%, N3 3%) et bonus Leadership (1% à 7%)' },
+        shop: isClient
+          ? { title: 'Boutique Soins & Packs Routines', desc: 'Commandez vos rituels au Prix Public avec livraison express et points fidélité' }
+          : { title: 'Boutique Cosmétiques & Packs Routines', desc: 'Soins de beauté au Prix Membre (90% PP), points PV (PP/10) et CV (60% PM)' },
+        bonus: { title: 'Portefeuille E-Point & Commissions', desc: 'Simulations officielles 3 mois (Slide 11), objectif 10 000 DH (Slide 13) et relevés' },
+        sponsor: { title: 'Parrainage & Inscription Partenaire (0 DH)', desc: 'Adhésion gratuite sans achat forcé • Seule la vente de soins déclenche la prime' },
+        admin: { title: 'Direction Générale Routini', desc: 'Contrôle central, barème V4 (PM 90%, CV 60%), stress test financier et solidité' }
+      },
+      en: {
+        dashboard: isClient
+          ? { title: 'My Routini Privilege Customer Space', desc: 'Track your skincare orders, Amana Express shipments, and loyalty points' }
+          : { title: 'ROUTINI ONE PLAN V4 Dashboard', desc: 'Overview of your performances, sales and qualifications (September 2026)' },
+        genealogy: { title: 'Genealogy Tree & Network', desc: '3-tier network tracking (N1 10%, N2 5%, N3 3%) and Leadership Bonus (1% to 7%)' },
+        shop: isClient
+          ? { title: 'Skincare & Routine Packs Store', desc: 'Order beauty rituals at Retail Price with express delivery & loyalty points' }
+          : { title: 'Cosmetics Store & Routine Packs', desc: 'Beauty rituals at Member Price (90% RP), PV points (RP/10) and CV (60% MP)' },
+        bonus: { title: 'E-Point Wallet & Commissions', desc: 'Official 3-month simulations, 10,000 MAD goal and detailed statements' },
+        sponsor: { title: 'Partner Sponsorship & Registration (0 MAD)', desc: 'Free registration without forced purchase • Skincare sales only trigger bonus' },
+        admin: { title: 'Routini General Management', desc: 'Central governance, V4 rules (MP 90%, CV 60%), financial stress testing' }
+      },
+      ar: {
+        dashboard: isClient
+          ? { title: 'مساحة العميل المميز روتيني', desc: 'تتبع طلبات العناية، شحنات أمانة إكسبريس ورصيد نقاط الولاء' }
+          : { title: 'لوحة تحكم روتيني ون بلان V4', desc: 'نظرة عامة على أدائك ومبيعاتك ومؤهلاتك (سبتمبر 2026)' },
+        genealogy: { title: 'شجرة الشبكة والأعضاء', desc: 'تتبع 3 مستويات (N1 10%, N2 5%, N3 3%) ومكافأة القيادة (1% إلى 7%)' },
+        shop: isClient
+          ? { title: 'متجر العناية ومجموعات الطقوس', desc: 'اطلب طقوس الجمال بسعر الجمهور مع توصيل سريع ونقاط ولاء' }
+          : { title: 'متجر مستحضرات التجميل والطقوس', desc: 'مستحضرات بسعر العضو (90% PP)، ونقاط PV ونقاط CV (60% PM)' },
+        bonus: { title: 'محفظة النقاط الإلكترونية والعمولات', desc: 'محاكاة 3 أشهر الرسمية، هدف 10,000 درهم وكشوفات الحساب' },
+        sponsor: { title: 'رعاية وتسجيل الشركاء (0 درهم)', desc: 'تسجيل مجاني بدون شراء إجباري • مبيعات المستحضرات تفعل المكافأة' },
+        admin: { title: 'الإدارة العامة روتيني', desc: 'التحكم المركزي، جدول V4 واختبارات القوة والمتانة المالية' }
+      },
+      es: {
+        dashboard: isClient
+          ? { title: 'Mi Espacio Cliente Privilegiado Routini', desc: 'Seguimiento de pedidos, envíos Amana Express y saldo de fidelidad' }
+          : { title: 'Panel de Control ROUTINI ONE PLAN V4', desc: 'Resumen de su rendimiento, ventas y calificaciones (Septiembre 2026)' },
+        genealogy: { title: 'Árbol Genealógico y Red', desc: 'Seguimiento en 3 niveles (N1 10%, N2 5%, N3 3%) y Bono de Liderazgo (1% al 7%)' },
+        shop: isClient
+          ? { title: 'Tienda de Cuidados y Packs de Rutinas', desc: 'Pida sus rituales al Precio Público con envío exprés y puntos de fidelidad' }
+          : { title: 'Tienda de Cosméticos y Packs de Rutinas', desc: 'Cosméticos al Precio Miembro (90% PP), puntos PV (PP/10) y CV (60% PM)' },
+        bonus: { title: 'Billetera E-Point y Comisiones', desc: 'Simulaciones oficiales de 3 meses, meta de 10.000 DH y extractos' },
+        sponsor: { title: 'Patrocinio e Inscripción de Socio (0 DH)', desc: 'Inscripción gratuita sin compra obligatoria • Solo las ventas activan el bono' },
+        admin: { title: 'Dirección General Routini', desc: 'Control central, baremo V4 (PM 90%, CV 60%), test de solidez financiera' }
+      }
     };
 
-    const header = titles[viewName] || { title: 'Portail Routini eWorld', desc: '' };
-    document.getElementById('headerTitleText').textContent = header.title;
-    document.getElementById('headerDescText').textContent = header.desc;
+    const langTitles = titles[lang] || titles.fr;
+    const header = langTitles[viewName] || { title: 'Portail Routini eWorld', desc: '' };
+    const titleEl = document.getElementById('headerTitleText');
+    const descEl = document.getElementById('headerDescText');
+    if (titleEl) titleEl.textContent = header.title;
+    if (descEl) descEl.textContent = header.desc;
   }
 
   renderAllViews() {
@@ -224,6 +260,9 @@ class App {
     this.renderDashboard();
     this.updateQuickRoleBar();
     this.switchView(this.currentView);
+    if (window.i18n) {
+      window.i18n.translateDOM();
+    }
   }
 
   updateUserProfileDisplay() {
@@ -467,6 +506,21 @@ class App {
     if (!quickBar) return;
 
     quickBar.style.display = 'flex';
+
+    // Synchronisation dynamique de la hauteur pour garantir que le logo et l'en-tête ne soient JAMAIS tronqués ni cachés
+    const syncHeight = () => {
+      const h = quickBar.offsetHeight || 52;
+      document.documentElement.style.setProperty('--quick-bar-height', `${h}px`);
+      document.body.classList.add('has-quick-bar');
+    };
+    syncHeight();
+    if (!this._quickBarResizeBound) {
+      window.addEventListener('resize', syncHeight);
+      if (window.ResizeObserver) {
+        new ResizeObserver(syncHeight).observe(quickBar);
+      }
+      this._quickBarResizeBound = true;
+    }
 
     const currentUser = window.stateManager.currentUser;
     const currentNameEl = document.getElementById('quickCurrentUserName');
@@ -1149,6 +1203,10 @@ class App {
     if (modalTitle) modalTitle.innerHTML = title;
     if (modalBody) modalBody.innerHTML = htmlBody;
     if (modalContainer) modalContainer.classList.add('active');
+
+    if (window.i18n && window.i18n.currentLang !== 'fr') {
+      window.i18n.translateDOM();
+    }
   }
 
   closeModal() {
