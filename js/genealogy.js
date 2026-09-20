@@ -36,24 +36,85 @@ class GenealogyController {
     this.render();
   }
 
+  measureTreeDimensions() {
+    const canvas = document.getElementById('treeCanvas');
+    if (!canvas) return { width: 1200, height: 600 };
+
+    const rootNode = canvas.querySelector('.tree-node-wrapper') || canvas;
+
+    const prevPos = canvas.style.position;
+    const prevTrans = canvas.style.transform;
+    const prevW = canvas.style.width;
+
+    canvas.style.position = 'relative';
+    canvas.style.transform = 'none';
+    canvas.style.width = 'max-content';
+
+    const width = Math.max(canvas.scrollWidth, canvas.offsetWidth, rootNode.scrollWidth, rootNode.offsetWidth, 800);
+    const height = Math.max(canvas.scrollHeight, canvas.offsetHeight, rootNode.scrollHeight, rootNode.offsetHeight, 450);
+
+    canvas.style.position = prevPos;
+    canvas.style.transform = prevTrans;
+    canvas.style.width = prevW;
+
+    return { width, height };
+  }
+
   setZoom(scale) {
-    this.zoomLevel = Math.max(0.15, Math.min(2.0, scale));
+    this.zoomLevel = Math.max(0.10, Math.min(1.8, Number(scale)));
     const wrapper = document.getElementById('treeCanvasWrapper');
+    const viewport = document.getElementById('treeViewport');
+    const canvas = document.getElementById('treeCanvas');
     const label = document.getElementById('genealogyZoomLabel');
-    if (wrapper) {
-      wrapper.style.transform = `scale(${this.zoomLevel})`;
+    const slider = document.getElementById('genealogyZoomSlider');
+
+    if (wrapper && canvas) {
+      if (!canvas.dataset.natW || canvas.dataset.natW === '0') {
+        const dims = this.measureTreeDimensions();
+        canvas.dataset.natW = dims.width;
+        canvas.dataset.natH = dims.height;
+      }
+
+      const natW = parseFloat(canvas.dataset.natW) || 1200;
+      const natH = parseFloat(canvas.dataset.natH) || 600;
+      const scaledW = Math.round(natW * this.zoomLevel);
+      const scaledH = Math.round(natH * this.zoomLevel);
+
+      wrapper.style.width = `${scaledW}px`;
+      wrapper.style.height = `${scaledH}px`;
+      wrapper.style.margin = '0 auto';
+      wrapper.style.position = 'relative';
+
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.width = `${natW}px`;
+      canvas.style.transformOrigin = '0 0';
+      canvas.style.transform = `scale(${this.zoomLevel})`;
+
+      if (viewport) {
+        if (scaledW > viewport.clientWidth) {
+          viewport.scrollLeft = Math.max(0, (scaledW - viewport.clientWidth) / 2);
+        } else {
+          viewport.scrollLeft = 0;
+        }
+      }
     }
+
     if (label) {
       label.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+    }
+    if (slider) {
+      slider.value = Math.round(this.zoomLevel * 100);
     }
   }
 
   zoomIn() {
-    this.setZoom(this.zoomLevel + 0.15);
+    this.setZoom(this.zoomLevel + 0.10);
   }
 
   zoomOut() {
-    this.setZoom(this.zoomLevel - 0.15);
+    this.setZoom(this.zoomLevel - 0.10);
   }
 
   resetZoom() {
@@ -63,35 +124,53 @@ class GenealogyController {
   fitToScreen() {
     const viewport = document.getElementById('treeViewport');
     const canvas = document.getElementById('treeCanvas');
-    if (!viewport || !canvas) return;
-
     const wrapper = document.getElementById('treeCanvasWrapper');
-    if (wrapper) wrapper.style.transform = 'scale(1)';
+    if (!viewport || !canvas || !wrapper) return;
 
-    setTimeout(() => {
-      const vWidth = viewport.clientWidth - 40;
-      const vHeight = viewport.clientHeight - 40;
-      const cWidth = canvas.scrollWidth || canvas.offsetWidth;
-      const cHeight = canvas.scrollHeight || canvas.offsetHeight;
+    delete canvas.dataset.natW;
+    delete canvas.dataset.natH;
+
+    requestAnimationFrame(() => {
+      const dims = this.measureTreeDimensions();
+      const natW = dims.width;
+      const natH = dims.height;
+
+      canvas.dataset.natW = natW;
+      canvas.dataset.natH = natH;
+
+      const vWidth = Math.max(300, viewport.clientWidth - 60);
+      const vHeight = Math.max(300, viewport.clientHeight - 60);
 
       let scale = 1.0;
-      if (cWidth > 0 && vWidth > 0) {
-        scale = Math.min(vWidth / cWidth, (vHeight > 100 ? vHeight / cHeight : 1.0));
-        scale = Math.max(scale, 0.15);
-        scale = Math.min(scale, 1.0);
+      if (natW > 0 && vWidth > 0) {
+        const scaleX = vWidth / natW;
+        const scaleY = (natH > 0 && vHeight > 0) ? (vHeight / natH) : 1.0;
+        scale = Math.min(scaleX, scaleY) * 0.94;
+        scale = Math.max(0.10, Math.min(scale, 1.0));
       }
+
       this.setZoom(Number(scale.toFixed(2)));
+
+      if (viewport) {
+        const scaledW = Math.round(natW * this.zoomLevel);
+        if (scaledW > viewport.clientWidth) {
+          viewport.scrollLeft = Math.max(0, (scaledW - viewport.clientWidth) / 2);
+        } else {
+          viewport.scrollLeft = 0;
+        }
+        viewport.scrollTop = 0;
+      }
+
       if (window.app && window.app.showToast) {
         window.app.showToast(`Arbre ajusté à l'écran : ${Math.round(this.zoomLevel * 100)}%`, 'info');
       }
-    }, 30);
+    });
   }
 
   expandAll() {
     const members = window.stateManager.members;
     members.forEach(m => this.expandedNodes.add(m.code));
     this.render();
-    setTimeout(() => this.fitToScreen(), 60);
   }
 
   collapseAll() {
@@ -99,6 +178,52 @@ class GenealogyController {
     const currentUser = window.stateManager.currentUser;
     if (currentUser) this.expandedNodes.add(currentUser.code);
     this.render();
+  }
+
+  bindTreeEvents() {
+    const viewport = document.getElementById('treeViewport');
+    if (!viewport || viewport._panZoomBound) return;
+    viewport._panZoomBound = true;
+
+    // Zoom à la molette (Ctrl + Molette ou trackpad pinch)
+    viewport.addEventListener('wheel', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.08 : -0.08;
+        this.setZoom(this.zoomLevel + delta);
+      }
+    }, { passive: false });
+
+    // Glisser-déposer pour se déplacer (Pan)
+    let isDown = false;
+    let startX = 0, startY = 0;
+    let scrollLeft = 0, scrollTop = 0;
+
+    viewport.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.tree-card') || e.target.closest('button')) return;
+      isDown = true;
+      viewport.style.cursor = 'grabbing';
+      startX = e.pageX - viewport.offsetLeft;
+      startY = e.pageY - viewport.offsetTop;
+      scrollLeft = viewport.scrollLeft;
+      scrollTop = viewport.scrollTop;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - viewport.offsetLeft;
+      const y = e.pageY - viewport.offsetTop;
+      viewport.scrollLeft = scrollLeft - (x - startX);
+      viewport.scrollTop = scrollTop - (y - startY);
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDown) {
+        isDown = false;
+        viewport.style.cursor = 'grab';
+      }
+    });
   }
 
   render() {
@@ -119,7 +244,7 @@ class GenealogyController {
         container.innerHTML = `
           <div style="text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; max-width: 600px; margin: 40px auto;">
             <div style="font-size: 2.5rem; color: var(--rtn-rose); margin-bottom: 12px;"><i class="fas fa-sitemap"></i></div>
-            <h4 style="font-weight: 800; color: var(--rtn-navy); margin-bottom: 6px;">Votre réseau commence ici</h4>
+            <h4 style="font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">Votre réseau commence ici</h4>
             <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 16px;">Vous n'avez pas encore parrainé de filleuls directs. Invitez de nouveaux distributeurs pour développer vos 3 niveaux de commissions.</p>
             <button class="btn-primary-auth" style="width: auto; margin: 0 auto; padding: 10px 20px;" onclick="window.app.switchView('sponsor')">
               <i class="fas fa-user-plus"></i> Parrainer un Nouveau Partenaire (0 DH)
@@ -128,44 +253,57 @@ class GenealogyController {
         `;
       } else {
         container.innerHTML = `
-          <!-- Barre d'outils Zoom & Ajustement Plein Écran -->
-          <div class="tree-zoom-toolbar" style="display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 14px; background: #fff; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0; flex-wrap: wrap;">
-            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-              <button class="btn-switch-account" style="background: var(--rtn-navy); color: #fff; font-weight: 700; border-color: var(--rtn-navy);" onclick="window.genealogyController.fitToScreen()" title="Réduire l'arbre pour tout afficher dans un seul écran">
-                <i class="fas fa-compress-arrows-alt" style="color: var(--rtn-gold);"></i> <span>Ajuster à l'écran (Vue Globale)</span>
+          <!-- Barre d'outils Zoom Évoluée & Plein Écran -->
+          <div class="tree-zoom-toolbar">
+            <div class="tree-zoom-left">
+              <button class="btn-tree-fit" onclick="window.genealogyController.fitToScreen()" title="Réduire automatiquement l'arbre pour tout afficher sur l'écran">
+                <i class="fas fa-compress-arrows-alt"></i> <span>Vue Globale (Tout voir)</span>
               </button>
-              <button class="btn-switch-account" style="color: #0f172a; border-color: #cbd5e1;" onclick="window.genealogyController.zoomOut()" title="Zoom - (Jusqu'à 0.15x)">
-                <i class="fas fa-search-minus"></i>
-              </button>
-              <span id="genealogyZoomLabel" style="font-weight: 800; font-size: 0.8rem; padding: 4px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; min-width: 55px; text-align: center;">
-                ${Math.round(this.zoomLevel * 100)}%
-              </span>
-              <button class="btn-switch-account" style="color: #0f172a; border-color: #cbd5e1;" onclick="window.genealogyController.zoomIn()" title="Zoom +">
-                <i class="fas fa-search-plus"></i>
-              </button>
-              <button class="btn-switch-account" style="color: #0f172a; border-color: #cbd5e1;" onclick="window.genealogyController.resetZoom()" title="Taille réelle 100%">
-                <i class="fas fa-undo"></i> 100%
-              </button>
+              <div class="tree-zoom-stepper">
+                <button type="button" class="btn-zoom-step" onclick="window.genealogyController.zoomOut()" title="Réduire (Jusqu'à 10%)">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input type="range" id="genealogyZoomSlider" class="tree-zoom-slider" min="10" max="180" value="${Math.round(this.zoomLevel * 100)}" oninput="window.genealogyController.setZoom(this.value / 100)" title="Curseur de zoom">
+                <button type="button" class="btn-zoom-step" onclick="window.genealogyController.zoomIn()" title="Agrandir (+)">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <span id="genealogyZoomLabel" class="tree-zoom-percent">${Math.round(this.zoomLevel * 100)}%</span>
+              </div>
+              <div class="tree-zoom-presets">
+                <button type="button" class="btn-zoom-preset" onclick="window.genealogyController.setZoom(0.25)">25%</button>
+                <button type="button" class="btn-zoom-preset" onclick="window.genealogyController.setZoom(0.50)">50%</button>
+                <button type="button" class="btn-zoom-preset" onclick="window.genealogyController.setZoom(0.75)">75%</button>
+                <button type="button" class="btn-zoom-preset" onclick="window.genealogyController.resetZoom()">100%</button>
+              </div>
             </div>
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <button class="btn-switch-account" style="color: #0f172a; border-color: #cbd5e1;" onclick="window.genealogyController.expandAll()">
-                <i class="fas fa-expand-alt"></i> Tout Déplier
+            <div class="tree-zoom-right">
+              <button class="btn-tree-action" onclick="window.genealogyController.expandAll()" title="Déplier toutes les branches et ajuster">
+                <i class="fas fa-expand-alt"></i> <span>Tout Déplier</span>
               </button>
-              <button class="btn-switch-account" style="color: #0f172a; border-color: #cbd5e1;" onclick="window.genealogyController.collapseAll()">
-                <i class="fas fa-compress-alt"></i> Tout Réduire
+              <button class="btn-tree-action" onclick="window.genealogyController.collapseAll()" title="Réduire toutes les branches">
+                <i class="fas fa-compress-alt"></i> <span>Tout Réduire</span>
               </button>
             </div>
           </div>
 
-          <!-- Fenêtre de visualisation avec support Zoom étendu -->
-          <div class="tree-viewport" id="treeViewport" style="overflow: auto; max-height: 720px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px; position: relative;">
-            <div id="treeCanvasWrapper" style="transform-origin: top center; transform: scale(${this.zoomLevel}); transition: transform 0.2s ease;">
+          <!-- Indication interactive -->
+          <div class="tree-drag-hint">
+            <i class="fas fa-info-circle"></i> <span>Glissez avec la souris pour vous déplacer • Utilisez <strong>Vue Globale</strong> ou le curseur pour afficher tout le réseau</span>
+          </div>
+
+          <!-- Fenêtre de visualisation avec support Zoom & Pan étendu -->
+          <div class="tree-viewport" id="treeViewport">
+            <div id="treeCanvasWrapper" style="position: relative; margin: 0 auto;">
               <div class="tree-canvas" id="treeCanvas">
                 ${this.renderTreeNode(treeData)}
               </div>
             </div>
           </div>
         `;
+        setTimeout(() => {
+          this.bindTreeEvents();
+          this.fitToScreen();
+        }, 40);
       }
     } else {
       const downlines = window.stateManager.getAllDownlines(rootCode);

@@ -509,7 +509,7 @@ class App {
 
     // Synchronisation dynamique de la hauteur pour garantir que le logo et l'en-tête ne soient JAMAIS tronqués ni cachés
     const syncHeight = () => {
-      const h = quickBar.offsetHeight || 52;
+      const h = quickBar.offsetHeight || 48;
       document.documentElement.style.setProperty('--quick-bar-height', `${h}px`);
       document.body.classList.add('has-quick-bar');
     };
@@ -531,13 +531,13 @@ class App {
       currentNameEl.textContent = `${currentUser.name} (${currentUser.code})`;
       if (currentUser.role === 'owner') {
         currentRoleTag.textContent = 'DIRECTION FONDATRICE';
-        currentRoleTag.style.background = 'var(--rtn-navy)';
+        currentRoleTag.style.background = 'var(--rtn-gold-gradient)';
         if (selectedMemberLabel) {
           selectedMemberLabel.textContent = 'Changer de profil (51 membres)';
         }
       } else if (currentUser.role === 'client') {
         currentRoleTag.textContent = 'CLIENT PRIVILÈGE (SANS ARBRE)';
-        currentRoleTag.style.background = 'var(--rtn-rose)';
+        currentRoleTag.style.background = 'var(--rtn-rose-gradient)';
         if (selectedMemberLabel) {
           selectedMemberLabel.textContent = `${currentUser.name} (Client Direct)`;
         }
@@ -548,7 +548,7 @@ class App {
                      currentUser.rankCode === 'LEADER' ? '2%' :
                      currentUser.rankCode === 'BUILDER' ? '1%' : 'N1 (10% CV)';
         currentRoleTag.textContent = `${currentUser.rankCode} (${rate}) — V4`;
-        currentRoleTag.style.background = 'var(--rtn-rose-dark)';
+        currentRoleTag.style.background = 'var(--rtn-rose-gradient)';
         if (selectedMemberLabel) {
           selectedMemberLabel.textContent = `${currentUser.name} (${currentUser.rankCode})`;
         }

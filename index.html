@@ -16,49 +16,78 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Feuille de style principale -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=9.4">
 </head>
 <body>
 
   <!-- ========================================================================
-       Barre Rapide de Démonstration & Changement de Profil (En-tête supérieur V4)
+       Définitions des Drapeaux Vectoriels SVG (100% compatibles tous OS & Navigateurs)
+       ======================================================================== -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <defs>
+      <!-- Drapeau Maroc 🇲🇦 -->
+      <g id="flag-ma">
+        <circle cx="16" cy="16" r="15" fill="#c1272d"/>
+        <polygon points="16,6 18.9,15 28,15 20.6,20.4 23.4,29.4 16,23.8 8.6,29.4 11.4,20.4 4,15 13.1,15" fill="none" stroke="#006233" stroke-width="2.2" stroke-linejoin="round"/>
+      </g>
+      <!-- Drapeau Royaume-Uni 🇬🇧 -->
+      <g id="flag-en">
+        <clipPath id="uk-circle"><circle cx="16" cy="16" r="15"/></clipPath>
+        <g clip-path="url(#uk-circle)">
+          <rect width="32" height="32" fill="#012169"/>
+          <path d="M0,0 L32,32 M32,0 L0,32" stroke="#ffffff" stroke-width="5"/>
+          <path d="M0,0 L32,32 M32,0 L0,32" stroke="#c8102e" stroke-width="2.8"/>
+          <path d="M16,0 V32 M0,16 H32" stroke="#ffffff" stroke-width="8"/>
+          <path d="M16,0 V32 M0,16 H32" stroke="#c8102e" stroke-width="4.8"/>
+        </g>
+      </g>
+      <!-- Drapeau Arabie Saoudite 🇸🇦 -->
+      <g id="flag-ar">
+        <clipPath id="sa-circle"><circle cx="16" cy="16" r="15"/></clipPath>
+        <g clip-path="url(#sa-circle)">
+          <circle cx="16" cy="16" r="15" fill="#006c35"/>
+          <path d="M8,12 C10,11 13,13 16,11.5 C19,13 22,11 24,12" stroke="#ffffff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M9,15 C12,14 20,14 23,15" stroke="#ffffff" stroke-width="1.4" fill="none"/>
+          <path d="M8,19 H24 M21,17.5 L24,19 L21,20.5 M10,17.5 V21" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+        </g>
+      </g>
+      <!-- Drapeau Espagne 🇪🇸 -->
+      <g id="flag-es">
+        <clipPath id="es-circle"><circle cx="16" cy="16" r="15"/></clipPath>
+        <g clip-path="url(#es-circle)">
+          <rect width="32" height="8" fill="#aa151b"/>
+          <rect y="8" width="32" height="16" fill="#f1bf00"/>
+          <rect y="24" width="32" height="8" fill="#aa151b"/>
+          <circle cx="10" cy="16" r="3" fill="#aa151b"/>
+          <path d="M9,13.5 L11,13.5 L10,11 Z" fill="#800c11"/>
+        </g>
+      </g>
+    </defs>
+  </svg>
+
+  <!-- ========================================================================
+       Barre Rapide Démo & Statut (En-tête supérieur V4 - Compact & Ligne Unique)
        ======================================================================== -->
   <div class="quick-role-bar" id="quickRoleBar" style="display: none;">
     <div class="role-info">
       <div class="quick-brand-tag" title="Routini Cosmetics - By Lys Horizon">
-        <img src="assets/images/routini-icon.png" alt="Routini" class="quick-logo-badge">
+        <img src="assets/images/routini-icon-transparent.png" alt="Routini" class="quick-logo-badge">
         <span class="quick-brand-title">Routini</span>
       </div>
       <span class="role-badge-tag" id="quickCurrentRoleTag">PROPRIÉTAIRE</span>
-      <span>Session : <strong id="quickCurrentUserName">Direction Générale Routini (ADMIN001)</strong></span>
+      <span class="quick-session-label">Session : <strong id="quickCurrentUserName">Direction Générale Routini (ADMIN001)</strong></span>
     </div>
     <div class="role-actions">
-      <!-- Sélecteur 4 Langues Rapide (Accessible partout directement sur la barre supérieure) -->
-      <div class="quick-lang-selector" style="display: flex; gap: 4px; align-items: center; background: rgba(255, 255, 255, 0.12); padding: 2px 6px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.25);">
-        <button type="button" class="btn-lang-flag active" data-lang="fr" onclick="window.i18n.setLanguage('fr')" title="Français (Maroc)">
-          <span>🇲🇦</span> <small>FR</small>
-        </button>
-        <button type="button" class="btn-lang-flag" data-lang="en" onclick="window.i18n.setLanguage('en')" title="English">
-          <span>🇬🇧</span> <small>EN</small>
-        </button>
-        <button type="button" class="btn-lang-flag" data-lang="ar" onclick="window.i18n.setLanguage('ar')" title="العربية (RTL)">
-          <span>🇸🇦</span> <small>AR</small>
-        </button>
-        <button type="button" class="btn-lang-flag" data-lang="es" onclick="window.i18n.setLanguage('es')" title="Español">
-          <span>🇪🇸</span> <small>ES</small>
-        </button>
-      </div>
-
-      <!-- Bouton Direction (ADMIN) conservé distinctement -->
+      <!-- Bouton Direction (ADMIN) -->
       <button class="btn-switch-account owner-btn" id="quickBtnAdmin" data-target-code="ADMIN001" onclick="window.app.switchAccount('ADMIN001')">
         <i class="fas fa-crown"></i> Direction (ADMIN)
       </button>
 
-      <!-- Flèche descendante avec tous les autres membres (Distributeurs, Rangs MLM & Clients Directs) -->
+      <!-- Menu déroulant avec flèche descendante pour TOUS les autres membres -->
       <div class="quick-members-dropdown-wrapper" id="quickMembersDropdownWrapper">
         <button type="button" class="btn-switch-account btn-dropdown-toggle" id="btnToggleMembersDropdown" onclick="window.app.toggleMembersDropdown(event)">
           <i class="fas fa-users" style="color: var(--rtn-rose);"></i>
-          <span id="quickSelectedMemberLabel">Changer de profil (Tous les membres)</span>
+          <span id="quickSelectedMemberLabel">Changer de profil (51 membres)</span>
           <i class="fas fa-chevron-down fleche-desc" id="dropdownChevronIcon"></i>
         </button>
         <div class="quick-members-dropdown-panel" id="quickMembersDropdownPanel" style="display: none;">
@@ -83,7 +112,7 @@
       </div>
 
       <!-- Menu d'Accueil / Déconnexion -->
-      <button class="btn-switch-account" style="background: rgba(255, 255, 255, 0.15); color: #fff; font-weight: 700;" onclick="window.authController.logout()" title="Revenir à l'écran de connexion / Menu principal">
+      <button class="btn-switch-account btn-quick-logout" onclick="window.authController.logout()" title="Revenir à l'écran de connexion / Menu principal">
         <i class="fas fa-door-open"></i> Menu d'Accueil
       </button>
     </div>
@@ -96,24 +125,28 @@
     <div class="auth-card" id="authCard">
       <div class="auth-header">
         <div class="brand-logo-img-box">
-          <img src="assets/images/routini-brand.jpg" alt="Routini COSMETICS By Lys Horizon" class="brand-logo-img">
+          <img src="assets/images/routini-brand-transparent.png" alt="Routini COSMETICS By Lys Horizon" class="brand-logo-img">
         </div>
         <div class="brand-official-tagline">Portail Officiel • eWorld MLM</div>
         <p>Espace Sécurisé des Partenaires & de la Direction Générale</p>
         
-        <!-- Sélecteur 4 Langues & Drapeaux Multi-pays (Marketing Good) -->
-        <div class="auth-lang-selector" style="display: flex; justify-content: center; gap: 8px; margin-top: 10px;">
+        <!-- Sélecteur 4 Langues avec Drapeaux SVG Circulaires Impeccables -->
+        <div class="auth-lang-selector">
           <button type="button" class="btn-lang-flag active" data-lang="fr" onclick="window.i18n.setLanguage('fr')" title="Français (Maroc)">
-            <span>🇲🇦</span> <small>FR</small>
+            <svg class="lang-flag-svg" viewBox="0 0 32 32" width="18" height="18"><use href="#flag-ma"></use></svg>
+            <small>FR</small>
           </button>
           <button type="button" class="btn-lang-flag" data-lang="en" onclick="window.i18n.setLanguage('en')" title="English">
-            <span>🇬🇧</span> <small>EN</small>
+            <svg class="lang-flag-svg" viewBox="0 0 32 32" width="18" height="18"><use href="#flag-en"></use></svg>
+            <small>EN</small>
           </button>
           <button type="button" class="btn-lang-flag" data-lang="ar" onclick="window.i18n.setLanguage('ar')" title="العربية (المغرب / الخليج)">
-            <span>🇸🇦</span> <small>AR</small>
+            <svg class="lang-flag-svg" viewBox="0 0 32 32" width="18" height="18"><use href="#flag-ar"></use></svg>
+            <small>AR</small>
           </button>
           <button type="button" class="btn-lang-flag" data-lang="es" onclick="window.i18n.setLanguage('es')" title="Español">
-            <span>🇪🇸</span> <small>ES</small>
+            <svg class="lang-flag-svg" viewBox="0 0 32 32" width="18" height="18"><use href="#flag-es"></use></svg>
+            <small>ES</small>
           </button>
         </div>
       </div>
@@ -133,43 +166,25 @@
 
       <div class="auth-body">
         <!-- Bannière incitative création de compte Client Direct sans arbre -->
-        <div id="clientRegisterPromo" style="display: none; background: #fdf2f8; border: 1.5px dashed #f472b6; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; text-align: center;">
-          <p style="font-size: 0.84rem; color: #9d174d; font-weight: 700; margin-bottom: 4px;">
+        <div id="clientRegisterPromo" style="display: none; background: #fff5f7; border: 1.5px dashed var(--rtn-rose); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; text-align: center;">
+          <p style="font-size: 0.86rem; color: var(--rtn-rose-dark); font-weight: 700; margin-bottom: 4px;">
             ✨ Nouveau Client Privilège Routini ?
           </p>
-          <p style="font-size: 0.74rem; color: #64748b; margin-bottom: 8px;">
+          <p style="font-size: 0.76rem; color: #64748b; margin-bottom: 10px;">
             Commandez directement sans parrainage ni réseau MLM.<br>
             <strong>+50 points fidélité offerts</strong> immédiatement à l'inscription !
           </p>
-          <button type="button" id="btnOpenClientRegister" class="btn-client-action" onclick="window.authController.openClientRegisterModal()" style="padding: 7px 16px; font-size: 0.8rem; margin: 0 auto; width: auto; cursor: pointer;">
+          <button type="button" id="btnOpenClientRegister" class="btn-client-action" onclick="window.authController.openClientRegisterModal()" style="padding: 8px 18px; font-size: 0.8rem; margin: 0 auto; width: auto; cursor: pointer;">
             <i class="fas fa-user-plus"></i> Créer mon Compte Client (Gratuit)
           </button>
         </div>
 
         <form id="loginForm">
-          <!-- Sélecteur Rapide Démo pour Présentation Client -->
-          <div class="form-group" id="demoClientSelectWrapper" style="display: none; background: #fdf2f8; padding: 12px; border-radius: 8px; border: 1.5px solid var(--rtn-rose-light); margin-bottom: 16px;">
-            <label style="color: var(--rtn-rose-dark); font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
-              <i class="fas fa-magic"></i> Choisir un profil client pour tester :
-            </label>
-            <select id="demoClientSelect" class="form-control" style="font-size: 0.82rem; margin-top: 4px; padding: 8px 10px; border: 1px solid var(--rtn-rose);">
-              <option value="818204921" selected>💎 Karim Benali (Ambassador 7% • Casablanca)</option>
-              <option value="818205114">🌸 Fatima-Zahra El Amrani (Ambassador 7% • Rabat)</option>
-              <option value="818206330">💎 Mehdi Alami (Diamond 5% • Marrakech)</option>
-              <option value="818210552">⭐ Nadia Mansouri (Manager 3% • Fès)</option>
-              <option value="818217123">🌿 Siham Tazi (Leader 2% • Tanger)</option>
-              <option value="818229345">📦 Ibtissam Fassi (Builder 1% • Agadir)</option>
-              <option value="818243789">✅ Najat Bennani (Partner Actif 50 PV • Meknès)</option>
-              <option value="818252678">⏳ Driss Chraibi (Partner Inactif &lt; 50 PV • Oujda)</option>
-            </select>
-            <small style="color: #64748b; font-size: 0.72rem; display: block; margin-top: 4px;">Pré-remplit automatiquement le code et le mot de passe du partenaire.</small>
-          </div>
-
           <div class="form-group">
             <label id="authRoleLabel">Identifiant Administrateur ou Distributeur :</label>
             <div class="input-with-icon">
               <i class="fas fa-id-badge input-icon"></i>
-              <input type="text" id="authUsername" value="admin" placeholder="Ex: admin ou ADMIN001" required>
+              <input type="text" id="authUsername" value="admin" placeholder="Ex: admin ou ADMIN001" required autocomplete="username">
             </div>
           </div>
 
@@ -177,48 +192,20 @@
             <label>Mot de passe :</label>
             <div class="input-with-icon">
               <i class="fas fa-lock input-icon"></i>
-              <input type="password" id="authPassword" value="admin123" placeholder="••••••••" required>
+              <input type="password" id="authPassword" value="admin123" placeholder="••••••••" required autocomplete="current-password">
             </div>
           </div>
 
           <div class="form-meta">
-            <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer;">
+            <label style="display: flex; align-items: center; gap: 6px; font-weight: 500; cursor: pointer; color: var(--text-secondary);">
               <input type="checkbox" checked> Mémoriser mes identifiants
             </label>
-            <span style="font-size: 0.78rem; color: #64748b;">Réseau actif : 50 membres • 6 mois</span>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Portail Sécurisé Routini</span>
           </div>
 
           <button type="submit" class="btn-primary-auth btn-owner-auth" id="btnSubmitAuth">
             <i class="fas fa-crown"></i> Connexion Direction Générale (Admin)
           </button>
-
-          <!-- Boîte de Connexion Rapide Démo -->
-          <div class="quick-connect-box">
-            <p><i class="fas fa-bolt" style="color: #f59e0b;"></i> Connexion Rapide en 1-Clic :</p>
-            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-              <button type="button" style="background: #fdf2f8; color: #9d174d; border: 1.5px solid #f472b6; font-weight: 700;" onclick="window.authController.quickLogin('CLT-818101')">
-                🛍️ Salma (Client Direct)
-              </button>
-              <button type="button" style="background: #0f172a; color: #fff; font-weight: 700;" onclick="window.authController.quickLogin('admin')">
-                👑 Admin (Direction)
-              </button>
-              <button type="button" onclick="window.authController.quickLogin('818204921')">
-                💎 Karim (Ambassador)
-              </button>
-              <button type="button" onclick="window.authController.quickLogin('818206330')">
-                💎 Mehdi (Diamond)
-              </button>
-              <button type="button" onclick="window.authController.quickLogin('818210552')">
-                ⭐ Nadia (Manager)
-              </button>
-              <button type="button" onclick="window.authController.quickLogin('818229345')">
-                📦 Ibtissam (Builder)
-              </button>
-              <button type="button" onclick="window.authController.quickLogin('818243789')">
-                ✅ Najat (Partner)
-              </button>
-            </div>
-          </div>
         </form>
       </div>
     </div>
@@ -233,23 +220,25 @@
     <aside class="sidebar" id="appSidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-box">
-          <img src="assets/images/routini-brand.jpg" alt="Routini Cosmetics By Lys Horizon" class="sidebar-brand-full-img">
+          <img src="assets/images/routini-brand-transparent.png" alt="Routini Cosmetics By Lys Horizon" class="sidebar-brand-full-img">
         </div>
         <button type="button" class="btn-close-sidebar-mobile" id="btnCloseSidebarMobile" onclick="window.app.closeMobileSidebar()" aria-label="Fermer le menu mobile">
           <i class="fas fa-times"></i>
         </button>
       </div>
 
-      <!-- Fiche Profil Utilisateur Connecté -->
+      <!-- Fiche Profil Utilisateur Connecté - Structure Verticale Aérée -->
       <div class="sidebar-user-card">
-        <div class="user-avatar-circle" id="sidebarUserAvatar">K</div>
-        <div class="user-info-text">
-          <div class="name" id="sidebarUserName">Karim Benali</div>
-          <span class="code" id="sidebarUserCode">ID: 818204921</span>
-          <span class="rank-pill" id="sidebarUserRank">Star Diamond</span>
+        <div class="sidebar-user-top">
+          <div class="user-avatar-circle" id="sidebarUserAvatar">K</div>
+          <div class="user-info-text">
+            <div class="name" id="sidebarUserName">Karim Benali</div>
+            <span class="code" id="sidebarUserCode">ID: 818204921</span>
+            <span class="rank-pill" id="sidebarUserRank">Star Diamond</span>
+          </div>
         </div>
-        <button type="button" class="btn-sidebar-change-profile" onclick="window.authController.logout()" title="Revenir au menu de sélection de compte / Déconnexion" style="margin-top: 10px; width: 100%; background: rgba(255,255,255,0.08); border: 1px dashed rgba(255,255,255,0.3); color: #e2e8f0; font-size: 0.72rem; padding: 5px 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
-          <i class="fas fa-exchange-alt" style="color: var(--rtn-gold);"></i> <span>Changer de Profil (Menu)</span>
+        <button type="button" class="btn-sidebar-change-profile" onclick="window.authController.logout()" title="Changer de profil ou revenir au menu">
+          <i class="fas fa-exchange-alt"></i> <span>Changer de Profil (Menu)</span>
         </button>
       </div>
 
@@ -322,7 +311,7 @@
             <i class="fas fa-bars"></i>
           </button>
           <a href="#" class="header-brand-logo-link" onclick="window.app.switchView('dashboard'); return false;" title="Routini Cosmetics - Accueil">
-            <img src="assets/images/routini-brand.jpg" alt="Routini Cosmetics By Lys Horizon" class="header-brand-logo-img">
+            <img src="assets/images/routini-brand-transparent.png" alt="Routini Cosmetics By Lys Horizon" class="header-brand-logo-img">
           </a>
           <div class="header-page-title">
             <h2 id="headerTitleText">Tableau de Bord eWorld</h2>
@@ -347,24 +336,28 @@
           </div>
 
           <!-- Solde Points Fidélité (Client Direct Privilège) -->
-          <div class="header-quick-wallet" id="headerClientLoyaltyBadge" title="Vos Points Fidélité (20 pts = 10 DH de réduction)" onclick="window.app.showLoyaltyDetails()" style="display: none; background: #fdf2f8; border: 1.5px solid #f472b6; color: #9d174d; cursor: pointer;">
-            <i class="fas fa-gift" style="color: #be185d;"></i>
+          <div class="header-quick-wallet" id="headerClientLoyaltyBadge" title="Vos Points Fidélité (20 pts = 10 DH de réduction)" onclick="window.app.showLoyaltyDetails()" style="display: none; background: #fff5f7; border: 1.5px solid var(--rtn-rose); color: var(--rtn-rose-dark); cursor: pointer;">
+            <i class="fas fa-gift" style="color: var(--rtn-rose);"></i>
             <span id="headerClientLoyaltyText">340 Pts Fidélité</span>
           </div>
 
-          <!-- Sélecteur 4 Langues Multi-Drapeaux (FR, EN, AR, ES) -->
-          <div class="header-lang-selector" style="display: flex; gap: 4px; align-items: center; background: #f8fafc; padding: 3px 6px; border-radius: 20px; border: 1px solid #e2e8f0;">
+          <!-- Sélecteur 4 Langues Multi-Drapeaux Vectoriels SVG -->
+          <div class="header-lang-selector">
             <button type="button" class="btn-lang-flag active" data-lang="fr" onclick="window.i18n.setLanguage('fr')" title="Français (Maroc)">
-              <span>🇲🇦</span> <small>FR</small>
+              <svg class="lang-flag-svg" viewBox="0 0 32 32" width="18" height="18"><use href="#flag-ma"></use></svg>
+              <small>FR</small>
             </button>
             <button type="button" class="btn-lang-flag" data-lang="en" onclick="window.i18n.setLanguage('en')" title="English">
-              <span>🇬🇧</span> <small>EN</small>
+              <svg class="lang-flag-svg" viewBox="0 0 32 32" width="18" height="18"><use href="#flag-en"></use></svg>
+              <small>EN</small>
             </button>
             <button type="button" class="btn-lang-flag" data-lang="ar" onclick="window.i18n.setLanguage('ar')" title="العربية (RTL)">
-              <span>🇸🇦</span> <small>AR</small>
+              <svg class="lang-flag-svg" viewBox="0 0 32 32" width="18" height="18"><use href="#flag-ar"></use></svg>
+              <small>AR</small>
             </button>
             <button type="button" class="btn-lang-flag" data-lang="es" onclick="window.i18n.setLanguage('es')" title="Español">
-              <span>🇪🇸</span> <small>ES</small>
+              <svg class="lang-flag-svg" viewBox="0 0 32 32" width="18" height="18"><use href="#flag-es"></use></svg>
+              <small>ES</small>
             </button>
           </div>
 
@@ -993,15 +986,15 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- Scripts JS Applicatifs (Modulaires V4 & i18n) -->
-  <script src="js/i18n.js?v=9.0"></script>
-  <script src="js/mock_data.js?v=9.0"></script>
-  <script src="js/state.js?v=9.0"></script>
-  <script src="js/db_sync.js?v=9.0"></script>
-  <script src="js/auth.js?v=9.0"></script>
-  <script src="js/genealogy.js?v=9.0"></script>
-  <script src="js/shop.js?v=9.0"></script>
-  <script src="js/bonus.js?v=9.0"></script>
-  <script src="js/admin.js?v=9.0"></script>
-  <script src="js/app.js?v=9.0"></script>
+  <script src="js/i18n.js?v=9.2"></script>
+  <script src="js/mock_data.js?v=9.2"></script>
+  <script src="js/state.js?v=9.2"></script>
+  <script src="js/db_sync.js?v=9.2"></script>
+  <script src="js/auth.js?v=9.2"></script>
+  <script src="js/genealogy.js?v=9.5"></script>
+  <script src="js/shop.js?v=9.2"></script>
+  <script src="js/bonus.js?v=9.2"></script>
+  <script src="js/admin.js?v=9.2"></script>
+  <script src="js/app.js?v=9.2"></script>
 </body>
 </html>
