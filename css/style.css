@@ -102,8 +102,7 @@ html, body {
   justify-content: space-between;
   flex-wrap: nowrap;
   white-space: nowrap;
-  overflow-x: auto;
-  scrollbar-width: none;
+  overflow: visible !important;
   gap: 12px;
   border-bottom: 1px solid rgba(243, 212, 220, 0.2);
   z-index: 1000;
@@ -219,22 +218,6 @@ html, body {
   object-fit: contain;
   background: transparent;
 }
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  border: 1px solid rgba(232, 200, 203, 0.3);
-  margin-right: 4px;
-}
-
-.quick-logo-badge {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #fff;
-}
 
 .quick-brand-title {
   font-family: 'Playfair Display', serif;
@@ -259,6 +242,9 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .btn-dropdown-toggle:hover,
@@ -282,18 +268,18 @@ html, body {
 .quick-members-dropdown-panel {
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
-  width: 380px;
-  max-width: calc(100vw - 24px);
-  background: #241a1c;
-  border: 1px solid rgba(232, 200, 203, 0.25);
-  border-radius: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.05);
-  z-index: 9999;
+  right: 0;
+  left: auto;
+  width: 440px;
+  max-width: min(460px, calc(100vw - 20px));
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25), 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  backdrop-filter: blur(16px);
   animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -303,17 +289,17 @@ html, body {
 }
 
 .dropdown-search-box {
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(0, 0, 0, 0.25);
+  background: #f8fafc;
 }
 
 .dropdown-search-box i {
   color: var(--rtn-rose);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
 
 .dropdown-search-box input {
@@ -321,34 +307,36 @@ html, body {
   background: transparent;
   border: none;
   outline: none;
-  color: #fff;
-  font-size: 0.82rem;
+  color: #0f172a;
+  font-size: 0.88rem;
+  font-weight: 600;
   font-family: inherit;
 }
 
 .dropdown-search-box input::placeholder {
-  color: rgba(255, 255, 255, 0.45);
+  color: #94a3b8;
+  font-weight: 400;
 }
 
 .dropdown-category-pills {
   display: flex;
-  gap: 5px;
-  padding: 8px 10px;
+  gap: 6px;
+  padding: 8px 12px;
   overflow-x: auto;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
   scrollbar-width: thin;
 }
 
 .cat-pill {
   white-space: nowrap;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #e2e8f0;
-  font-size: 0.68rem;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -356,92 +344,99 @@ html, body {
 .cat-pill:hover, .cat-pill.active {
   background: var(--rtn-rose);
   border-color: var(--rtn-rose);
-  color: #fff;
+  color: #ffffff;
 }
 
 .dropdown-members-list {
-  max-height: 330px;
+  max-height: 380px;
   overflow-y: auto;
-  padding: 6px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  background: #ffffff;
 }
 
 .dropdown-member-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 10px;
-  border-radius: 8px;
-  color: #f1f5f9;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #0f172a;
   cursor: pointer;
   transition: all 0.15s ease;
   text-decoration: none;
-  border: 1px solid transparent;
+  border: 1px solid #f1f5f9;
+  background: #ffffff;
 }
 
 .dropdown-member-item:hover {
-  background: rgba(178, 93, 84, 0.25);
-  border-color: rgba(232, 200, 203, 0.2);
-  color: #fff;
+  background: #fff5f7;
+  border-color: #fbcfe8;
   transform: translateX(2px);
 }
 
 .dropdown-member-item.active {
-  background: linear-gradient(90deg, var(--rtn-rose) 0%, #b25d54 100%);
-  color: #fff;
-  font-weight: 600;
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+  border-color: var(--rtn-rose);
 }
 
 .dropdown-member-item .m-info-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   overflow: hidden;
 }
 
 .dropdown-member-item .m-avatar {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, #c9536e 0%, #a23850 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #fff;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(201, 83, 110, 0.3);
 }
 
 .dropdown-member-item .m-text {
   overflow: hidden;
   text-align: left;
+  display: flex;
+  flex-direction: column;
 }
 
 .dropdown-member-item .m-name {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .dropdown-member-item .m-meta {
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.74rem;
+  color: #64748b;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dropdown-member-item .m-rank-tag {
-  font-size: 0.66rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fcd34d;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
   flex-shrink: 0;
-  margin-left: 6px;
+  margin-left: 8px;
 }
 
 /* Authentification - Ambiance Blush & Or Rose Doux */
@@ -754,6 +749,7 @@ html, body {
   border-radius: 0;
   box-shadow: none;
   border: none;
+  filter: contrast(1.1) saturate(1.15);
 }
 
 .btn-close-sidebar-mobile {
@@ -1083,11 +1079,10 @@ html, body {
   box-shadow: none;
   border: none;
   transition: transform 0.2s ease;
+  filter: contrast(1.1) saturate(1.15);
 }
 
 .header-brand-logo-link:hover .header-brand-logo-img {
-  transform: scale(1.03);
-}
   transform: scale(1.03);
 }
 

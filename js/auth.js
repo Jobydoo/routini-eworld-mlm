@@ -22,12 +22,17 @@ class AuthController {
     const demoSelect = document.getElementById('demoClientSelect');
     const clientRegisterPromo = document.getElementById('clientRegisterPromo');
 
+    // Assurer que les champs sont toujours vides au chargement
+    if (codeInput) codeInput.value = '';
+    if (passInput) passInput.value = '';
+
     if (demoSelect) {
       demoSelect.addEventListener('change', (e) => {
         const val = e.target.value;
         if (val) {
           codeInput.value = val;
-          passInput.value = (val === 'admin' || val === 'ADMIN001') ? 'admin123' : 'routini123';
+          passInput.value = '';
+          passInput.focus();
         }
       });
     }
@@ -63,8 +68,8 @@ class AuthController {
         codeInput.setAttribute('pattern', '[0-9]*');
         if (demoClientWrapper) demoClientWrapper.style.display = 'none';
         if (clientRegisterPromo) clientRegisterPromo.style.display = 'block';
-        codeInput.value = '818101';
-        passInput.value = 'client123';
+        codeInput.value = '';
+        passInput.value = '';
         authSubmitBtn.className = 'btn-primary-auth btn-client-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-shopping-bag"></i> Connexion Espace Client Privilège';
         if (window.i18n && window.i18n.currentLang !== 'fr') window.i18n.translateDOM();
@@ -82,10 +87,10 @@ class AuthController {
         codeInput.placeholder = 'Ex: 818204921 (chiffres uniquement)';
         codeInput.setAttribute('inputmode', 'numeric');
         codeInput.setAttribute('pattern', '[0-9]*');
-        if (demoClientWrapper) demoClientWrapper.style.display = 'block';
+        if (demoClientWrapper) demoClientWrapper.style.display = 'none';
         if (clientRegisterPromo) clientRegisterPromo.style.display = 'none';
-        codeInput.value = '818204921';
-        passInput.value = 'routini123';
+        codeInput.value = '';
+        passInput.value = '';
         authSubmitBtn.className = 'btn-primary-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Connexion Espace Distributeur';
         if (window.i18n && window.i18n.currentLang !== 'fr') window.i18n.translateDOM();
@@ -105,8 +110,8 @@ class AuthController {
         codeInput.removeAttribute('pattern');
         if (demoClientWrapper) demoClientWrapper.style.display = 'none';
         if (clientRegisterPromo) clientRegisterPromo.style.display = 'none';
-        codeInput.value = 'admin';
-        passInput.value = 'admin123';
+        codeInput.value = '';
+        passInput.value = '';
         authSubmitBtn.className = 'btn-primary-auth btn-owner-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-crown"></i> Connexion Direction Générale (Admin)';
         if (window.i18n && window.i18n.currentLang !== 'fr') window.i18n.translateDOM();
@@ -142,6 +147,13 @@ class AuthController {
 
         if (!code) {
           window.app.showToast('Veuillez renseigner votre identifiant.', 'warning');
+          codeInput.focus();
+          return;
+        }
+
+        if (!pass) {
+          window.app.showToast('Veuillez renseigner votre mot de passe.', 'warning');
+          passInput.focus();
           return;
         }
 
@@ -264,6 +276,12 @@ class AuthController {
   logout() {
     window.stateManager.currentUser = null;
     window.stateManager.saveState();
+    sessionStorage.removeItem('routini_active_user');
+
+    const codeInput = document.getElementById('authUsername');
+    const passInput = document.getElementById('authPassword');
+    if (codeInput) codeInput.value = '';
+    if (passInput) passInput.value = '';
 
     document.getElementById('appMainLayout').style.display = 'none';
     const quickBar = document.getElementById('quickRoleBar');

@@ -26,12 +26,22 @@ class App {
         quickBar.style.display = 'flex';
       }
       this.renderAllViews();
-      this.switchView('dashboard');
+      if (window.stateManager.isOwner()) {
+        this.switchView('admin');
+      } else {
+        this.switchView('dashboard');
+      }
     } else {
       document.getElementById('authSection').style.display = 'flex';
       document.getElementById('appMainLayout').style.display = 'none';
       const quickBar = document.getElementById('quickRoleBar');
       if (quickBar) quickBar.style.display = 'none';
+      document.body.classList.remove('has-quick-bar');
+      document.documentElement.style.setProperty('--quick-bar-height', '0px');
+      const u = document.getElementById('authUsername');
+      const p = document.getElementById('authPassword');
+      if (u) u.value = '';
+      if (p) p.value = '';
     }
   }
 
@@ -96,6 +106,14 @@ class App {
         if (lang && window.i18n) {
           window.i18n.setLanguage(lang);
         }
+      }
+    });
+
+    // Fermeture du menu déroulant des membres en cas de clic à l'extérieur
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('quickMembersDropdownWrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        this.closeMembersDropdown();
       }
     });
 
@@ -386,11 +404,11 @@ class App {
     const wrapper = document.getElementById('quickMembersDropdownWrapper');
     if (!panel || !wrapper) return;
 
-    const isVisible = panel.style.display === 'block';
+    const isVisible = panel.style.display === 'flex';
     if (isVisible) {
       this.closeMembersDropdown();
     } else {
-      panel.style.display = 'block';
+      panel.style.display = 'flex';
       wrapper.classList.add('open');
       this.renderQuickMembersDropdown(this._currentMemberQuery || '', this._currentMemberCategory || 'all');
       const searchInput = document.getElementById('inputSearchQuickMember');
@@ -438,8 +456,8 @@ class App {
 
     if (list.length === 0) {
       container.innerHTML = `
-        <div style="padding: 24px; text-align: center; color: rgba(255,255,255,0.5); font-size: 0.8rem;">
-          <i class="fas fa-search" style="font-size: 1.2rem; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+        <div style="padding: 24px; text-align: center; color: #64748b; font-size: 0.85rem;">
+          <i class="fas fa-search" style="font-size: 1.4rem; color: var(--rtn-rose); margin-bottom: 8px; display: block;"></i>
           Aucun membre trouvé pour "${query}"
         </div>
       `;
@@ -447,32 +465,32 @@ class App {
     }
 
     const rankColors = {
-      AMBASSADOR: { bg: 'rgba(236, 72, 153, 0.25)', color: '#f472b6', label: '💎 Ambassador 7%' },
-      DIAMOND: { bg: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa', label: '🔷 Diamond 5%' },
-      MANAGER: { bg: 'rgba(245, 158, 11, 0.25)', color: '#fbbf24', label: '⭐ Manager 3%' },
-      LEADER: { bg: 'rgba(16, 185, 129, 0.25)', color: '#34d399', label: '🎖️ Leader 2%' },
-      BUILDER: { bg: 'rgba(14, 165, 233, 0.25)', color: '#38bdf8', label: '📦 Builder 1%' },
-      PARTNER: { bg: 'rgba(148, 163, 184, 0.25)', color: '#cbd5e1', label: '👤 Partner Actif' },
-      CLIENT: { bg: 'rgba(190, 24, 93, 0.25)', color: '#f472b6', label: '🛍️ Client Direct' }
+      AMBASSADOR: { bg: '#fdf2f8', color: '#be185d', border: '#fbcfe8', label: '💎 Ambassador 7%' },
+      DIAMOND: { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe', label: '🔷 Diamond 5%' },
+      MANAGER: { bg: '#fffbeb', color: '#b45309', border: '#fde68a', label: '⭐ Manager 3%' },
+      LEADER: { bg: '#f0fdf4', color: '#15803d', border: '#bbf7d0', label: '🎖️ Leader 2%' },
+      BUILDER: { bg: '#f0f9ff', color: '#0369a1', border: '#bae6fd', label: '📦 Builder 1%' },
+      PARTNER: { bg: '#f8fafc', color: '#475569', border: '#e2e8f0', label: '👤 Partner Actif' },
+      CLIENT: { bg: '#fff1f2', color: '#be123c', border: '#fecdd3', label: '🛍️ Client Direct' }
     };
 
     container.innerHTML = list.map(m => {
       const isCurrent = currentUser && (currentUser.code === m.code || currentUser.id === m.id);
       const initial = (m.name || 'M').charAt(0).toUpperCase();
       const rCode = m.role === 'client' ? 'CLIENT' : (m.rankCode || 'PARTNER');
-      const rMeta = rankColors[rCode] || { bg: 'rgba(255,255,255,0.1)', color: '#fff', label: m.rankName || rCode };
+      const rMeta = rankColors[rCode] || { bg: '#f8fafc', color: '#334155', border: '#cbd5e1', label: m.rankName || rCode };
       const pvDisplay = m.role === 'client' ? `${m.fidelityPoints || 0} Pts Fidélité` : `${m.ppv || 0} PPV • ${m.city || 'Maroc'}`;
 
       return `
         <div class="dropdown-member-item ${isCurrent ? 'active' : ''}" onclick="window.app.handleSelectQuickMember('${m.code}')">
           <div class="m-info-left">
-            <div class="m-avatar" style="${isCurrent ? 'background: #fff; color: var(--rtn-rose);' : ''}">${initial}</div>
+            <div class="m-avatar" style="${isCurrent ? 'background: #fff; color: var(--rtn-rose); border: 2px solid var(--rtn-rose);' : ''}">${initial}</div>
             <div class="m-text">
               <div class="m-name">${m.name}</div>
               <div class="m-meta">${m.code} • ${pvDisplay}</div>
             </div>
           </div>
-          <span class="m-rank-tag" style="background: ${rMeta.bg}; color: ${rMeta.color};">
+          <span class="m-rank-tag" style="background: ${rMeta.bg}; color: ${rMeta.color}; border: 1px solid ${rMeta.border || 'transparent'};">
             ${rMeta.label}
           </span>
         </div>

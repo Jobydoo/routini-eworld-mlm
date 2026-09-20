@@ -489,13 +489,9 @@ class StateManager {
           }
         });
 
-        // Respecter l'état de déconnexion si l'utilisateur s'est déconnecté (currentUserId === null)
-        if (parsed.currentUserId === null) {
-          this.currentUser = null;
-        } else {
-          const savedUserId = parsed.currentUserId || 'ADMIN001';
-          this.currentUser = this.getMemberByCode(savedUserId) || this.members[0];
-        }
+        // Règle stricte de sécurité : Tout le monde est déconnecté par défaut.
+        // Connexion obligatoire avec identifiant et mot de passe valides.
+        this.currentUser = null;
       } else {
         this.resetToDefaults();
       }
@@ -622,7 +618,7 @@ class StateManager {
     });
     this.transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
     this.currency = 'DH';
-    this.currentUser = this.members[0]; // Direction par défaut
+    this.currentUser = null; // Tout le monde déconnecté par défaut
     this.cart = [];
     this.orderChannel = 'attached_client';
     this.ensureTransactionsInitialized();
@@ -646,18 +642,25 @@ class StateManager {
   }
 
   login(codeOrEmail, password) {
-    if (!codeOrEmail) {
-      return { success: false, message: 'Veuillez renseigner votre identifiant ou code partenaire/client.' };
+    if (!codeOrEmail || !String(codeOrEmail).trim()) {
+      return { success: false, message: 'Veuillez saisir votre identifiant de connexion.' };
+    }
+
+    if (!password || !String(password).trim()) {
+      return { success: false, message: 'Veuillez saisir votre mot de passe pour vous connecter.' };
     }
 
     const input = String(codeOrEmail).trim().toLowerCase();
+    const pass = String(password).trim();
 
-    // 1. Détection compte Administrateur / Direction (Supporte 'admin', 'admin001' ou le code numérique '0000' / '000000')
-    if (input === 'admin' || input === 'admin001' || input === '0000' || input === '000000') {
+    // 1. Détection compte Administrateur / Direction (Supporte 'admin', 'admin001' ou le code numérique '0000' / '000000' ou email direction)
+    const isDirectorLogin = (input === 'admin' || input === 'admin001' || input === '0000' || input === '000000' || input === 'direction@routini.com' || input === 'fondateur@routini.com');
+    if (isDirectorLogin) {
       const admin = this.members.find(m => m.role === 'owner' || m.code === 'ADMIN001');
       if (admin) {
-        if (password && password !== admin.password && password !== 'admin123') {
-          return { success: false, message: 'Mot de passe administrateur incorrect.' };
+        const validAdminPass = admin.password || 'admin123';
+        if (pass !== validAdminPass && pass !== 'admin123') {
+          return { success: false, message: 'Mot de passe administrateur incorrect. Veuillez vérifier votre saisie.' };
         }
         this.currentUser = admin;
         this.saveState();
@@ -665,7 +668,7 @@ class StateManager {
       }
     }
 
-    // 2. Recherche par Code (Distributeur 818..., Client CLT-... ou chiffres seuls ex: 818101) ou par Email
+    // 2. Recherche par Code ou Email pour les comptes existants ou nouveaux inscrits
     const member = this.members.find(m => 
       String(m.code).toLowerCase() === input || 
       String(m.id).toLowerCase() === input || 
@@ -677,25 +680,40 @@ class StateManager {
     if (!member) {
       return { 
         success: false, 
-        message: 'Identifiant ou adresse email introuvable. Veuillez vérifier vos identifiants ou créer un compte client.' 
+        message: 'Identifiant introuvable. Actuellement, seule la Direction Générale peut se connecter, ou vous pouvez créer un nouveau compte via l\'espace inscription.' 
       };
     }
 
-    // 3. Vérification du mot de passe
-    let expectedPass = member.password;
-    if (!expectedPass) {
-      if (member.role === 'owner') expectedPass = 'admin123';
-      else if (member.role === 'client') expectedPass = 'client123';
-      else expectedPass = 'routini123';
+    // Si c'est le compte Administrateur / Direction trouvé par un autre moyen
+    if (member.role === 'owner' || member.code === 'ADMIN001') {
+      const validAdminPass = member.password || 'admin123';
+      if (pass !== validAdminPass && pass !== 'admin123') {
+        return { success: false, message: 'Mot de passe administrateur incorrect.' };
+      }
+      this.currentUser = member;
+      this.saveState();
+      return { success: true, user: member };
     }
 
-    if (password && password !== expectedPass && password !== 'routini123' && password !== 'admin123' && password !== 'client123') {
-      return { success: false, message: 'Mot de passe incorrect.' };
+    // 3. Règle stricte demandée :
+    // "pour lisntant fais moi saeulement le login du directeur et deconnecte tout le monde, personne ne peut entrer sans directeur , ou bien sinscrire comme on a deja parlé"
+    // Vérification des comptes nouvellement enregistrés via l'application
+    const isRegisteredUser = !!(member.isRegistered || member.isNewUser);
+    if (isRegisteredUser) {
+      const expectedPass = member.password;
+      if (!expectedPass || pass !== expectedPass) {
+        return { success: false, message: 'Mot de passe incorrect pour ce compte.' };
+      }
+      this.currentUser = member;
+      this.saveState();
+      return { success: true, user: member };
     }
 
-    this.currentUser = member;
-    this.saveState();
-    return { success: true, user: member };
+    // Pour tous les autres comptes (distributeurs de démo existants dans le plan réseau) :
+    return {
+      success: false,
+      message: "Accès temporairement restreint : Pour le moment, seule la Direction Générale (Admin) est autorisée à se connecter. Vous pouvez également créer un nouveau compte via l'espace d'inscription."
+    };
   }
 
   setCurrentUser(memberCode) {
@@ -913,6 +931,7 @@ class StateManager {
       city: data.city || 'Casablanca',
       country: data.country || 'Maroc',
       joinDate: new Date().toLocaleDateString('fr-FR'),
+      isRegistered: true,
       ppv: kitPV,
       teamPV: 0,
       gpv: kitPV,
@@ -993,6 +1012,7 @@ class StateManager {
       walletDH: 0.00,
       clientsCount: 0,
       fidelityPoints: 50, // Cadeau d'accueil de bienvenue : +50 points fidélité offerts !
+      isRegistered: true,
       active: true
     };
 
