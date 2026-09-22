@@ -288,6 +288,38 @@ class ShopController {
     if (window.i18n && window.i18n.currentLang !== 'fr') {
       window.i18n.translateDOM();
     }
+
+    this.updateMobileFloatingCart(totals);
+  }
+
+  updateMobileFloatingCart(totals) {
+    const floatingCart = document.getElementById('mobileFloatingCart');
+    if (!floatingCart) return;
+
+    if (totals && totals.totalItems > 0) {
+      floatingCart.style.display = 'flex';
+      const countEl = document.getElementById('floatingCartCount');
+      const totalEl = document.getElementById('floatingCartTotal');
+      if (countEl) countEl.textContent = totals.totalItems;
+      if (totalEl) {
+        const isClient = window.stateManager.isClient();
+        const displayTotal = (this.currentOrderChannel === 'partner_personal' && !isClient)
+          ? totals.totalPM
+          : totals.totalPP;
+        totalEl.textContent = window.stateManager.formatMoney(displayTotal);
+      }
+    } else {
+      floatingCart.style.display = 'none';
+    }
+  }
+
+  scrollToCart() {
+    const cartBox = document.getElementById('shopCartContainer');
+    if (cartBox) {
+      cartBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      cartBox.classList.add('cart-highlight-pulse');
+      setTimeout(() => cartBox.classList.remove('cart-highlight-pulse'), 1800);
+    }
   }
 
   handleAddToCart(productId) {

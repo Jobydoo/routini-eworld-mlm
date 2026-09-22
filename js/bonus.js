@@ -135,7 +135,7 @@ class BonusController {
           </div>
 
           <!-- Les 4 sources de gains Routine ONE PLAN V4 (Slide 2, 5, 6, 8, 9) -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px;">
+          <div class="bonus-tier-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px;">
             <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border-left: 3px solid #0284c7;">
               <small style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight:700;">1. Vente Perso (10% DH)</small>
               <div style="font-size: 1.15rem; font-weight: 800; color: #0369a1; margin-top: 4px;">
