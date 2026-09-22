@@ -26,7 +26,7 @@ Accédez ensuite à l'application dans votre navigateur : **[http://localhost:80
 
 ### 👑 Espace Direction Générale / Fondateur
 - **Identifiant :** `admin` (ou `ADMIN001`)
-- **Mot de passe :** `admin123`
+- **Mot de passe :** `[Privé & Confidentiel — Réservé exclusivement au Fondateur]`
 - **Rôle :** Direction Fondatrice / Administrateur Système
 - **Fonctionnalités exclusives :**
   - Contrôle du catalogue avec formules automatiques V4 : Prix Membre ($90\%$), Points PV ($PP \div 10$), Base CV ($60\%$ du Prix Membre).

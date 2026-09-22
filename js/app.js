@@ -195,6 +195,9 @@ class App {
       window.genealogyController.render();
     } else if (viewName === 'shop') {
       window.shopController.render();
+      if (window.shopController.updateMobileFloatingCart) {
+        window.shopController.updateMobileFloatingCart(window.stateManager.getCartTotals());
+      }
     } else if (viewName === 'bonus') {
       window.bonusController.render();
     } else if (viewName === 'admin') {
@@ -203,6 +206,11 @@ class App {
       this.setupSponsorForm();
     } else if (viewName === 'dashboard') {
       this.renderDashboard();
+    }
+
+    if (viewName !== 'shop') {
+      const fc = document.getElementById('mobileFloatingCart');
+      if (fc) fc.style.display = 'none';
     }
 
     if (window.i18n) {
@@ -527,8 +535,13 @@ class App {
 
     // Synchronisation dynamique de la hauteur pour garantir que le logo et l'en-tête ne soient JAMAIS tronqués ni cachés
     const syncHeight = () => {
-      const h = quickBar.offsetHeight || 48;
-      document.documentElement.style.setProperty('--quick-bar-height', `${h}px`);
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        document.documentElement.style.setProperty('--quick-bar-height', '0px');
+      } else {
+        const h = quickBar.offsetHeight || 48;
+        document.documentElement.style.setProperty('--quick-bar-height', `${h}px`);
+      }
       document.body.classList.add('has-quick-bar');
     };
     syncHeight();
@@ -602,7 +615,24 @@ class App {
     });
   }
 
+  promptDirectorLogin() {
+    if (window.stateManager.isOwner()) {
+      this.switchView('admin');
+    } else {
+      window.authController.logout();
+      const tabOwner = document.getElementById('tabOwner');
+      if (tabOwner) tabOwner.click();
+      const passInput = document.getElementById('authPassword');
+      if (passInput) passInput.focus();
+      this.showToast('Veuillez saisir le mot de passe confidentiel de la Direction.', 'info');
+    }
+  }
+
   switchAccount(code) {
+    if (code === 'ADMIN001' || code === 'admin') {
+      this.promptDirectorLogin();
+      return;
+    }
     const success = window.stateManager.setCurrentUser(code);
     if (success) {
       const user = window.stateManager.currentUser;

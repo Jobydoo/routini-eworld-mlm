@@ -177,10 +177,14 @@ class AuthController {
   }
 
   quickLogin(code) {
-    let res = window.stateManager.login(code, 'admin123');
-    if (!res.success) {
-      res = window.stateManager.login(code, 'routini123');
+    if (code === 'ADMIN001' || code === 'admin') {
+      window.app.showToast('Accès Direction protégé : veuillez saisir votre mot de passe confidentiel.', 'warning');
+      this.logout();
+      const tabOwner = document.getElementById('tabOwner');
+      if (tabOwner) tabOwner.click();
+      return;
     }
+    let res = window.stateManager.login(code, 'routini123');
     if (!res.success) {
       res = window.stateManager.login(code, 'client123');
     }
@@ -276,7 +280,11 @@ class AuthController {
   logout() {
     window.stateManager.currentUser = null;
     window.stateManager.saveState();
-    sessionStorage.removeItem('routini_active_user');
+    try {
+      localStorage.removeItem('ROUTINI_ONE_PLAN_STATE_V4_2026');
+      sessionStorage.removeItem('routini_active_user');
+      sessionStorage.clear();
+    } catch (e) {}
 
     const codeInput = document.getElementById('authUsername');
     const passInput = document.getElementById('authPassword');

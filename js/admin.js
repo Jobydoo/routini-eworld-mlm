@@ -50,8 +50,8 @@ class AdminController {
             Cette section est exclusivement réservée au Fondateur et Administrateur Principal (Compte ADMIN001).
           </p>
           <div style="margin-top: 16px;">
-            <button class="btn-primary-auth btn-owner-auth" style="width: auto; padding: 8px 18px;" onclick="window.app.switchAccount('ADMIN001')">
-              <i class="fas fa-crown"></i> Se connecter en tant que Direction (ADMIN001)
+            <button class="btn-primary-auth btn-owner-auth" style="width: auto; padding: 8px 18px;" onclick="window.app.promptDirectorLogin()">
+              <i class="fas fa-crown"></i> S'authentifier en tant que Direction (Admin)
             </button>
           </div>
         </div>
@@ -168,15 +168,10 @@ class AdminController {
               PM = 90% PP • PV = PP ÷ 10 • CV = 60% PM • Chaque modification se répercute instantanément sur la boutique.
             </p>
           </div>
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <div class="search-box" style="min-width: 200px;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;" class="admin-products-actions-bar">
+            <div class="search-box" style="flex: 1; min-width: 200px;">
               <i class="fas fa-search"></i>
               <input type="text" placeholder="Filtrer un soin ou pack..." value="${this.searchProductQuery}" oninput="window.adminController.setProductSearch(this.value)">
-            </div>
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <div class="search-box" style="min-width: 180px;">
-              <i class="fas fa-search"></i>
-              <input type="text" placeholder="Filtrer un produit ou pack..." value="${this.searchProductQuery}" oninput="window.adminController.setProductSearch(this.value)">
             </div>
             <button class="btn-primary-auth" style="width: auto; padding: 8px 14px; font-size: 0.82rem;" onclick="window.adminController.showAddSoloProductModal()">
               <i class="fas fa-plus"></i> Créer Nouveau Produit

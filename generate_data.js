@@ -18,7 +18,7 @@ const MEMBERS_RAW = [
     id: 'ADMIN001', code: 'ADMIN001', name: 'Direction Générale Routini (Fondateur)',
     email: 'direction@routini-cosmetics.com', role: 'owner', rankCode: 'AMBASSADOR',
     rankName: 'Ambassador (7% Leadership)', sponsorCode: null, sponsorName: 'Siège Routini Cosmétiques',
-    password: 'admin123', phone: '+212 522 888999', city: 'Casablanca', country: 'Maroc',
+    password: 'Routini@2026#Direction', phone: '+212 522 888999', city: 'Casablanca', country: 'Maroc',
     joinDate: '01/01/2023', ppv: 1850, teamPV: 185000, gpv: 186850, sv: 128000,
     monthlySalesDH: 36000, walletDH: 245800.00, clientsCount: 22, fidelityPoints: 680, active: true
   },

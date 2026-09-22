@@ -30,7 +30,9 @@
  * - Formule : Taux membre - Taux plus haut qualifié de la branche = Différentiel payé.
  */
 
-const STORAGE_KEY = 'ROUTINI_ONE_PLAN_STATE_V4_2026';
+const STORAGE_KEY = 'ROUTINI_ONE_PLAN_STATE_V4_SECURE_2026';
+const AUTH_SECURITY_EPOCH = '2026-09-22-SECURE-REV-2';
+const ADMIN_SECURE_PASSWORD = 'Routini@2026#Direction';
 
 // Barème officiel des 6 grades Routine ONE PLAN - Version 4
 const ROUTINE_GRADES = [
@@ -470,6 +472,12 @@ class StateManager {
 
   loadState() {
     try {
+      // Nettoyage immédiat des anciennes sessions et stockages résiduels (déconnexion de tous les appareils)
+      try {
+        localStorage.removeItem('ROUTINI_ONE_PLAN_STATE_V4_2026');
+        sessionStorage.clear();
+      } catch (err) {}
+
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -489,8 +497,14 @@ class StateManager {
           }
         });
 
-        // Règle stricte de sécurité : Tout le monde est déconnecté par défaut.
-        // Connexion obligatoire avec identifiant et mot de passe valides.
+        // Mise à jour impérative du mot de passe Direction privée
+        const adminMember = this.members.find(m => m.role === 'owner' || m.code === 'ADMIN001');
+        if (adminMember) {
+          adminMember.password = ADMIN_SECURE_PASSWORD;
+        }
+
+        // Règle absolue de sécurité : Tout le monde est déconnecté par défaut.
+        // Aucune session conservée sans authentification explicite.
         this.currentUser = null;
       } else {
         this.resetToDefaults();
@@ -610,6 +624,12 @@ class StateManager {
     if (!this.members.some(m => m.code === 'CLT-818101')) {
       this.members.push(JSON.parse(JSON.stringify(DEFAULT_DIRECT_CLIENT)));
     }
+    // Garantir le mot de passe Direction ultra-sécurisé
+    const adminMember = this.members.find(m => m.role === 'owner' || m.code === 'ADMIN001');
+    if (adminMember) {
+      adminMember.password = ADMIN_SECURE_PASSWORD;
+    }
+
     this.orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
     DEFAULT_CLIENT_ORDERS.forEach(ord => {
       if (!this.orders.some(o => o.id === ord.id)) {
@@ -658,10 +678,11 @@ class StateManager {
     if (isDirectorLogin) {
       const admin = this.members.find(m => m.role === 'owner' || m.code === 'ADMIN001');
       if (admin) {
-        const validAdminPass = admin.password || 'admin123';
-        if (pass !== validAdminPass && pass !== 'admin123') {
+        const validAdminPass = ADMIN_SECURE_PASSWORD;
+        if (pass !== validAdminPass) {
           return { success: false, message: 'Mot de passe administrateur incorrect. Veuillez vérifier votre saisie.' };
         }
+        admin.password = ADMIN_SECURE_PASSWORD;
         this.currentUser = admin;
         this.saveState();
         return { success: true, user: admin };
@@ -686,10 +707,11 @@ class StateManager {
 
     // Si c'est le compte Administrateur / Direction trouvé par un autre moyen
     if (member.role === 'owner' || member.code === 'ADMIN001') {
-      const validAdminPass = member.password || 'admin123';
-      if (pass !== validAdminPass && pass !== 'admin123') {
+      const validAdminPass = ADMIN_SECURE_PASSWORD;
+      if (pass !== validAdminPass) {
         return { success: false, message: 'Mot de passe administrateur incorrect.' };
       }
+      member.password = ADMIN_SECURE_PASSWORD;
       this.currentUser = member;
       this.saveState();
       return { success: true, user: member };
@@ -717,6 +739,11 @@ class StateManager {
   }
 
   setCurrentUser(memberCode) {
+    // Interdiction stricte de basculer arbitrairement sur le compte Direction sans mot de passe
+    if (memberCode === 'ADMIN001' || memberCode === 'admin') {
+      console.warn('Accès refusé : Le compte Direction nécessite une authentification par mot de passe.');
+      return false;
+    }
     const found = this.getMemberByCode(memberCode);
     if (found) {
       this.currentUser = found;
@@ -761,7 +788,16 @@ class StateManager {
   getActivityDetails(member) {
     if (!member) return { isActive: false, ppv: 0, requiredPV: 50, rankName: 'Partner', shortfall: 50, percentage: 0 };
     if (member.role === 'owner') {
-      return { isActive: true, ppv: member.ppv || 1850, requiredPV: 1600, rankName: 'Direction (Ambassador)', shortfall: 0, percentage: 100 };
+      return { 
+        isActive: true, 
+        ppv: member.ppv || 1850, 
+        requiredPV: 1600, 
+        rankName: 'Direction (Ambassador)', 
+        shortfall: 0, 
+        percentage: 100,
+        equivDH_PP: 1600 * 10,
+        equivDH_PM: Math.round(1600 * 10 * 0.90)
+      };
     }
     const grade = this.getGrade(member.rankCode || 'PARTNER');
     const requiredPV = grade.minPersonalPV || 50;

@@ -40,7 +40,7 @@ L'architecture de base de données de Routini eWorld est optimisée pour **Neon 
 ### Étape 3 : Initialiser les Tables et les Données (1-Clic)
 Deux options simples :
 - **Option A (Depuis l'application) :**
-  Connectez-vous avec le compte Direction Fondatrice (`admin` / `admin123`), ouvrez l'onglet **Administration**, et cliquez sur le bouton **Sync Base Vercel**.
+  Connectez-vous avec le compte Direction Fondatrice (`admin` avec votre mot de passe confidentiel), ouvrez l'onglet **Administration**, et cliquez sur le bouton **Sync Base Vercel**.
 - **Option B (Depuis l'URL directe) :**
   Ouvrez simplement l'adresse de votre application déployée :  
   `https://votre-projet.vercel.app/api/init-db`  
