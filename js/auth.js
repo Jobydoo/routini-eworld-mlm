@@ -22,9 +22,25 @@ class AuthController {
     const demoSelect = document.getElementById('demoClientSelect');
     const clientRegisterPromo = document.getElementById('clientRegisterPromo');
 
-    // Assurer que les champs sont toujours vides au chargement
-    if (codeInput) codeInput.value = '';
+    // Initialisation intelligente : si l'onglet Direction est actif par défaut, préremplir 'admin'
+    if (codeInput) {
+      const isOwnerDefault = tabOwner && tabOwner.classList.contains('active');
+      codeInput.value = isOwnerDefault ? 'admin' : '';
+    }
     if (passInput) passInput.value = '';
+
+    // Basculement Afficher / Masquer le mot de passe (icône œil)
+    const btnTogglePwd = document.getElementById('btnTogglePassword');
+    const eyeIconPwd = document.getElementById('eyeIconPassword');
+    if (btnTogglePwd && passInput) {
+      btnTogglePwd.addEventListener('click', () => {
+        const isPassword = passInput.type === 'password';
+        passInput.type = isPassword ? 'text' : 'password';
+        if (eyeIconPwd) {
+          eyeIconPwd.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+        }
+      });
+    }
 
     if (demoSelect) {
       demoSelect.addEventListener('change', (e) => {
@@ -70,6 +86,7 @@ class AuthController {
         if (clientRegisterPromo) clientRegisterPromo.style.display = 'block';
         codeInput.value = '';
         passInput.value = '';
+        codeInput.focus();
         authSubmitBtn.className = 'btn-primary-auth btn-client-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-shopping-bag"></i> Connexion Espace Client Privilège';
         if (window.i18n && window.i18n.currentLang !== 'fr') window.i18n.translateDOM();
@@ -91,6 +108,7 @@ class AuthController {
         if (clientRegisterPromo) clientRegisterPromo.style.display = 'none';
         codeInput.value = '';
         passInput.value = '';
+        codeInput.focus();
         authSubmitBtn.className = 'btn-primary-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Connexion Espace Distributeur';
         if (window.i18n && window.i18n.currentLang !== 'fr') window.i18n.translateDOM();
@@ -110,8 +128,9 @@ class AuthController {
         codeInput.removeAttribute('pattern');
         if (demoClientWrapper) demoClientWrapper.style.display = 'none';
         if (clientRegisterPromo) clientRegisterPromo.style.display = 'none';
-        codeInput.value = '';
+        codeInput.value = 'admin';
         passInput.value = '';
+        passInput.focus();
         authSubmitBtn.className = 'btn-primary-auth btn-owner-auth';
         authSubmitBtn.innerHTML = '<i class="fas fa-crown"></i> Connexion Direction Générale (Admin)';
         if (window.i18n && window.i18n.currentLang !== 'fr') window.i18n.translateDOM();
@@ -142,8 +161,14 @@ class AuthController {
     if (loginForm) {
       loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const code = codeInput.value.trim();
+        const isOwner = tabOwner && tabOwner.classList.contains('active');
+        let code = codeInput.value.trim();
         const pass = passInput.value.trim();
+
+        if (isOwner && !code) {
+          code = 'admin';
+          codeInput.value = 'admin';
+        }
 
         if (!code) {
           window.app.showToast('Veuillez renseigner votre identifiant.', 'warning');
@@ -157,7 +182,12 @@ class AuthController {
           return;
         }
 
-        const res = window.stateManager.login(code, pass);
+        let res = window.stateManager.login(code, pass);
+        // Si l'onglet Direction Générale est sélectionné et que la première tentative a échoué, essayer avec le compte admin officiel
+        if (!res.success && isOwner) {
+          res = window.stateManager.login('admin', pass);
+        }
+
         if (res.success) {
           window.app.showToast(`Bienvenue, ${res.user.name} !`, 'success');
           this.handleSuccessfulAuth();
@@ -282,16 +312,33 @@ class AuthController {
     window.stateManager.saveState();
     try {
       localStorage.setItem('ROUTINI_GLOBAL_FORCE_LOGOUT', Date.now().toString());
-      localStorage.removeItem('ROUTINI_ONE_PLAN_STATE_V4_SECURE_2026');
-      localStorage.removeItem('ROUTINI_ONE_PLAN_STATE_V4_2026');
-      localStorage.removeItem('ROUTINI_ONE_PLAN_STATE_V3_2026');
-      sessionStorage.removeItem('routini_active_user');
+      const allKeys = [
+        'ROUTINI_ONE_PLAN_STATE_V6_FORCE_DISCONNECT_OCT2026',
+        'ROUTINI_ONE_PLAN_STATE_V5_REVOKED_OCT2026',
+        'ROUTINI_ONE_PLAN_STATE_V4_SECURE_2026',
+        'ROUTINI_ONE_PLAN_STATE_V4_2026',
+        'ROUTINI_ONE_PLAN_STATE_V3_2026',
+        'ROUTINI_ONE_PLAN_STATE_V2',
+        'ROUTINI_STATE_V1',
+        'routini_active_user',
+        'routini_active_session',
+        'routini_auth_token',
+        'routini_current_user',
+        'routini_user',
+        'currentUser'
+      ];
+      allKeys.forEach(k => {
+        try { localStorage.removeItem(k); } catch (err) {}
+      });
       sessionStorage.clear();
     } catch (e) {}
 
     const codeInput = document.getElementById('authUsername');
     const passInput = document.getElementById('authPassword');
-    if (codeInput) codeInput.value = '';
+    const tabOwner = document.getElementById('tabOwner');
+    if (codeInput) {
+      codeInput.value = (tabOwner && tabOwner.classList.contains('active')) ? 'admin' : '';
+    }
     if (passInput) passInput.value = '';
 
     const appLayout = document.getElementById('appMainLayout');

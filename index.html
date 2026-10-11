@@ -14,26 +14,38 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Feuille de style principale -->
-  <link rel="stylesheet" href="css/style.css?v=10.0">
+  <link rel="stylesheet" href="css/style.css?v=12.1_FORCE_REVOKE_OCT2026">
 
   <!-- Révocation immédiate et absolue de session sur tous les appareils -->
   <script>
-    try {
-      [
-        'ROUTINI_ONE_PLAN_STATE_V4_SECURE_2026',
-        'ROUTINI_ONE_PLAN_STATE_V4_2026',
-        'ROUTINI_ONE_PLAN_STATE_V3_2026',
-        'ROUTINI_ONE_PLAN_STATE_V2',
-        'ROUTINI_STATE_V1',
-        'routini_active_user',
-        'routini_active_session',
-        'routini_auth_token'
-      ].forEach(function(k) {
-        localStorage.removeItem(k);
-      });
-      sessionStorage.clear();
-    } catch (e) {}
+    (function() {
+      try {
+        sessionStorage.clear();
+        var allKeys = [
+          'ROUTINI_ONE_PLAN_STATE_V6_FORCE_DISCONNECT_OCT2026',
+          'ROUTINI_ONE_PLAN_STATE_V5_REVOKED_OCT2026',
+          'ROUTINI_ONE_PLAN_STATE_V4_SECURE_2026',
+          'ROUTINI_ONE_PLAN_STATE_V4_2026',
+          'ROUTINI_ONE_PLAN_STATE_V3_2026',
+          'ROUTINI_ONE_PLAN_STATE_V2',
+          'ROUTINI_STATE_V1',
+          'routini_active_user',
+          'routini_active_session',
+          'routini_auth_token',
+          'routini_current_user',
+          'routini_user',
+          'currentUser'
+        ];
+        var epoch = localStorage.getItem('ROUTINI_SESSION_EPOCH_V6');
+        if (epoch !== '2026-10-11-ALL-DEVICES-KILLED-V6') {
+          allKeys.forEach(function(k) {
+            try { localStorage.removeItem(k); } catch (e) {}
+          });
+          localStorage.setItem('ROUTINI_SESSION_EPOCH_V6', '2026-10-11-ALL-DEVICES-KILLED-V6');
+          localStorage.setItem('ROUTINI_GLOBAL_FORCE_LOGOUT', Date.now().toString());
+        }
+      } catch (e) {}
+    })();
   </script>
 </head>
 <body>
@@ -199,10 +211,10 @@
 
         <form id="loginForm">
           <div class="form-group">
-            <label id="authRoleLabel">Identifiant Administrateur ou Distributeur :</label>
+            <label id="authRoleLabel">Identifiant Administrateur (Direction Routini) :</label>
             <div class="input-with-icon">
               <i class="fas fa-id-badge input-icon"></i>
-              <input type="text" id="authUsername" placeholder="Ex: admin ou ADMIN001" required autocomplete="username">
+              <input type="text" id="authUsername" value="admin" placeholder="Ex: admin ou ADMIN001" required autocomplete="username">
             </div>
           </div>
 
@@ -210,7 +222,10 @@
             <label>Mot de passe :</label>
             <div class="input-with-icon">
               <i class="fas fa-lock input-icon"></i>
-              <input type="password" id="authPassword" placeholder="••••••••" required autocomplete="current-password">
+              <input type="password" id="authPassword" placeholder="••••••••" required autocomplete="current-password" style="padding-right: 42px;">
+              <button type="button" id="btnTogglePassword" class="btn-toggle-pwd" title="Afficher/Masquer le mot de passe" tabindex="-1">
+                <i class="fas fa-eye" id="eyeIconPassword"></i>
+              </button>
             </div>
           </div>
 
@@ -1024,16 +1039,16 @@
   <!-- Conteneur des Toasts -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Scripts JS Applicatifs (Modulaires V4 & i18n) -->
-  <script src="js/i18n.js?v=10.0"></script>
-  <script src="js/mock_data.js?v=10.0"></script>
-  <script src="js/state.js?v=10.0"></script>
-  <script src="js/db_sync.js?v=10.0"></script>
-  <script src="js/auth.js?v=10.0"></script>
-  <script src="js/genealogy.js?v=10.0"></script>
-  <script src="js/shop.js?v=10.0"></script>
-  <script src="js/bonus.js?v=10.0"></script>
-  <script src="js/admin.js?v=10.0"></script>
-  <script src="js/app.js?v=10.0"></script>
+  <!-- Scripts JS Applicatifs (Modulaires V4 & i18n avec cache buster V12) -->
+  <script src="js/i18n.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
+  <script src="js/mock_data.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
+  <script src="js/state.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
+  <script src="js/db_sync.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
+  <script src="js/auth.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
+  <script src="js/genealogy.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
+  <script src="js/shop.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
+  <script src="js/bonus.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
+  <script src="js/admin.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
+  <script src="js/app.js?v=12.1_FORCE_REVOKE_OCT2026"></script>
 </body>
 </html>

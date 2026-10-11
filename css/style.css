@@ -625,6 +625,28 @@ html, body {
   box-shadow: 0 0 0 3px rgba(200, 109, 93, 0.15);
 }
 
+.input-with-icon .btn-toggle-pwd {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+  z-index: 2;
+}
+
+.input-with-icon .btn-toggle-pwd:hover {
+  color: var(--rtn-rose);
+}
+
 .admin-mode .input-with-icon input:focus {
   border-color: var(--rtn-navy);
   box-shadow: 0 0 0 3px rgba(11, 25, 44, 0.15);
