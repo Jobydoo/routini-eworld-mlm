@@ -184,9 +184,9 @@ class AuthController {
       if (tabOwner) tabOwner.click();
       return;
     }
-    let res = window.stateManager.login(code, 'routini123');
+    let res = window.stateManager.login(code, 'Routini#Pro2026!Pass');
     if (!res.success) {
-      res = window.stateManager.login(code, 'client123');
+      res = window.stateManager.login(code, 'Routini#Client2026!Pass');
     }
     if (res.success) {
       this.handleSuccessfulAuth();
@@ -277,11 +277,14 @@ class AuthController {
     }
   }
 
-  logout() {
+  logout(silent = false) {
     window.stateManager.currentUser = null;
     window.stateManager.saveState();
     try {
+      localStorage.setItem('ROUTINI_GLOBAL_FORCE_LOGOUT', Date.now().toString());
+      localStorage.removeItem('ROUTINI_ONE_PLAN_STATE_V4_SECURE_2026');
       localStorage.removeItem('ROUTINI_ONE_PLAN_STATE_V4_2026');
+      localStorage.removeItem('ROUTINI_ONE_PLAN_STATE_V3_2026');
       sessionStorage.removeItem('routini_active_user');
       sessionStorage.clear();
     } catch (e) {}
@@ -291,18 +294,22 @@ class AuthController {
     if (codeInput) codeInput.value = '';
     if (passInput) passInput.value = '';
 
-    document.getElementById('appMainLayout').style.display = 'none';
+    const appLayout = document.getElementById('appMainLayout');
+    if (appLayout) appLayout.style.display = 'none';
     const quickBar = document.getElementById('quickRoleBar');
     if (quickBar) quickBar.style.display = 'none';
     document.body.classList.remove('has-quick-bar');
     document.documentElement.style.setProperty('--quick-bar-height', '0px');
-    document.getElementById('authSection').style.display = 'flex';
+    const authSection = document.getElementById('authSection');
+    if (authSection) authSection.style.display = 'flex';
 
     if (window.i18n) {
       window.i18n.translateDOM();
     }
 
-    window.app.showToast('Vous avez été déconnecté avec succès.', 'warning');
+    if (!silent && window.app) {
+      window.app.showToast('Vous avez été déconnecté avec succès de tous les appareils.', 'warning');
+    }
   }
 }
 

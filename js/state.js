@@ -30,9 +30,11 @@
  * - Formule : Taux membre - Taux plus haut qualifié de la branche = Différentiel payé.
  */
 
-const STORAGE_KEY = 'ROUTINI_ONE_PLAN_STATE_V4_SECURE_2026';
-const AUTH_SECURITY_EPOCH = '2026-09-22-SECURE-REV-2';
-const ADMIN_SECURE_PASSWORD = 'Routini@2026#Direction';
+const STORAGE_KEY = 'ROUTINI_ONE_PLAN_STATE_V5_REVOKED_OCT2026';
+const AUTH_SECURITY_EPOCH = '2026-10-11-GLOBAL-REVOKE-ALL-SESSIONS-V5';
+const ADMIN_SECURE_PASSWORD = 'Routini#2026$DirectionSecurisee!';
+const DISTRIBUTOR_SECURE_PASSWORD = 'Routini#Pro2026!Pass';
+const CLIENT_SECURE_PASSWORD = 'Routini#Client2026!Pass';
 
 // Barème officiel des 6 grades Routine ONE PLAN - Version 4
 const ROUTINE_GRADES = [
@@ -388,7 +390,7 @@ const DEFAULT_DIRECT_CLIENT = {
   rankName: "Client Privilège",
   sponsorCode: null, // STRICTEMENT SANS ARBRE NI PARRAINAGE
   sponsorName: "Routini Boutique Directe",
-  password: "client123",
+  password: "Routini#Client2026!Pass",
   phone: "+212 662 987654",
   city: "Rabat",
   address: "14 Avenue Mohammed VI, Souissi",
@@ -472,9 +474,21 @@ class StateManager {
 
   loadState() {
     try {
-      // Nettoyage immédiat des anciennes sessions et stockages résiduels (déconnexion de tous les appareils)
+      // Nettoyage immédiat et complet de toutes les anciennes sessions résiduelles (déconnexion globale de TOUS les appareils)
+      const legacyKeys = [
+        'ROUTINI_ONE_PLAN_STATE_V4_SECURE_2026',
+        'ROUTINI_ONE_PLAN_STATE_V4_2026',
+        'ROUTINI_ONE_PLAN_STATE_V3_2026',
+        'ROUTINI_ONE_PLAN_STATE_V2',
+        'ROUTINI_STATE_V1',
+        'routini_active_user',
+        'routini_active_session',
+        'routini_auth_token'
+      ];
+      legacyKeys.forEach(k => {
+        try { localStorage.removeItem(k); } catch (err) {}
+      });
       try {
-        localStorage.removeItem('ROUTINI_ONE_PLAN_STATE_V4_2026');
         sessionStorage.clear();
       } catch (err) {}
 
@@ -487,7 +501,7 @@ class StateManager {
         this.transactions = (parsed.transactions && parsed.transactions.length >= 5) ? parsed.transactions : INITIAL_TRANSACTIONS;
         this.currency = parsed.currency || 'DH';
         
-        // Garantir la présence du client direct démo Salma Bennani
+        // Garantir la présence du client direct démo Salma Bennani avec nouveau mot de passe
         if (!this.members.some(m => m.code === 'CLT-818101')) {
           this.members.push(JSON.parse(JSON.stringify(DEFAULT_DIRECT_CLIENT)));
         }
@@ -497,13 +511,18 @@ class StateManager {
           }
         });
 
-        // Mise à jour impérative du mot de passe Direction privée
-        const adminMember = this.members.find(m => m.role === 'owner' || m.code === 'ADMIN001');
-        if (adminMember) {
-          adminMember.password = ADMIN_SECURE_PASSWORD;
-        }
+        // Mise à jour impérative de TOUS les mots de passe de sécurité
+        this.members.forEach(m => {
+          if (m.role === 'owner' || m.code === 'ADMIN001') {
+            m.password = ADMIN_SECURE_PASSWORD;
+          } else if (m.role === 'client' || m.code === 'CLT-818101') {
+            m.password = CLIENT_SECURE_PASSWORD;
+          } else if (m.role === 'distributor') {
+            m.password = DISTRIBUTOR_SECURE_PASSWORD;
+          }
+        });
 
-        // Règle absolue de sécurité : Tout le monde est déconnecté par défaut.
+        // Règle absolue de sécurité : TOUT LE MONDE EST DÉCONNECTÉ PAR DÉFAUT SUR TOUS LES APPAREILS.
         // Aucune session conservée sans authentification explicite.
         this.currentUser = null;
       } else {
@@ -511,7 +530,7 @@ class StateManager {
       }
       this.ensureTransactionsInitialized();
     } catch (e) {
-      console.error('Erreur chargement état local Routini V4:', e);
+      console.error('Erreur chargement état local Routini V5:', e);
       this.resetToDefaults();
     }
   }
@@ -624,11 +643,16 @@ class StateManager {
     if (!this.members.some(m => m.code === 'CLT-818101')) {
       this.members.push(JSON.parse(JSON.stringify(DEFAULT_DIRECT_CLIENT)));
     }
-    // Garantir le mot de passe Direction ultra-sécurisé
-    const adminMember = this.members.find(m => m.role === 'owner' || m.code === 'ADMIN001');
-    if (adminMember) {
-      adminMember.password = ADMIN_SECURE_PASSWORD;
-    }
+    // Garantir les mots de passe ultra-sécurisés pour tous les rôles
+    this.members.forEach(m => {
+      if (m.role === 'owner' || m.code === 'ADMIN001') {
+        m.password = ADMIN_SECURE_PASSWORD;
+      } else if (m.role === 'client') {
+        m.password = CLIENT_SECURE_PASSWORD;
+      } else if (m.role === 'distributor') {
+        m.password = DISTRIBUTOR_SECURE_PASSWORD;
+      }
+    });
 
     this.orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
     DEFAULT_CLIENT_ORDERS.forEach(ord => {
@@ -701,7 +725,7 @@ class StateManager {
     if (!member) {
       return { 
         success: false, 
-        message: 'Identifiant introuvable. Actuellement, seule la Direction Générale peut se connecter, ou vous pouvez créer un nouveau compte via l\'espace inscription.' 
+        message: 'Identifiant introuvable. Veuillez vérifier votre identifiant ou votre mot de passe.' 
       };
     }
 
@@ -717,25 +741,25 @@ class StateManager {
       return { success: true, user: member };
     }
 
-    // 3. Règle stricte demandée :
-    // "pour lisntant fais moi saeulement le login du directeur et deconnecte tout le monde, personne ne peut entrer sans directeur , ou bien sinscrire comme on a deja parlé"
-    // Vérification des comptes nouvellement enregistrés via l'application
-    const isRegisteredUser = !!(member.isRegistered || member.isNewUser);
-    if (isRegisteredUser) {
-      const expectedPass = member.password;
-      if (!expectedPass || pass !== expectedPass) {
-        return { success: false, message: 'Mot de passe incorrect pour ce compte.' };
+    // Si c'est le compte Client Direct (Salma Bennani ou autre client)
+    if (member.role === 'client' || member.code === 'CLT-818101') {
+      const expectedClientPass = member.password || CLIENT_SECURE_PASSWORD;
+      if (pass !== expectedClientPass) {
+        return { success: false, message: 'Mot de passe client incorrect.' };
       }
       this.currentUser = member;
       this.saveState();
       return { success: true, user: member };
     }
 
-    // Pour tous les autres comptes (distributeurs de démo existants dans le plan réseau) :
-    return {
-      success: false,
-      message: "Accès temporairement restreint : Pour le moment, seule la Direction Générale (Admin) est autorisée à se connecter. Vous pouvez également créer un nouveau compte via l'espace d'inscription."
-    };
+    // Distributeurs / Partenaires Réseau (Membres enregistrés ou membres réseau avec mot de passe sécurisé)
+    const expectedDistributorPass = member.password || DISTRIBUTOR_SECURE_PASSWORD;
+    if (pass !== expectedDistributorPass) {
+      return { success: false, message: 'Mot de passe distributeur incorrect pour ce compte.' };
+    }
+    this.currentUser = member;
+    this.saveState();
+    return { success: true, user: member };
   }
 
   setCurrentUser(memberCode) {
@@ -962,7 +986,7 @@ class StateManager {
       rankName: 'Partner (N1 Accès)',
       sponsorCode: sponsor.code,
       sponsorName: sponsor.name,
-      password: data.password || 'routini123',
+      password: data.password || DISTRIBUTOR_SECURE_PASSWORD,
       phone: data.phone || '',
       city: data.city || 'Casablanca',
       country: data.country || 'Maroc',
@@ -1031,7 +1055,7 @@ class StateManager {
       rankName: 'Client Privilège',
       sponsorCode: null, // STRICTEMENT SANS ARBRE MLM
       sponsorName: 'Routini Boutique Directe',
-      password: data.password || 'client123',
+      password: data.password || CLIENT_SECURE_PASSWORD,
       phone: data.phone || '',
       city: data.city || 'Casablanca',
       address: data.address || '',
@@ -1481,3 +1505,18 @@ class StateManager {
 }
 
 window.stateManager = new StateManager();
+
+
+// Écouteur de synchronisation globale pour forcer la déconnexion instantanée sur tous les onglets/fenêtres
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'ROUTINI_GLOBAL_FORCE_LOGOUT' || e.key === 'ROUTINI_GLOBAL_SESSION_REVOCATION') {
+      if (window.stateManager) {
+        window.stateManager.currentUser = null;
+      }
+      if (window.authController) {
+        window.authController.logout(true);
+      }
+    }
+  });
+}

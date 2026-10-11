@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS members (
   rank_name VARCHAR(128) DEFAULT 'Partner',
   sponsor_code VARCHAR(64),
   sponsor_name VARCHAR(255),
-  password VARCHAR(128) DEFAULT 'routini123',
+  password VARCHAR(128) DEFAULT 'Routini#Pro2026!Pass',
   join_date VARCHAR(32) DEFAULT TO_CHAR(CURRENT_DATE, 'DD/MM/YYYY'),
   ppv NUMERIC(12, 2) DEFAULT 0,
   team_pv NUMERIC(12, 2) DEFAULT 0,

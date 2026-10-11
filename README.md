@@ -34,13 +34,14 @@ Accédez ensuite à l'application dans votre navigateur : **[http://localhost:80
   - Supervision des 51 partenaires et ajustement des barèmes PV/CV/Portefeuilles.
 
 ### 💎 Profils Distributeurs Disponibles
-- **Ambassador (7%) :** Karim Benali (`818204921` / `routini123`) — Casablanca
-- **Diamond (5%) :** Mehdi Alami (`818206330` / `routini123`) — Marrakech
-- **Manager (3%) :** Nadia Berrada (`818210552` / `routini123`) — Agadir
-- **Leader (2%) :** Siham Bouazza (`818217123` / `routini123`) — Oujda
-- **Builder (1%) :** Ibtissam Kadiri (`818229345` / `routini123`) — Kénitra
-- **Partner Actif :** Najat El Mokri (`818243789` / `routini123`)
-- **Partner Inactif (< 50 PV) :** Driss Bensaid (`818252678` / `routini123`) — *Démontre la règle de non-versement des commissions si l'activité personnelle n'est pas atteinte (Slide 8/15)*.
+- **Ambassador (7%) :** Karim Benali (`818204921` / `Routini#Pro2026!Pass`) — Casablanca
+- **Diamond (5%) :** Mehdi Alami (`818206330` / `Routini#Pro2026!Pass`) — Marrakech
+- **Manager (3%) :** Nadia Berrada (`818210552` / `Routini#Pro2026!Pass`) — Agadir
+- **Leader (2%) :** Siham Bouazza (`818217123` / `Routini#Pro2026!Pass`) — Oujda
+- **Builder (1%) :** Ibtissam Kadiri (`818229345` / `Routini#Pro2026!Pass`) — Kénitra
+- **Partner Actif :** Najat El Mokri (`818243789` / `Routini#Pro2026!Pass`)
+- **Partner Inactif (< 50 PV) :** Driss Bensaid (`818252678` / `Routini#Pro2026!Pass`) — *Démontre la règle de non-versement des commissions si l'activité personnelle n'est pas atteinte (Slide 8/15)*.
+- **Client Privilège (Sans Arbre MLM) :** Salma Bennani (`CLT-818101` / `Routini#Client2026!Pass`) — *Accès direct boutique avec +50 points fidélité offerts*.
 
 ---
 

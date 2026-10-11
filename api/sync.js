@@ -68,7 +68,7 @@ export default async function handler(req, res) {
           m.rankName || 'Partner',
           m.sponsorCode || null,
           m.sponsorName || '',
-          m.password || 'routini123',
+          m.password || 'Routini#Pro2026!Pass',
           m.joinDate || '01/01/2026',
           Number(m.ppv || 0),
           Number(m.teamPV || 0),

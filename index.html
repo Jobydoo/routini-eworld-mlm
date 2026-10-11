@@ -14,9 +14,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
   <!-- Feuille de style principale -->
   <link rel="stylesheet" href="css/style.css?v=10.0">
+
+  <!-- Révocation immédiate et absolue de session sur tous les appareils -->
+  <script>
+    try {
+      [
+        'ROUTINI_ONE_PLAN_STATE_V4_SECURE_2026',
+        'ROUTINI_ONE_PLAN_STATE_V4_2026',
+        'ROUTINI_ONE_PLAN_STATE_V3_2026',
+        'ROUTINI_ONE_PLAN_STATE_V2',
+        'ROUTINI_STATE_V1',
+        'routini_active_user',
+        'routini_active_session',
+        'routini_auth_token'
+      ].forEach(function(k) {
+        localStorage.removeItem(k);
+      });
+      sessionStorage.clear();
+    } catch (e) {}
+  </script>
 </head>
 <body>
 
